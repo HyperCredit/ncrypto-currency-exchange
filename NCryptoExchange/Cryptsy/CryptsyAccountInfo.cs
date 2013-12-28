@@ -26,7 +26,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         }
 
-        internal static AccountInfo<Wallet> ParseJson(string json)
+        internal static AccountInfo<Wallet> Parse(Newtonsoft.Json.Linq.JObject returnObj)
         {
             throw new NotImplementedException();
         }

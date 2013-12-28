@@ -20,11 +20,22 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
 
-            string request = "method=getinfo&nonce=1388246959";
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, CryptsyExchange.METHOD_GET_INFO),
+                new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
+            });
             string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
-            string actual = cryptsy.GenerateSignature(request);
+            Task task = cryptsy.SignRequest(request);
 
-            Assert.AreEqual(expected, actual);
+            task.Wait();
+
+            foreach (string actual in request.Headers.GetValues(CryptsyExchange.HEADER_SIGN))
+            {
+                Assert.AreEqual(expected, actual);
+                return;
+            }
+
+            Assert.Fail("No signature header found.");
         }
 
         [TestMethod]
@@ -33,18 +44,6 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
             Task<Fees> response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
-
-            response.Wait();
-
-            System.Console.Write(response.Result);
-        }
-
-        [TestMethod]
-        public void GetAccountInfoTest()
-        {
-            CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret");
-            Task<string> response = cryptsy.GetAccountInfoRaw();
 
             System.Console.Write(response.Result);
         }

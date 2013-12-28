@@ -10,7 +10,7 @@ namespace Lostics.NCryptoExchange
     {
         Task<AccountInfo<W>> GetAccountInfo();
 
-        /* Task<List<Market<M>>> GetMarkets();
+        Task<List<Market<M>>> GetMarkets();
 
         Task<List<Transaction>> GetMyTransactons();
 
@@ -26,15 +26,15 @@ namespace Lostics.NCryptoExchange
 
         Task<List<MarketDepth>> GetMarketDepth(M marketId);
 
-        void CancelOrder(O orderId);
+        Task CancelOrder(O orderId);
 
-        void CancelAllOrders();
+        Task CancelAllOrders();
 
-        void CancelMarketOrders(M marketId);
+        Task CancelMarketOrders(M marketId);
 
         Task<O> CreateOrder(M marketId,
                 OrderType orderType, Quantity quantity,
-                Quantity price); */
+                Quantity price);
 
         string GetNextNonce();
     }

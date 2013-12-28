@@ -19,11 +19,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
+        public const string METHOD_CANCEL_ORDER = "cancelorder";
+        public const string METHOD_CANCEL_ALL_ORDERS = "cancelallorders";
+        public const string METHOD_CANCEL_MARKET_ORDERS = "cancelmarketorder";
         public const string METHOD_CALCULATE_FEES = "calculatefees";
         public const string METHOD_GET_INFO = "getinfo";
 
+        public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
         public const string PARAM_NONCE = "nonce";
+        public const string PARAM_ORDER_ID = "orderid";
         public const string PARAM_ORDER_TYPE = "ordertype";
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
@@ -33,50 +38,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
         private readonly string publicKey;
         private readonly byte[] privateKey;
 
+        public byte[] PrivateKey { get { return this.privateKey; } }
+
         public CryptsyExchange(string publicKey, string privateKey)
         {
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
-        }
-
-        public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
-                Quantity price)
-        {
-            HttpClient client = new HttpClient();
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CALCULATE_FEES),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
-                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
-                new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
-            });
-
-            string requestContent = await request.ReadAsStringAsync();
-            string signature = GenerateSignature(requestContent);
-
-            request.Headers.Add(HEADER_SIGN, signature);
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-
-            string requestBody = await request.ReadAsStringAsync();
-
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            Fees fees;
-
-            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
-            {
-                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
-                {
-                    JObject jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
-
-                    AssertSuccess(jsonObj);
-
-                    JObject returnObj = (JObject)jsonObj["return"];
-                    fees = new Fees(Quantity.Parse(returnObj["fee"].ToString()),
-                        Quantity.Parse(returnObj["net"].ToString()));
-                }
-            }
-
-            return fees;
         }
 
         private void AssertSuccess(JObject jsonObj)
@@ -92,47 +59,114 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
         }
 
-        public async Task<FormUrlEncodedContent> GenerateAccountInfoRequest()
+        public async Task CancelOrder(CryptsyOrderId orderId)
         {
+            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_INFO),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ORDER),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
             });
+            string requestBody = await request.ReadAsStringAsync();
 
-            string requestContent = await request.ReadAsStringAsync();
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject jsonObj = await GetResponseAsJObject(response);
 
-            request.Headers.Add(HEADER_SIGN, GenerateSignature(requestContent));
-            request.Headers.Add(HEADER_KEY, this.publicKey);
+            AssertSuccess(jsonObj);
 
-            return request;
+            return;
         }
 
-        public string GenerateSignature(string request)
+        public async Task CancelAllOrders()
         {
-            HMAC digester = new HMACSHA512(this.PrivateKey);
-            StringBuilder hex = new StringBuilder();
-            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request);
+            HttpClient client = new HttpClient();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ALL_ORDERS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+            string requestBody = await request.ReadAsStringAsync();
 
-            return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject jsonObj = await GetResponseAsJObject(response);
+
+            AssertSuccess(jsonObj);
+
+            return;
+        }
+
+        public async Task CancelMarketOrders(CryptsyMarketId marketId)
+        {
+            HttpClient client = new HttpClient();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_MARKET_ORDERS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+            });
+            string requestBody = await request.ReadAsStringAsync();
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject jsonObj = await GetResponseAsJObject(response);
+
+            AssertSuccess(jsonObj);
+
+            return;
+        }
+
+        public Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
+                OrderType orderType, Quantity quantity,
+                Quantity price)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
+                Quantity price)
+        {
+            HttpClient client = new HttpClient();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CALCULATE_FEES),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
+                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
+                new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
+            });
+
+            await SignRequest(request);
+
+            string requestBody = await request.ReadAsStringAsync();
+
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject jsonObj = await GetResponseAsJObject(response);
+
+            AssertSuccess(jsonObj);
+
+            JObject returnObj = (JObject)jsonObj["return"];
+
+            return new Fees(Quantity.Parse(returnObj["fee"].ToString()),
+                Quantity.Parse(returnObj["net"].ToString()));
         }
 
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
-            return CryptsyAccountInfo.ParseJson(await GetAccountInfoRaw());
-        }
-
-        public async Task<string> GetAccountInfoRaw()
-        {
             HttpClient client = new HttpClient();
-            FormUrlEncodedContent request = await GenerateAccountInfoRequest();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_INFO),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
             string requestBody = await request.ReadAsStringAsync();
 
+            await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject jsonObj = await GetResponseAsJObject(response);
 
-            using (StreamReader reader = new StreamReader(await response.Content.ReadAsStreamAsync()))
-            {
-                return await reader.ReadToEndAsync();
-            }
+            AssertSuccess(jsonObj);
+
+            JObject returnObj = (JObject)jsonObj["return"];
+
+            return CryptsyAccountInfo.Parse(returnObj);
         }
 
         public string GetNextNonce()
@@ -140,16 +174,81 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return DateTime.Now.Ticks.ToString();
         }
 
-        /* public List<MarketOrder> GetMarketOrders(CryptsyMarketId marketId)
+        public async Task<List<MarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
         {
-
+            throw new NotImplementedException();
         }
 
-        public Address GenerateNewAddress(string currencyCode)
+        public async Task<Address> GenerateNewAddress(string currencyCode)
         {
+            throw new NotImplementedException();
+        }
 
-        } */
+        public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
+        {
+            throw new NotImplementedException();
+        }
 
-        public byte[] PrivateKey { get { return this.privateKey; } }
+        public async Task<List<Transaction>> GetMyTransactons()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MarketTrade>> GetMarketTrades(CryptsyMarketId marketId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MyTrade>> GetMyTrades(CryptsyMarketId marketId, int? limit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MyTrade>> GetAllMyTrades(int? limit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MyOrder>> GetMyOrders(CryptsyMarketId marketId, int? limit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MyOrder>> GetAllMyOrders(int? limit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<MarketDepth>> GetMarketDepth(CryptsyMarketId marketId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<JObject> GetResponseAsJObject(HttpResponseMessage response)
+        {
+            JObject jsonObj;
+
+            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+            {
+                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                {
+                    jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                }
+            }
+
+            return jsonObj;
+        }
+
+        public async Task<FormUrlEncodedContent> SignRequest(FormUrlEncodedContent request)
+        {
+            HMAC digester = new HMACSHA512(this.PrivateKey);
+            StringBuilder hex = new StringBuilder();
+            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(await request.ReadAsStringAsync());
+
+            request.Headers.Add(HEADER_SIGN, BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower());
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+
+            return request;
+        }
     }
 }
