@@ -1,7 +1,8 @@
 namespace Lostics.NCryptoExchange.Model
 {
-    public interface OrderType
+    public enum OrderType
     {
-
+        Buy,
+        Sell
     }
 }

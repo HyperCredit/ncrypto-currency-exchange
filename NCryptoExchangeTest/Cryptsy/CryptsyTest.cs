@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Lostics.NCryptoExchange.Cryptsy;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchangeTest.Cryptsy
 {
@@ -24,11 +25,23 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         }
 
         [TestMethod]
-        public void GetRawAccountInfoTest()
+        public void CalculateFeesTest()
         {
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
-            Task<string> response = cryptsy.GetRawAccountInfo();
+            Task<string> response = cryptsy.CalculateFeesRaw(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
+
+            response.Wait();
+
+            System.Console.Write(response.Result);
+        }
+
+        [TestMethod]
+        public void GetAccountInfoTest()
+        {
+            CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret");
+            Task<string> response = cryptsy.GetAccountInfoRaw();
 
             response.Wait();
 

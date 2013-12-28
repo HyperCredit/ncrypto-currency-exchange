@@ -40,8 +40,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
                 Quantity price)
         {
+            return Fees.ParseJson(await CalculateFeesRaw(orderType, quantity, price));
+        }
+
+        public async Task<string> CalculateFeesRaw(OrderType orderType, Quantity quantity, Quantity price)
+        {
             HttpClient client = new HttpClient();
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new [] {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
                 new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
@@ -57,12 +62,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
             string requestBody = await request.ReadAsStringAsync();
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            string json;
 
             using (StreamReader reader = new StreamReader(await response.Content.ReadAsStreamAsync()))
             {
                 // Write the output.
-                return Fees.ParseJson(await reader.ReadToEndAsync());
+                json = await reader.ReadToEndAsync();
             }
+            return json;
         }
 
         public async Task<FormUrlEncodedContent> GenerateAccountInfoRequest()
@@ -91,12 +98,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
-            string json = await GetRawAccountInfo();
-
-            return CryptsyAccountInfo.ParseJson(json);
+            return CryptsyAccountInfo.ParseJson(await GetAccountInfoRaw());
         }
 
-        public async Task<string> GetRawAccountInfo()
+        public async Task<string> GetAccountInfoRaw()
         {
             HttpClient client = new HttpClient();
             FormUrlEncodedContent request = await GenerateAccountInfoRequest();
@@ -125,6 +130,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         } */
 
-        protected byte[] PrivateKey { get { return this.privateKey; } }
+        public byte[] PrivateKey { get { return this.privateKey; } }
     }
 }
