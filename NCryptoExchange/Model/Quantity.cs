@@ -40,6 +40,21 @@ namespace Lostics.NCryptoExchange.Model
             return (int)this.count;
         }
 
+        /// <summary>
+        /// Parse a quantity from a string representation
+        /// </summary>
+        /// <param name="valueAsStr"></param>
+        /// <returns></returns>
+        /// <exception cref="System.FormatException">valueAsStr does not represent a number in a valid format.</exception>
+        public static Quantity Parse(string valueAsStr)
+        {
+            double value = Double.Parse(valueAsStr);
+
+            // Should derive tick size from formatted string
+
+            return new Quantity(value);
+        }
+
         public override string ToString()
         {
             return this.Value.ToString();

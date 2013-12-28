@@ -18,6 +18,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
+        public const string METHOD_CALCULATE_FEES = "calculatefees";
         public const string METHOD_GET_INFO = "getinfo";
 
         public const string PARAM_METHOD = "method";
@@ -40,13 +41,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
                 Quantity price)
         {
-            return Fees.ParseJson(await CalculateFeesRaw(orderType, quantity, price));
-        }
-
-        public async Task<string> CalculateFeesRaw(OrderType orderType, Quantity quantity, Quantity price)
-        {
             HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CALCULATE_FEES),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
                 new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
@@ -62,14 +59,20 @@ namespace Lostics.NCryptoExchange.Cryptsy
             string requestBody = await request.ReadAsStringAsync();
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            string json;
 
-            using (StreamReader reader = new StreamReader(await response.Content.ReadAsStreamAsync()))
+            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
             {
-                // Write the output.
-                json = await reader.ReadToEndAsync();
+                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                {
+                    /* using (JsonReader reader = new JsonTextReader(jsonStreamReader))
+                    {
+                        
+                    } */
+                    Console.Out.Write(await jsonStreamReader.ReadToEndAsync());
+                }
             }
-            return json;
+
+            return null;
         }
 
         public async Task<FormUrlEncodedContent> GenerateAccountInfoRequest()
