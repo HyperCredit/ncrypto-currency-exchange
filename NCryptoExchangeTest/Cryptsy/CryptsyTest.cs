@@ -3,6 +3,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Lostics.NCryptoExchange.Cryptsy;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace Lostics.NCryptoExchangeTest.Cryptsy
 {
@@ -10,15 +11,30 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
     public class CryptsyTest
     {
         [TestMethod]
+        public void GenerateAccountInfoRequestTest()
+        {
+            CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5", "topsecret");
+            Task<FormUrlEncodedContent> request = cryptsy.GenerateAccountInfoRequest();
+
+            request.Wait();
+
+            Task<string> content = request.Result.ReadAsStringAsync();
+
+            content.Wait();
+
+            System.Console.Write(content.Result);
+            System.Console.Write(request.Result.Headers.ToString());
+        }
+
+        [TestMethod]
         public void GetRawAccountInfoTest()
         {
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5", "topsecret");
+            Task<string> response = cryptsy.GetRawAccountInfo();
 
-            Task<string> accountInfo = cryptsy.GetRawAccountInfo();
+            response.Wait();
 
-            accountInfo.Wait();
-
-            System.Console.Write(accountInfo.Result);
+            System.Console.Write(response.Result);
         }
     }
 }

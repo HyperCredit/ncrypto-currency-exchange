@@ -15,22 +15,26 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, Wallet>
     {
+        public const string HEADER_SIGN = "Sign";
+        public const string HEADER_KEY = "Key";
+
+        public const string METHOD_GET_INFO = "getinfo";
+
+        public const string PARAM_METHOD = "method";
         public const string PARAM_NONCE = "nonce";
         public const string PARAM_ORDER_TYPE = "ordertype";
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
-        public const string HEADER_SIGN = "Sign";
-        public const string HEADER_KEY = "Key";
 
         private readonly string publicUrl = "http://pubapi.cryptsy.com/api.php";
         private readonly string privateUrl = "https://www.cryptsy.com/api";
         private readonly string publicKey;
-        private readonly string privateKey;
+        private readonly byte[] privateKey;
 
         public CryptsyExchange(string publicKey, string privateKey)
         {
             this.publicKey = publicKey;
-            this.privateKey = privateKey;
+            this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
@@ -61,13 +65,28 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
         }
 
+        public async Task<FormUrlEncodedContent> GenerateAccountInfoRequest()
+        {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_INFO),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            string requestContent = await request.ReadAsStringAsync();
+
+            request.Headers.Add(HEADER_SIGN, GenerateSignature(requestContent));
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+
+            return request;
+        }
+
         private string GenerateSignature(string request)
         {
-            HMAC digester = new HMACSHA512(this.PrivateKeyBytes);
+            HMAC digester = new HMACSHA512(this.PrivateKey);
             StringBuilder hex = new StringBuilder();
             byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request);
 
-            return BitConverter.ToString(requestBytes).Replace("-", "");
+            return BitConverter.ToString(requestBytes).Replace("-", "").ToLower();
         }
 
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
@@ -80,16 +99,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public async Task<string> GetRawAccountInfo()
         {
             HttpClient client = new HttpClient();
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
-
-            string requestContent = await request.ReadAsStringAsync();
-            string signature = GenerateSignature(requestContent);
-
-            request.Headers.Add(HEADER_SIGN, signature);
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-
+            FormUrlEncodedContent request = await GenerateAccountInfoRequest();
             string requestBody = await request.ReadAsStringAsync();
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -115,7 +125,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         } */
 
-        protected string PrivateKey { get { return this.privateKey; } }
-        protected byte[] PrivateKeyBytes { get { return System.Text.Encoding.ASCII.GetBytes(this.privateKey); } }
+        protected byte[] PrivateKey { get { return this.privateKey; } }
     }
 }
