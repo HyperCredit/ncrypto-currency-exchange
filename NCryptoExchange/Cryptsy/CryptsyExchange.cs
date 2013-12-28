@@ -80,13 +80,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return request;
         }
 
-        private string GenerateSignature(string request)
+        public string GenerateSignature(string request)
         {
             HMAC digester = new HMACSHA512(this.PrivateKey);
             StringBuilder hex = new StringBuilder();
             byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request);
 
-            return BitConverter.ToString(requestBytes).Replace("-", "").ToLower();
+            return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
         }
 
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
