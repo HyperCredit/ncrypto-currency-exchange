@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Cryptsy\Cryptsy.cs" />
+    <Compile Include="Cryptsy\CryptsyExchange.cs" />
+    <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
     <Compile Include="Cryptsy\CryptsyMarket.cs" />
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />

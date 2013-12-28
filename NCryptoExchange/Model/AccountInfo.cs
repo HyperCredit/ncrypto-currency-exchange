@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Lostics.NCryptoExchange.Model {
+namespace Lostics.NCryptoExchange.Model
 {
-    public virtual class AccountInfo<W> where W: Wallet
+    public abstract class AccountInfo<W> where W: Wallet
     {
         private readonly List<W> wallets;
         private readonly DateTime systemTime;

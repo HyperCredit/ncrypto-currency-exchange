@@ -2,39 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Lostics.NCryptoExchange.Model;
+using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
     public interface IExchange<M, O, W> where M: MarketId where O: OrderId where W: Wallet
     {
-        public AccountInfo<W> getAccountInfo();
+        Task<AccountInfo<W>> GetAccountInfo();
 
-        public List<Market<M>> getMarkets();
+        /* Task<List<Market<M>>> GetMarkets();
 
-        public List<Transaction> getMyTransactons();
+        Task<List<Transaction>> GetMyTransactons();
 
-        public List<MarketTrade> getMarketTrades(M marketId);
+        Task<List<MarketTrade>> GetMarketTrades(M marketId);
 
-        public List<MyTrade> getMyTrades(M marketId, int? limit);
+        Task<List<MyTrade>> GetMyTrades(M marketId, int? limit);
 
-        public List<MyTrade> getAllMyTrades(int? limit);
+        Task<List<MyTrade>> GetAllMyTrades(int? limit);
 
-        public List<MyOrder> getMyOrders(M marketId, int? limit);
+        Task<List<MyOrder>> GetMyOrders(M marketId, int? limit);
 
-        public List<MyOrder> getAllMyOrders(int? limit);
+        Task<List<MyOrder>> GetAllMyOrders(int? limit);
 
-        public List<MarketDepth> getMarketDepth(M marketId);
+        Task<List<MarketDepth>> GetMarketDepth(M marketId);
 
-        public void cancelOrder(O orderId);
+        void CancelOrder(O orderId);
 
-        public void cancelAllOrders();
+        void CancelAllOrders();
 
-        public void cancelMarketOrders(M marketId);
+        void CancelMarketOrders(M marketId);
 
-        public O createOrder(M marketId,
+        Task<O> CreateOrder(M marketId,
                 OrderType orderType, Quantity quantity,
-                Quantity price);
+                Quantity price); */
 
-        public int GetNextNonce();
+        string GetNextNonce();
     }
 }

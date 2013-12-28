@@ -8,6 +8,6 @@ namespace Lostics.NCryptoExchange
 {
     public class Constants
     {
-        public static const double DEFAULT_TICK_SIZE = 0.00000001;
+        public const double DEFAULT_TICK_SIZE = 0.00000001;
     }
 }

@@ -26,11 +26,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             return new Fees(rawFees.fee, rawFees.net);
         }
-    }
 
-    protected class RawFees
-    {
-        public double fee;
-        public double net;
+        private class RawFees
+        {
+            public double fee;
+            public double net;
+        }
     }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public virtual class Market<I> where I: MarketId
+    public abstract class Market<I> where I: MarketId
     {
         private readonly I marketId;
         private string baseCurrencyCode;

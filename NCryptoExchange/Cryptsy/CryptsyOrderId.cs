@@ -32,5 +32,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             return other.value == this.value;
         }
+
+        public override int GetHashCode()
+        {
+            return this.value;
+        }
     }
 }
