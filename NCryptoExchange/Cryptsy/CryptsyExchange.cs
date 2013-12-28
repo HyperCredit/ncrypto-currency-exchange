@@ -14,7 +14,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, Wallet>
+    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, Wallet> , IDisposable
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -33,6 +33,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
 
+        private HttpClient client = new HttpClient();
         private readonly string publicUrl = "http://pubapi.cryptsy.com/api.php";
         private readonly string privateUrl = "https://www.cryptsy.com/api";
         private readonly string publicKey;
@@ -61,7 +62,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelOrder(CryptsyOrderId orderId)
         {
-            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ORDER),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
@@ -80,7 +80,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelAllOrders()
         {
-            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ALL_ORDERS),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
@@ -98,7 +97,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelMarketOrders(CryptsyMarketId marketId)
         {
-            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_MARKET_ORDERS),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
@@ -125,7 +123,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
                 Quantity price)
         {
-            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CALCULATE_FEES),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
@@ -149,9 +146,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 Quantity.Parse(returnObj["net"].ToString()));
         }
 
+        public void Dispose() {
+            this.client.Dispose();
+        }
+
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
-            HttpClient client = new HttpClient();
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_INFO),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())

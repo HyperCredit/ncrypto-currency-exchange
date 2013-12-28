@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Lostics.NCryptoExchange.Model;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchangeTest.Cryptsy
 {
@@ -17,17 +15,17 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         [TestMethod]
         public void SignRequestTest()
         {
-            CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret");
-
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, CryptsyExchange.METHOD_GET_INFO),
-                new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
-            });
             string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
-            Task task = cryptsy.SignRequest(request);
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, CryptsyExchange.METHOD_GET_INFO),
+                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
+                });
 
-            task.Wait();
+            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret"))
+            {
+                cryptsy.SignRequest(request).Wait();
+            }
 
             foreach (string actual in request.Headers.GetValues(CryptsyExchange.HEADER_SIGN))
             {
@@ -41,9 +39,14 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         [TestMethod]
         public void CalculateFeesTest()
         {
-            CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret");
-            Task<Fees> response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
+            Task<Fees> response;
+
+            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret"))
+            {
+                response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
+                response.Wait();
+            }
 
             System.Console.Write(response.Result);
         }
