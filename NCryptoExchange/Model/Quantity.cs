@@ -1,4 +1,5 @@
 using System;
+
 namespace Lostics.NCryptoExchange.Model
 {
     public class Quantity
@@ -14,6 +15,12 @@ namespace Lostics.NCryptoExchange.Model
         {
             this.count = setCount;
             this.tickSize = setTickSize;
+        }
+
+        public Quantity(double setValue)
+        {
+            this.count = (long)Math.Round(setValue / Constants.DEFAULT_TICK_SIZE);
+            this.tickSize = Constants.DEFAULT_TICK_SIZE;
         }
 
         public override bool Equals(object obj)

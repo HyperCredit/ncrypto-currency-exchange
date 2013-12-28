@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
 using Lostics.NCryptoExchange.Model;
-using System.IO;
+using System.Security.Cryptography;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
@@ -16,6 +19,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public static const string PARAM_ORDER_TYPE = "ordertype";
         public static const string PARAM_PRICE = "price";
         public static const string PARAM_QUANTITY = "quantity";
+        public static const string HEADER_SIGN = "Sign";
+        public static const string HEADER_KEY = "Key";
 
         private readonly string publicUrl;
         private readonly string privateUrl;
@@ -33,23 +38,30 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
             });
 
+            string requestContent = await request.ReadAsStringAsync();
+            string signature = GenerateSignature(requestContent);
+
+            request.Headers.Add(HEADER_SIGN, signature);
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+
             string requestBody = await request.ReadAsStringAsync();
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
 
-            // Get the response content.
-            HttpContent responseContent = response.Content;
-
-            // Get the stream of the content.
-            String content;
-
-            using (StreamReader reader = new StreamReader(await responseContent.ReadAsStreamAsync()))
+            using (StreamReader reader = new StreamReader(await response.Content.ReadAsStreamAsync()))
             {
                 // Write the output.
-                content = await reader.ReadToEndAsync();
+                return Fees.ParseJson(await reader.ReadToEndAsync());
             }
+        }
 
-            return new Fees();
+        private string GenerateSignature(string request)
+        {
+            HMAC digester = new HMACSHA512(this.PrivateKeyBytes);
+            StringBuilder hex = new StringBuilder();
+            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request);
+
+            return BitConverter.ToString(requestBytes).Replace("-", "");
         }
 
         public override string GetNextNonce()
@@ -66,5 +78,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
 
         } */
+
+        protected string PrivateKey { get { return this.privateKey; } }
+        protected byte[] PrivateKeyBytes { get { return System.Text.Encoding.ASCII.GetBytes(this.privateKey); } }
     }
 }
