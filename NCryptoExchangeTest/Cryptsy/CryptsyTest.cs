@@ -50,5 +50,20 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
 
             System.Console.Write(response.Result);
         }
+
+        [TestMethod]
+        public void GetAccountInfoTest()
+        {
+            Task<AccountInfo<Wallet>> response;
+
+            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret"))
+            {
+                response = cryptsy.GetAccountInfo();
+                response.Wait();
+            }
+
+            System.Console.Write(response.Result.SystemTime.ToString());
+        }
     }
 }

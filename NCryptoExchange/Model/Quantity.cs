@@ -55,6 +55,11 @@ namespace Lostics.NCryptoExchange.Model
             return new Quantity(value);
         }
 
+        public static Quantity Parse(Newtonsoft.Json.Linq.JProperty valueAsJson)
+        {
+            return Parse(valueAsJson.Value.ToString());
+        }
+
         public override string ToString()
         {
             return this.Value.ToString();

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
@@ -28,7 +29,20 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         internal static AccountInfo<Wallet> Parse(Newtonsoft.Json.Linq.JObject returnObj)
         {
-            throw new NotImplementedException();
+            JObject balancesAvailable = (JObject)returnObj["balances_available"];
+            JObject balancesHold = (JObject)returnObj["balances_hold"];
+            string serverDateTime = returnObj["serverdatetime"].ToString();
+            List<Wallet> wallets = new List<Wallet>();
+
+            foreach (JProperty balanceAvailable in balancesAvailable.Properties())
+            {
+                JProperty balanceHeld = balancesHold.Property(balanceAvailable.Name);
+
+                wallets.Add(new Wallet(balanceAvailable.Name,
+                    Quantity.Parse(balanceAvailable), Quantity.Parse(balanceHeld)));
+            }
+
+            return new CryptsyAccountInfo(wallets, DateTime.Parse(serverDateTime));
         }
     }
 }

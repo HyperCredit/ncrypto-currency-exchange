@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using Lostics.NCryptoExchange.Model;
-using System.Security.Cryptography;
-using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
@@ -113,13 +111,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return;
         }
 
-        public Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
-                OrderType orderType, Quantity quantity,
-                Quantity price)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
                 Quantity price)
         {
@@ -144,6 +135,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             return new Fees(Quantity.Parse(returnObj["fee"].ToString()),
                 Quantity.Parse(returnObj["net"].ToString()));
+        }
+
+        public Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
+                OrderType orderType, Quantity quantity,
+                Quantity price)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose() {

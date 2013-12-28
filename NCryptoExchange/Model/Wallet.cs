@@ -7,6 +7,7 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Wallet
     {
+        private readonly string currencyCode;
         private readonly Quantity balance;
         private readonly Quantity heldBalance;
 
@@ -20,10 +21,17 @@ namespace Lostics.NCryptoExchange.Model
             get { return this.heldBalance; }
         }
 
-        public Wallet(Quantity setBalance, Quantity setHeldBalance)
+        public Wallet(string currencyCode, Quantity setBalance, Quantity setHeldBalance)
         {
+            this.currencyCode = currencyCode;
             this.balance = setBalance;
             this.heldBalance = setHeldBalance;
+        }
+
+        public override string ToString()
+        {
+            return balance + " "
+                + currencyCode;
         }
     }
 }
