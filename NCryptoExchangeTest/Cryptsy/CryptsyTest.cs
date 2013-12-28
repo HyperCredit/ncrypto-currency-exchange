@@ -5,6 +5,9 @@ using Lostics.NCryptoExchange.Cryptsy;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Lostics.NCryptoExchange.Model;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchangeTest.Cryptsy
 {
@@ -29,7 +32,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
-            Task<string> response = cryptsy.CalculateFeesRaw(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
+            Task<Fees> response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
 
             response.Wait();
 
@@ -42,8 +45,6 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
             Task<string> response = cryptsy.GetAccountInfoRaw();
-
-            response.Wait();
 
             System.Console.Write(response.Result);
         }

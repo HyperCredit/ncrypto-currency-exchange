@@ -47,9 +47,12 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyExchange.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
+    <Compile Include="Cryptsy\CryptsyFailureException.cs" />
     <Compile Include="Cryptsy\CryptsyMarket.cs" />
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />
+    <Compile Include="Cryptsy\CryptsyResponseException.cs" />
+    <Compile Include="ExchangeException.cs" />
     <Compile Include="Model\AccountInfo.cs" />
     <Compile Include="Model\Address.cs" />
     <Compile Include="IExchange.cs" />

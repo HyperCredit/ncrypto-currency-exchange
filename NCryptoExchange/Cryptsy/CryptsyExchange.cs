@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 
 using Lostics.NCryptoExchange.Model;
 using System.Security.Cryptography;
+using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
@@ -59,20 +60,36 @@ namespace Lostics.NCryptoExchange.Cryptsy
             string requestBody = await request.ReadAsStringAsync();
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            Fees fees;
 
             using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
             {
                 using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                 {
-                    /* using (JsonReader reader = new JsonTextReader(jsonStreamReader))
-                    {
-                        
-                    } */
-                    Console.Out.Write(await jsonStreamReader.ReadToEndAsync());
+                    JObject jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+
+                    AssertSuccess(jsonObj);
+
+                    JObject returnObj = (JObject)jsonObj["return"];
+                    fees = new Fees(Quantity.Parse(returnObj["fee"].ToString()),
+                        Quantity.Parse(returnObj["net"].ToString()));
                 }
             }
 
-            return null;
+            return fees;
+        }
+
+        private void AssertSuccess(JObject jsonObj)
+        {
+            if (null == jsonObj["success"])
+            {
+                throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
+            }
+
+            if (!(jsonObj["success"].ToString().Equals("1")))
+            {
+                throw new CryptsyFailureException("False success value returned in response from Cryptsy.");
+            }
         }
 
         public async Task<FormUrlEncodedContent> GenerateAccountInfoRequest()
