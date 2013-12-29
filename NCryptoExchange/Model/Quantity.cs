@@ -2,7 +2,7 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public class Quantity
+    public class Quantity : IComparable<Quantity>
     {
         private readonly long count;
         private readonly double tickSize;
@@ -21,6 +21,26 @@ namespace Lostics.NCryptoExchange.Model
         {
             this.count = (long)Math.Round(setValue / Constants.DEFAULT_TICK_SIZE);
             this.tickSize = Constants.DEFAULT_TICK_SIZE;
+        }
+
+        public int CompareTo(Quantity other)
+        {
+            double otherValue = other.Value;
+            double diff = this.Value - other.Value;
+            double smallestTick = Math.Min(this.tickSize, other.tickSize);
+
+            if (diff > smallestTick)
+            {
+                return 1;
+            }
+            else if (diff < -smallestTick)
+            {
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public override bool Equals(object obj)

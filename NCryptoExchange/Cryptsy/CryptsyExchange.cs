@@ -23,6 +23,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string METHOD_CALCULATE_FEES = "calculatefees";
         public const string METHOD_CREATE_ORDER = "createorder";
         public const string METHOD_GET_INFO = "getinfo";
+        public const string METHOD_MARKET_ORDERS = "marketorders";
 
         public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
@@ -168,6 +169,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.client.Dispose();
         }
 
+        public async Task<Address> GenerateNewAddress(string currencyCode)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
@@ -189,12 +195,22 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
         {
-            throw new NotImplementedException();
-        }
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MARKET_ORDERS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+            });
 
-        public async Task<Address> GenerateNewAddress(string currencyCode)
-        {
-            throw new NotImplementedException();
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject returnObj = await GetReturnAsJObject(response);
+
+            List<MarketOrder> buyOrders = ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
+            List<MarketOrder> sellOrders = ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
+
+            buyOrders.AddRange(sellOrders);
+
+            return buyOrders;
         }
 
         public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
@@ -283,6 +299,40 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             JObject returnObj = (JObject)jsonObj["return"];
             return returnObj;
+        }
+
+        private List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
+        {
+            List<MarketOrder> orders = new List<MarketOrder>(jArray.Count);
+
+            try
+            {
+                foreach (JObject jsonOrder in jArray)
+                {
+                    Quantity quantity = Quantity.Parse(jsonOrder["quantity"].ToString());
+                    Quantity price;
+
+                    switch (orderType)
+                    {
+                        case OrderType.Buy:
+                            price = Quantity.Parse(jsonOrder["buyprice"].ToString());
+                            break;
+                        case OrderType.Sell:
+                            price = Quantity.Parse(jsonOrder["sellprice"].ToString());
+                            break;
+                        default:
+                            throw new ArgumentException("Unknown order type \"" + orderType.ToString() + "\".");
+                    }
+
+                    orders.Add(new MarketOrder(orderType, price, quantity));
+                }
+            }
+            catch (System.FormatException e)
+            {
+                throw new CryptsyResponseException("Encountered invalid quantity/price while parsing market orders.", e);
+            }
+
+            return orders;
         }
 
         public async Task<FormUrlEncodedContent> SignRequest(FormUrlEncodedContent request)

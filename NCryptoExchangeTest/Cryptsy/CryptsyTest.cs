@@ -65,5 +65,24 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
 
             System.Console.Write(response.Result.SystemTime.ToString());
         }
+
+        [TestMethod]
+        public void GetMarketOrdersTest()
+        {
+            CryptsyMarketId marketId = new CryptsyMarketId(132);
+            Task<List<MarketOrder>> response;
+
+            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret"))
+            {
+                response = cryptsy.GetMarketOrders(marketId);
+                response.Wait();
+            }
+
+            foreach (MarketOrder order in response.Result)
+            {
+                Console.WriteLine(order.ToString());
+            }
+        }
     }
 }
