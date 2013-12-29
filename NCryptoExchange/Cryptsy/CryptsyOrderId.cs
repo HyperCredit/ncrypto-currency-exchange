@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyOrderId : OrderId
+    public sealed class CryptsyOrderId : OrderId
     {
         private readonly string value;
 
