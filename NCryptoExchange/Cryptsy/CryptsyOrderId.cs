@@ -9,14 +9,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyOrderId : OrderId
     {
-        private readonly int value;
+        private readonly string value;
 
-        public int Value
+        public string Value
         {
             get { return this.value; }
         }
 
-        public CryptsyOrderId(int setValue)
+        public CryptsyOrderId(string setValue)
         {
             this.value = setValue;
         }
@@ -30,10 +30,15 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             CryptsyOrderId other = (CryptsyOrderId)obj;
 
-            return other.value == this.value;
+            return other.value.Equals(this.value);
         }
 
         public override int GetHashCode()
+        {
+            return this.value.GetHashCode();
+        }
+
+        public override string ToString()
         {
             return this.value;
         }

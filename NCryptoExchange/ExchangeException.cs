@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
-    public class ExchangeException : Exception
+    public abstract class ExchangeException : Exception
     {
         public ExchangeException(string message)
             : base(message)
+        {
+
+        }
+
+        public ExchangeException(string message, Exception cause)
+            : base(message, cause)
         {
 
         }
