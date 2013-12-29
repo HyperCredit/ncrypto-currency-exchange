@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace Lostics.NCryptoExchange.Model
@@ -75,9 +76,19 @@ namespace Lostics.NCryptoExchange.Model
             return new Quantity(value);
         }
 
-        public static Quantity Parse(Newtonsoft.Json.Linq.JProperty valueAsJson)
+        public static Quantity Parse(JToken valueAsJson)
         {
-            return Parse(valueAsJson.Value.ToString());
+            switch (valueAsJson.Type) {
+                case JTokenType.Property:
+                    JProperty property = (JProperty)valueAsJson;
+                    return Parse(property.Value);
+                case JTokenType.String:
+                    string value = valueAsJson.ToString();
+                    return Parse(value);
+                default:
+                    throw new ArgumentException("Expected property or string, found JSON token type \""
+                        + valueAsJson.Type + "\".");
+            }
         }
 
         public override string ToString()

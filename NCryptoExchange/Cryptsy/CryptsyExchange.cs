@@ -143,8 +143,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
-            return new Fees(Quantity.Parse(returnObj["fee"].ToString()),
-                Quantity.Parse(returnObj["net"].ToString()));
+            return new Fees(Quantity.Parse(returnObj["fee"]),
+                Quantity.Parse(returnObj["net"]));
         }
 
         public async Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
@@ -224,10 +224,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnObj = (JArray)await GetReturnAsJToken(response);
+            List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
 
-            Console.WriteLine(returnObj.ToString());
+            foreach (JToken marketToken in returnObj)
+            {
+                markets.Add(CryptsyMarket.Parse(marketToken));
+            }
 
-            return null;
+            return markets;
         }
 
         public async Task<List<Transaction>> GetMyTransactons()
@@ -320,16 +324,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
             {
                 foreach (JObject jsonOrder in jArray)
                 {
-                    Quantity quantity = Quantity.Parse(jsonOrder["quantity"].ToString());
+                    Quantity quantity = Quantity.Parse(jsonOrder["quantity"]);
                     Quantity price;
 
                     switch (orderType)
                     {
                         case OrderType.Buy:
-                            price = Quantity.Parse(jsonOrder["buyprice"].ToString());
+                            price = Quantity.Parse(jsonOrder["buyprice"]);
                             break;
                         case OrderType.Sell:
-                            price = Quantity.Parse(jsonOrder["sellprice"].ToString());
+                            price = Quantity.Parse(jsonOrder["sellprice"]);
                             break;
                         default:
                             throw new ArgumentException("Unknown order type \"" + orderType.ToString() + "\".");

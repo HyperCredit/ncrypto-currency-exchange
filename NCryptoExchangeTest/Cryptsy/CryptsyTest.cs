@@ -92,6 +92,12 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
                 response = cryptsy.GetMarkets();
                 response.Wait();
             }
+
+
+            foreach (Market<CryptsyMarketId> market in response.Result)
+            {
+                Console.WriteLine(market.ToString());
+            }
         }
 
         private static CryptsyExchange GetExchange()
