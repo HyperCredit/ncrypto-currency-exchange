@@ -25,6 +25,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string METHOD_GET_INFO = "getinfo";
         public const string METHOD_GET_MARKETS = "getmarkets";
         public const string METHOD_MARKET_ORDERS = "marketorders";
+        public const string METHOD_MY_TRANSACTIONS = "mytransactions";
 
         public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
@@ -223,10 +224,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnObj = (JArray)await GetReturnAsJToken(response);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
             List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
 
-            foreach (JToken marketToken in returnObj)
+            foreach (JToken marketToken in returnArray)
             {
                 markets.Add(CryptsyMarket.Parse(marketToken));
             }
@@ -234,9 +235,18 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return markets;
         }
 
-        public async Task<List<Transaction>> GetMyTransactons()
+        public async Task<List<Transaction>> GetMyTransactions()
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_TRANSACTIONS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseTransactions(returnArray);
         }
 
         public async Task<List<MarketTrade>> GetMarketTrades(CryptsyMarketId marketId)
@@ -348,6 +358,27 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
 
             return orders;
+        }
+
+        private List<Transaction> ParseTransactions(JArray jsonTransactions)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+
+            foreach (JToken token in jsonTransactions)
+            {
+                JObject jsonTransaction = (JObject)token;
+                // FIXME: Need to correct timezone on this
+                DateTime transactionPosted = DateTime.Parse(jsonTransaction["datetime"].ToString());
+                TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction["type"].ToString());
+
+                Transaction transaction = new Transaction(jsonTransaction["currency"].ToString(),
+                    transactionPosted, transactionType, 
+                    Address.Parse(jsonTransaction["address"]), Quantity.Parse(jsonTransaction["amount"]),
+                    Quantity.Parse(jsonTransaction["fee"]));
+                transactions.Add(transaction);
+            }
+
+            return transactions;
         }
 
         public async Task<FormUrlEncodedContent> SignRequest(FormUrlEncodedContent request)

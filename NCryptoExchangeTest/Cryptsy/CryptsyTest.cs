@@ -100,6 +100,24 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             }
         }
 
+        [TestMethod]
+        public void GetTransactionsTest()
+        {
+            Task<List<Transaction>> response;
+
+            using (CryptsyExchange cryptsy = GetExchange())
+            {
+                response = cryptsy.GetMyTransactions();
+                response.Wait();
+            }
+
+
+            foreach (Transaction transaction in response.Result)
+            {
+                Console.WriteLine(transaction.ToString());
+            }
+        }
+
         private static CryptsyExchange GetExchange()
         {
             return new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",

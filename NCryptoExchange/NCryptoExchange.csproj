@@ -70,6 +70,7 @@
     <Compile Include="Model\Quantity.cs" />
     <Compile Include="Model\Trade.cs" />
     <Compile Include="Model\Transaction.cs" />
+    <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace Lostics.NCryptoExchange
 
         Task<List<Market<M>>> GetMarkets();
 
-        Task<List<Transaction>> GetMyTransactons();
+        Task<List<Transaction>> GetMyTransactions();
 
         Task<List<MarketTrade>> GetMarketTrades(M marketId);
 

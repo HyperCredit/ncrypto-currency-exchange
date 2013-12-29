@@ -1,8 +1,6 @@
 namespace Lostics.NCryptoExchange.Model
 {
-
-
-    public interface MarketTrade : Trade
+    public abstract class MarketTrade : Trade
     {
 
     }
