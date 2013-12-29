@@ -23,6 +23,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string METHOD_CALCULATE_FEES = "calculatefees";
         public const string METHOD_CREATE_ORDER = "createorder";
         public const string METHOD_GET_INFO = "getinfo";
+        public const string METHOD_GET_MARKETS = "getmarkets";
         public const string METHOD_MARKET_ORDERS = "marketorders";
 
         public const string PARAM_MARKET_ID = "marketid";
@@ -140,7 +141,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = await GetReturnAsJObject(response);
+            JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
             return new Fees(Quantity.Parse(returnObj["fee"].ToString()),
                 Quantity.Parse(returnObj["net"].ToString()));
@@ -160,7 +161,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = await GetReturnAsJObject(response);
+            JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
             return new CryptsyOrderId(returnObj["orderid"].ToString());
         }
@@ -183,7 +184,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = await GetReturnAsJObject(response);
+            JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
             return CryptsyAccountInfo.Parse(returnObj);
         }
@@ -197,13 +198,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MARKET_ORDERS),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString()),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
             });
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = await GetReturnAsJObject(response);
+            JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
             List<MarketOrder> buyOrders = ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
             List<MarketOrder> sellOrders = ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
@@ -215,7 +216,18 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_MARKETS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnObj = (JArray)await GetReturnAsJToken(response);
+
+            Console.WriteLine(returnObj.ToString());
+
+            return null;
         }
 
         public async Task<List<Transaction>> GetMyTransactons()
@@ -291,14 +303,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns>The returned content from Cryptsy as a JObject</returns>
         /// <exception cref="IOException">Where there was a problem reading the response from Cryptsy.</exception>
         /// <exception cref="CryptsyResponseException">Where there was a problem parsing the response from Cryptsy.</exception>
-        private async Task<JObject> GetReturnAsJObject(HttpResponseMessage response)
+        private async Task<JToken> GetReturnAsJToken(HttpResponseMessage response)
         {
             JObject jsonObj = await GetResponseAsJObject(response);
 
             AssertSuccess(jsonObj);
 
-            JObject returnObj = (JObject)jsonObj["return"];
-            return returnObj;
+            return jsonObj["return"];
         }
 
         private List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)

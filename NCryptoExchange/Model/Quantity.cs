@@ -82,7 +82,7 @@ namespace Lostics.NCryptoExchange.Model
 
         public override string ToString()
         {
-            return this.Value.ToString();
+            return this.Value.ToString("F8");
         }
     }
 }

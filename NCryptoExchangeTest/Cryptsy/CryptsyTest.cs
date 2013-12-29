@@ -41,8 +41,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<Fees> response;
 
-            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret"))
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
                 response.Wait();
@@ -56,8 +55,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<AccountInfo<Wallet>> response;
 
-            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret"))
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetAccountInfo();
                 response.Wait();
@@ -72,8 +70,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyMarketId marketId = new CryptsyMarketId(132);
             Task<List<MarketOrder>> response;
 
-            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret"))
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMarketOrders(marketId);
                 response.Wait();
@@ -83,6 +80,24 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             {
                 Console.WriteLine(order.ToString());
             }
+        }
+
+        [TestMethod]
+        public void GetMarketsTest()
+        {
+            Task<List<Market<CryptsyMarketId>>> response;
+
+            using (CryptsyExchange cryptsy = GetExchange())
+            {
+                response = cryptsy.GetMarkets();
+                response.Wait();
+            }
+        }
+
+        private static CryptsyExchange GetExchange()
+        {
+            return new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                "topsecret");
         }
     }
 }
