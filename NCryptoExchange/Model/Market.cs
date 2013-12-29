@@ -2,6 +2,10 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
+    /// <summary>
+    /// A market for trading a currency pair.
+    /// </summary>
+    /// <typeparam name="I">The type of ID this market wraps around.</typeparam>
     public abstract class Market<I> where I: MarketId
     {
         private readonly I marketId;
@@ -22,9 +26,18 @@ namespace Lostics.NCryptoExchange.Model
             this.label = label;
         }
 
-        public override bool Equals(Object o)
+        public override bool Equals(Object obj)
         {
-            Market<I> other = (Market<I>)o;
+            if (!(obj is Market<I>))
+            {
+                return false;
+            }
+
+            Market<I> other = (Market<I>)obj;
+
+            // Market IDs must be able to differentiate between each other (i.e.,
+            // a Cryptsy market ID must only ever match another Cryptsy market ID),
+            // such that markets on different exchanges are never considered the same
 
             return this.marketId.Equals(other.marketId);
         }
