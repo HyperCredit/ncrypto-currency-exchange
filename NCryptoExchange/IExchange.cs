@@ -1,12 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using Lostics.NCryptoExchange.Model;
-using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
-    public interface IExchange<M, O, W> where M: MarketId where O: OrderId where W: Wallet
+    public interface IExchange<M, O, T, W>
+        where M : MarketId
+        where O : OrderId
+        where T : TradeId
+        where W : Wallet
     {
         Task<AccountInfo<W>> GetAccountInfo();
 
@@ -14,11 +17,11 @@ namespace Lostics.NCryptoExchange
 
         Task<List<Transaction>> GetMyTransactions();
 
-        Task<List<MarketTrade>> GetMarketTrades(M marketId);
+        Task<List<MarketTrade<O, T>>> GetMarketTrades(M marketId);
 
-        Task<List<MyTrade>> GetMyTrades(M marketId, int? limit);
+        Task<List<MyTrade<O, T>>> GetMyTrades(M marketId, int? limit);
 
-        Task<List<MyTrade>> GetAllMyTrades(int? limit);
+        Task<List<MyTrade<O, T>>> GetAllMyTrades(int? limit);
 
         Task<List<MyOrder>> GetMyOrders(M marketId, int? limit);
 
