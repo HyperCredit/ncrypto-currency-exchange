@@ -389,6 +389,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             {
                 // FIXME: Need to correct timezone on this
                 DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+                trades.Add(new MyTrade<CryptsyOrderId, CryptsyTradeId>(new CryptsyTradeId(jsonTrade["tradeid"].ToString()),
+                    tradeType,
+                    tradeDateTime, Quantity.Parse(jsonTrade["tradeprice"]),
+                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"])
+                ));
             }
 
             return trades;
