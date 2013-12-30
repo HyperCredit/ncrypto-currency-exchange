@@ -67,7 +67,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         [TestMethod]
         public void GetMarketOrdersTest()
         {
-            CryptsyMarketId marketId = new CryptsyMarketId(132);
+            CryptsyMarketId marketId = new CryptsyMarketId("132");
             Task<List<MarketOrder>> response;
 
             using (CryptsyExchange cryptsy = GetExchange())
@@ -97,6 +97,24 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             foreach (Market<CryptsyMarketId> market in response.Result)
             {
                 Console.WriteLine(market.ToString());
+            }
+        }
+
+        [TestMethod]
+        public void GetMyTradesTest()
+        {
+            CryptsyMarketId marketId = new CryptsyMarketId("132");
+            Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> response;
+
+            using (CryptsyExchange cryptsy = GetExchange())
+            {
+                response = cryptsy.GetMyTrades(marketId, null);
+                response.Wait();
+            }
+
+            foreach (MyTrade<CryptsyOrderId, CryptsyTradeId> trade in response.Result)
+            {
+                Console.WriteLine(trade.ToString());
             }
         }
 
