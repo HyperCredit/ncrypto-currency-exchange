@@ -104,7 +104,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void GetMyTradesTest()
         {
             CryptsyMarketId marketId = new CryptsyMarketId("132");
-            Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> response;
+            Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> response;
 
             using (CryptsyExchange cryptsy = GetExchange())
             {
@@ -112,7 +112,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
                 response.Wait();
             }
 
-            foreach (MyTrade<CryptsyOrderId, CryptsyTradeId> trade in response.Result)
+            foreach (MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId> trade in response.Result)
             {
                 Console.WriteLine(trade.ToString());
             }

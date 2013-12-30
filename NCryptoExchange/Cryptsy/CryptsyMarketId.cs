@@ -12,5 +12,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public CryptsyMarketId(string setValue) : base(setValue)
         {
         }
+
+        internal static CryptsyMarketId Parse(Newtonsoft.Json.Linq.JToken marketIdToken)
+        {
+            if (marketIdToken.Type != Newtonsoft.Json.Linq.JTokenType.String)
+            {
+                throw new CryptsyResponseException("Expected market ID as a string but encountered token type \""
+                    + marketIdToken.Type + "\".");
+            }
+
+            return new CryptsyMarketId(marketIdToken.ToString());
+        }
     }
 }

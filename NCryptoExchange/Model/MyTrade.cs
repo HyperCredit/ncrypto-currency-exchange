@@ -1,14 +1,20 @@
 using System;
 namespace Lostics.NCryptoExchange.Model
 {
-    public class MyTrade<O, T> : Trade<O, T>
+    public class MyTrade<M, O, T> : Trade<M, T>
+        where M : MarketId
         where O : OrderId
         where T : TradeId
     {
+        private readonly O orderId;
+
         public MyTrade(T tradeId, OrderType tradeType,
             DateTime dateTime, Quantity price,
-            Quantity quantity, Quantity fee) : base(tradeId, tradeType, dateTime, price, quantity, fee)
+            Quantity quantity, Quantity fee,
+            M marketId, O orderId)
+            : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
         {
+            this.orderId = orderId;
         }
     }
 }

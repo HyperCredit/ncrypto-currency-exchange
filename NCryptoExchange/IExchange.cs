@@ -17,11 +17,11 @@ namespace Lostics.NCryptoExchange
 
         Task<List<Transaction>> GetMyTransactions();
 
-        Task<List<MarketTrade<O, T>>> GetMarketTrades(M marketId);
+        Task<List<MarketTrade<M, T>>> GetMarketTrades(M marketId);
 
-        Task<List<MyTrade<O, T>>> GetMyTrades(M marketId, int? limit);
+        Task<List<MyTrade<M, O, T>>> GetMyTrades(M marketId, int? limit);
 
-        Task<List<MyTrade<O, T>>> GetAllMyTrades(int? limit);
+        Task<List<MyTrade<M, O, T>>> GetAllMyTrades(int? limit);
 
         Task<List<MyOrder>> GetMyOrders(M marketId, int? limit);
 

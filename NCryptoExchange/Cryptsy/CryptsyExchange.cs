@@ -251,12 +251,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return ParseTransactions(returnArray);
         }
 
-        public async Task<List<MarketTrade<CryptsyOrderId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
+        public async Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
+        public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_TRADES),
@@ -268,10 +268,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return ParseMyTrades(returnArray);
+            return ParseMyTrades(returnArray, marketId);
         }
 
-        public async Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
+        public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_ALL_MY_TRADES),
@@ -282,7 +282,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return ParseMyTrades(returnArray);
+            return ParseMyTrades(returnArray, null);
         }
 
         public async Task<List<MyOrder>> GetMyOrders(CryptsyMarketId marketId, int? limit)
@@ -381,19 +381,26 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        private List<MyTrade<CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades)
+        private List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
         {
-            List<MyTrade<CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyOrderId, CryptsyTradeId>>();
+            List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>();
 
             foreach (JObject jsonTrade in jsonTrades)
             {
                 // FIXME: Need to correct timezone on this
                 DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+                JToken marketIdToken = jsonTrade["marketid"];
+                CryptsyMarketId marketId = null == marketIdToken
+                    ? defaultMarketId
+                    : CryptsyMarketId.Parse(marketIdToken);
+                CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["order_id"]);
+                CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
                 OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
-                trades.Add(new MyTrade<CryptsyOrderId, CryptsyTradeId>(new CryptsyTradeId(jsonTrade["tradeid"].ToString()),
-                    tradeType,
-                    tradeDateTime, Quantity.Parse(jsonTrade["tradeprice"]),
-                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"])
+                trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>(tradeId,
+                    tradeType, tradeDateTime,
+                    Quantity.Parse(jsonTrade["tradeprice"]),
+                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"]),
+                    marketId, orderId
                 ));
             }
 
