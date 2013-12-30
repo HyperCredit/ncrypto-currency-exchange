@@ -17,17 +17,17 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                    new KeyValuePair<string, string>(Cryptsy.PARAM_METHOD, Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.getinfo)),
-                    new KeyValuePair<string, string>(Cryptsy.PARAM_NONCE, "1388246959")
+                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.getinfo)),
+                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
                 });
 
-            using (Cryptsy cryptsy = new Cryptsy("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret"))
             {
                 cryptsy.SignRequest(request).Wait();
             }
 
-            foreach (string actual in request.Headers.GetValues(Cryptsy.HEADER_SIGN))
+            foreach (string actual in request.Headers.GetValues(CryptsyExchange.HEADER_SIGN))
             {
                 Assert.AreEqual(expected, actual);
                 return;
@@ -41,7 +41,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<Fees> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.CalculateFees(OrderType.Buy, new Price(0.05), new Price(1.0));
                 response.Wait();
@@ -55,7 +55,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<AccountInfo<Wallet>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetAccountInfo();
                 response.Wait();
@@ -70,7 +70,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyMarketId marketId = new CryptsyMarketId("132");
             Task<List<MarketOrder>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMarketOrders(marketId);
                 response.Wait();
@@ -87,7 +87,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<List<Market<CryptsyMarketId>>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMarkets();
                 response.Wait();
@@ -106,7 +106,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyMarketId marketId = new CryptsyMarketId("132");
             Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMyOrders(marketId, null);
                 response.Wait();
@@ -124,7 +124,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             CryptsyMarketId marketId = new CryptsyMarketId("132");
             Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMyTrades(marketId, null);
                 response.Wait();
@@ -141,7 +141,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             Task<List<Transaction>> response;
 
-            using (Cryptsy cryptsy = GetExchange())
+            using (CryptsyExchange cryptsy = GetExchange())
             {
                 response = cryptsy.GetMyTransactions();
                 response.Wait();
@@ -154,9 +154,9 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             }
         }
 
-        private static Cryptsy GetExchange()
+        private static CryptsyExchange GetExchange()
         {
-            return new Cryptsy("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+            return new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret");
         }
     }

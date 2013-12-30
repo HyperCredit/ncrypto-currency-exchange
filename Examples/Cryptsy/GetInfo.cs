@@ -16,7 +16,7 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             {
                 Task<AccountInfo<Wallet>> response;
 
-                using (Cryptsy cryptsy = GetExchange())
+                using (CryptsyExchange cryptsy = GetExchange())
                 {
                     response = cryptsy.GetAccountInfo();
                     response.Wait();

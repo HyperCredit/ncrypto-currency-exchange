@@ -47,8 +47,10 @@
   <ItemGroup>
     <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Cryptsy\CryptsyExchange.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
+    <Compile Include="Cryptsy\CryptsyExchange.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Cryptsy\CryptsyFailureException.cs" />
     <Compile Include="Cryptsy\CryptsyMarket.cs" />
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />

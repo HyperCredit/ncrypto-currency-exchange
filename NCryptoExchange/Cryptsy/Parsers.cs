@@ -108,13 +108,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        internal static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
+        internal static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades,
+            CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = new List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>();
 
             foreach (JObject jsonTrade in jsonTrades)
             {
-                // FIXME: Need to correct timezone on this
                 DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
@@ -122,6 +122,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
                 OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+
+                tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
+
                 trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
                     Price.Parse(jsonTrade["tradeprice"]),
@@ -133,13 +136,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return trades;
         }
 
-        internal static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders, CryptsyMarketId defaultMarketId)
+        internal static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders,
+            CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MyOrder<CryptsyMarketId, CryptsyOrderId>> orders = new List<MyOrder<CryptsyMarketId, CryptsyOrderId>>();
 
             foreach (JObject jsonTrade in jsonOrders)
             {
-                // FIXME: Need to correct timezone on this
                 DateTime created = DateTime.Parse(jsonTrade["created"].ToString());
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
@@ -147,6 +150,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["orderid"]);
                 OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["ordertype"].ToString());
+
+                created = TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
+
                 orders.Add(new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
                     orderType, created,
                     Price.Parse(jsonTrade["price"]),
@@ -158,13 +164,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        internal static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
+        internal static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades,
+            CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>();
 
             foreach (JObject jsonTrade in jsonTrades)
             {
-                // FIXME: Need to correct timezone on this
                 DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
@@ -173,6 +179,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["order_id"]);
                 CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
                 OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+
+                tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
+
                 trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
                     Price.Parse(jsonTrade["tradeprice"]),
@@ -194,7 +203,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 DateTime transactionPosted = DateTime.Parse(jsonTransaction["datetime"].ToString());
                 TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction["type"].ToString());
 
-                TimeZoneInfo.ConvertTimeToUtc(transactionPosted, serverTimeZone);
+                transactionPosted = TimeZoneInfo.ConvertTimeToUtc(transactionPosted, serverTimeZone);
 
                 Transaction transaction = new Transaction(jsonTransaction["currency"].ToString(),
                     transactionPosted, transactionType,

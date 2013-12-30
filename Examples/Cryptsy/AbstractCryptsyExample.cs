@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Lostics.NCryptoExchange.Cryptsy;
+using System;
 using System.IO;
-
-using Lostics.NCryptoExchange.Cryptsy;
 
 namespace Lostics.NCryptoExchangeExamples.Cryptsy
 {
@@ -15,9 +14,9 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             return new FileInfo(Path.Combine(dir.FullName, CONFIG_FILENAME));
         }
 
-        public static Cryptsy GetExchange()
+        public static CryptsyExchange GetExchange()
         {
-            return Cryptsy.GetExchange(GetDefaultConfigurationFile());
+            return Lostics.NCryptoExchange.Cryptsy.CryptsyExchange.GetExchange(GetDefaultConfigurationFile());
         }
     }
 }

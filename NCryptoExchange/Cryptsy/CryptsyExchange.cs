@@ -12,7 +12,7 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class Cryptsy : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
+    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -39,7 +39,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public byte[] PrivateKey { get { return this.privateKey; } }
 
-        public Cryptsy(string publicKey, string privateKey)
+        public CryptsyExchange(string publicKey, string privateKey)
         {
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
@@ -173,7 +173,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyAccountInfo.Parse(returnObj);
         }
 
-        public static Cryptsy GetExchange(FileInfo configurationFile)
+        public static CryptsyExchange GetExchange(FileInfo configurationFile)
         {
             string publicKey = null;
             string privateKey = null;
@@ -233,7 +233,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     + configurationFile.FullName + "\".");
             }
 
-            return new Cryptsy(publicKey, privateKey);
+            return new CryptsyExchange(publicKey, privateKey);
         }
 
         private static void WriteDefaultFile(FileInfo file)
@@ -301,7 +301,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return Parsers.ParseMarketTrades(returnArray, marketId);
+            return Parsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
@@ -313,7 +313,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return Parsers.ParseMyTrades(returnArray, marketId);
+            // XXX: Should use timezone provided by Cryptsy, not just presume.
+
+            return Parsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
         }
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
@@ -325,7 +327,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return Parsers.ParseMyTrades(returnArray, null);
+            // XXX: Should use timezone provided by Cryptsy, not just presume.
+
+            return Parsers.ParseMyTrades(returnArray, null, defaultTimeZone);
         }
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
@@ -337,7 +341,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return Parsers.ParseMyOrders(returnArray, marketId);
+            // XXX: Should use timezone provided by Cryptsy, not just presume.
+
+            return Parsers.ParseMyOrders(returnArray, marketId, defaultTimeZone);
         }
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
@@ -349,7 +355,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
 
-            return Parsers.ParseMyOrders(returnArray, null);
+            // XXX: Should use timezone provided by Cryptsy, not just presume.
+
+            return Parsers.ParseMyOrders(returnArray, null, defaultTimeZone);
         }
 
         public async Task<Book> GetMarketDepth(CryptsyMarketId marketId)
