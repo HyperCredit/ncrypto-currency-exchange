@@ -65,10 +65,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             List<MarketDepth> side = new List<MarketDepth>(sideJson.Count);
 
-            foreach (JObject depthJson in sideJson)
+            foreach (JArray depthJson in sideJson)
             {
-                side.Add(new MarketDepth(Price.Parse(depthJson["price"]),
-                    Price.Parse(depthJson["quantity"])));
+                side.Add(new MarketDepth(Price.Parse(depthJson[0]),
+                    Price.Parse(depthJson[1])));
             }
 
             return side;

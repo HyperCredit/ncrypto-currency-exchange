@@ -1,0 +1,29 @@
+{
+  "success": "1",
+  "return": [
+    {
+      "tradeid": "9373209",
+      "tradetype": "Buy",
+      "datetime": "2013-12-27 10:52:00",
+      "marketid": "132",
+      "tradeprice": "0.00000059",
+      "quantity": "1500.00000000",
+      "fee": "0.000000069",
+      "total": "0.00031500",
+      "initiate_ordertype": "Sell",
+      "order_id": "12257812"
+    },
+    {
+      "tradeid": "9164163",
+      "tradetype": "Buy",
+      "datetime": "2013-12-27 09:57:10",
+      "marketid": "132",
+      "tradeprice": "0.00000063",
+      "quantity": "1400.00000000",
+      "fee": "0.000002044",
+      "total": "0.03022000",
+      "initiate_ordertype": "Buy",
+      "order_id": "12255840"
+    }
+  ]
+}

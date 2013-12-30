@@ -1,5 +1,7 @@
 ﻿using Lostics.NCryptoExchange.Cryptsy;
+using Lostics.NCryptoExchange.Model;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Lostics.NCryptoExchangeExamples.Cryptsy
@@ -21,7 +23,17 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             cryptsy.DumpResponse = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent;
 
             cryptsy.GetAccountInfo().Wait();
-            cryptsy.GetMarkets().Wait();
+            List<Market<CryptsyMarketId>> markets = cryptsy.GetMarkets().Result;
+
+            if (markets.Count > 0)
+            {
+                Book marketDepth = cryptsy.GetMarketDepth(markets[0].MarketId).Result;
+                List<MarketOrder> orders = cryptsy.GetMarketOrders(markets[0].MarketId).Result;
+            }
+
+            cryptsy.GetAllMyOrders(null).Wait();
+            cryptsy.GetAllMyTrades(null).Wait();
+            cryptsy.CancelAllOrders().Wait();
 
             Console.WriteLine("Requests completed, press any key to exit.");
             Console.ReadKey();

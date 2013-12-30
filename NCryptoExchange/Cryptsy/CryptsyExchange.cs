@@ -444,10 +444,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             // For methods where we expect a response, verify the type of the
             // response (typically an array or object)
-            if (null == requiredType)
+            if (null != requiredType)
             {
-                if (null == returnObj
-                    || returnObj.Type != requiredType)
+                if (null == returnObj)
+                {
+                    throw new CryptsyResponseException("Expected \"return\" JSON token in response from Cryptsy, but was missing.");
+                }
+
+                if (returnObj.Type != requiredType)
                 {
                     throw new CryptsyResponseException("Expected \"return\" JSON token in response from Cryptsy, but was missing or the wrong type.");
                 }
