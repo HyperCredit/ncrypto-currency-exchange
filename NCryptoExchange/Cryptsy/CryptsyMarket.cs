@@ -11,41 +11,28 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyMarket : Market<CryptsyMarketId>
     {
-        private Price currentVolume;
-        private Price lastTrade;
-        private Price highTrade;
-        private Price lowTrade;
-        private DateTime created;
+        private readonly Price currentVolume;
+        private readonly Price lastTrade;
+        private readonly Price highTrade;
+        private readonly Price lowTrade;
+        private readonly DateTime created;
 
         public CryptsyMarket(CryptsyMarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
-            string quoteCurrencyCode, string quoteCurrencyName, string label)
+            string quoteCurrencyCode, string quoteCurrencyName, string label,
+            Price currentVolume, Price lastTrade, Price highTrade, Price lowTrade, DateTime created)
             : base(setMarketId, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label)
         {
-
+            this.currentVolume = currentVolume;
+            this.lastTrade = lastTrade;
+            this.highTrade = highTrade;
+            this.lowTrade = lowTrade;
+            this.created = created;
         }
 
-        internal static CryptsyMarket Parse(JToken marketToken)
-        {
-            if (marketToken.Type != JTokenType.Object)
-            {
-                throw new CryptsyResponseException("Expected object, but found unexpected JSON token \""
-                    + marketToken.Type + "\".");
-            }
-
-            JObject marketObj = (JObject)marketToken;
-
-            CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketObj["marketid"].ToString()),
-                marketObj["primary_currency_code"].ToString(), marketObj["primary_currency_name"].ToString(),
-                marketObj["secondary_currency_code"].ToString(), marketObj["secondary_currency_name"].ToString(),
-                marketObj["label"].ToString());
-
-            market.currentVolume = Price.Parse(marketObj["current_volume"]);
-            market.lastTrade = Price.Parse(marketObj["last_trade"]);
-            market.highTrade = Price.Parse(marketObj["high_trade"]);
-            market.lowTrade = Price.Parse(marketObj["low_trade"]);
-            market.created = DateTime.Parse(marketObj["created"].ToString());
-
-            return market;
-        }
+        public Price CurrentVolume { get { return this.currentVolume; } }
+        public Price LastTrade { get { return this.lastTrade; } }
+        public Price HighTrade { get { return this.highTrade; } }
+        public Price LowTrade { get { return this.lowTrade; } }
+        public DateTime Created { get { return this.created; } }
     }
 }

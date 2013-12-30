@@ -29,6 +29,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string PROPERTY_PUBLIC_KEY = "public_key";
         public const string PROPERTY_PRIVATE_KEY = "private_key";
 
+        private readonly TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+
         private HttpClient client = new HttpClient();
         private readonly string publicUrl = "http://pubapi.cryptsy.com/api.php";
         private readonly string privateUrl = "https://www.cryptsy.com/api";
@@ -274,14 +276,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JArray returnArray = (JArray)await GetReturnAsJToken(response);
-            List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
 
-            foreach (JToken marketToken in returnArray)
-            {
-                markets.Add(CryptsyMarket.Parse(marketToken));
-            }
-
-            return markets;
+            return Parsers.ParseMarkets(returnArray, defaultTimeZone);
         }
 
         public async Task<List<Transaction>> GetMyTransactions()
