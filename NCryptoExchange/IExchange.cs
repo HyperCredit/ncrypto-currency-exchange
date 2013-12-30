@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange
 {
-    public interface IExchange<M, O, T, W>
+    public interface IExchange<M, O, T, W> : IDisposable
         where M : MarketId
         where O : OrderId
         where T : TradeId

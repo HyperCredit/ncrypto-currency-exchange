@@ -12,7 +12,7 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet> , IDisposable
+    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
