@@ -28,7 +28,7 @@ namespace Lostics.NCryptoExchange
 
         Task<List<MyOrder<M, O>>> GetAllMyOrders(int? limit);
 
-        Task<List<MarketDepth>> GetMarketDepth(M marketId);
+        Task<Book> GetMarketDepth(M marketId);
 
         Task CancelOrder(O orderId);
 

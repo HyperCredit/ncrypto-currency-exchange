@@ -281,9 +281,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return ParseMyOrders(returnArray, null);
         }
 
-        public async Task<List<MarketDepth>> GetMarketDepth(CryptsyMarketId marketId)
+        public async Task<Book> GetMarketDepth(CryptsyMarketId marketId)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.depth,
+                (CryptsyOrderId)null, marketId, null));
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject returnArray = (JObject)await GetReturnAsJToken(response);
+
+            return ParseMarketDepthBook(returnArray, marketId);
         }
 
         /// <summary>
@@ -339,6 +346,45 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
 
             return jsonObj["return"];
+        }
+
+        private Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
+        {
+            JToken buyJson = bookJson["buy"];
+            JToken sellJson = bookJson["sell"];
+
+            if (buyJson.Type != JTokenType.Array)
+            {
+                throw new CryptsyResponseException("Expected array for buy-side market depth, found \""
+                    + Enum.GetName(typeof(JTokenType), buyJson.Type) + "\".");
+            }
+
+            if (sellJson.Type != JTokenType.Array)
+            {
+                throw new CryptsyResponseException("Expected array for sell-side market depth, found \""
+                    + Enum.GetName(typeof(JTokenType), sellJson.Type) + "\".");
+            }
+
+            JArray buyArray = (JArray)buyJson;
+            JArray sellArray = (JArray)sellJson;
+
+            List<MarketDepth> buy = ParseMarketDepth(buyArray, marketId);
+            List<MarketDepth> sell = ParseMarketDepth(sellArray, marketId);
+
+            return new Book(sell, buy);
+        }
+
+        private List<MarketDepth> ParseMarketDepth(JArray sideJson, CryptsyMarketId marketId)
+        {
+            List<MarketDepth> side = new List<MarketDepth>(sideJson.Count);
+
+            foreach (JObject depthJson in sideJson)
+            {
+                side.Add(new MarketDepth(Quantity.Parse(depthJson["price"]),
+                    Quantity.Parse(depthJson["quantity"])));
+            }
+
+            return side;
         }
 
         private static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)

@@ -61,6 +61,7 @@
     <Compile Include="Model\Address.cs" />
     <Compile Include="IExchange.cs" />
     <Compile Include="Cryptsy\Fees.cs" />
+    <Compile Include="Model\Book.cs" />
     <Compile Include="Model\Market.cs" />
     <Compile Include="Model\MarketDepth.cs" />
     <Compile Include="Model\MarketId.cs" />

@@ -15,6 +15,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         cancelmarketorder,
         calculatefees,
         createorder,
+        depth,
         generatenewaddress,
         getinfo,
         getmarkets,
