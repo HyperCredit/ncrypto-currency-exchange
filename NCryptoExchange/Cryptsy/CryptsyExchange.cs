@@ -32,7 +32,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
         private readonly TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
         private HttpClient client = new HttpClient();
-        private readonly string publicUrl = "http://pubapi.cryptsy.com/api.php";
         private readonly string privateUrl = "https://www.cryptsy.com/api";
         private readonly string publicKey;
         private readonly byte[] privateKey;
@@ -45,14 +44,36 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
+        /// <summary>
+        /// Make a call to Cryptsy's private API
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private async Task Call(FormUrlEncodedContent request)
+        {
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            await GetReturnAsJToken(response, null);
+        }
+
+        /// <summary>
+        /// Make a call to Cryptsy's private API
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>The return from Cryptsy as a JSON token</returns>
+        private async Task<JToken> Call(FormUrlEncodedContent request, JTokenType returnType)
+        {
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            return await GetReturnAsJToken(response, returnType);
+        }
+
         public async Task CancelOrder(CryptsyOrderId orderId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelorder,
                 orderId, (CryptsyMarketId)null, null));
 
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            await GetReturnAsJToken(response, null);
+            await Call(request);
         }
 
         public async Task CancelAllOrders()
@@ -60,9 +81,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelallorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            await GetReturnAsJToken(response, null);
+            await Call(request);
         }
 
         public async Task CancelMarketOrders(CryptsyMarketId marketId)
@@ -70,9 +89,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelmarketorder,
                 (CryptsyOrderId)null, marketId, null));
 
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            await GetReturnAsJToken(response, null);
+            await Call(request);
         }
 
         public async Task<Fees> CalculateFees(OrderType orderType, Price quantity,
@@ -80,10 +97,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.calculatefees,
                 orderType, quantity, price));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return new Fees(Price.Parse(returnObj["fee"]),
                 Price.Parse(returnObj["net"]));
@@ -95,10 +109,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.createorder,
                 orderType, quantity, price));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return new CryptsyOrderId(returnObj["orderid"].ToString());
         }
@@ -114,10 +125,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_CURRENCY_CODE, currencyCode)
             });
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return Address.Parse(returnObj);
         }
@@ -165,10 +173,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return CryptsyAccountInfo.Parse(returnObj);
         }
@@ -255,10 +260,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnObj = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             List<MarketOrder> buyOrders = Parsers.ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
             List<MarketOrder> sellOrders = Parsers.ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
@@ -272,10 +274,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             return Parsers.ParseMarkets(returnArray, defaultTimeZone);
         }
@@ -284,10 +283,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             return Parsers.ParseTransactions(returnArray);
         }
@@ -296,10 +292,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             return Parsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
@@ -308,10 +301,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -322,10 +312,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -336,10 +323,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -350,10 +334,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JArray returnArray = (JArray)await GetReturnAsJToken(response, JTokenType.Array);
+            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -364,12 +345,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.depth,
                 (CryptsyOrderId)null, marketId, null));
+            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
-            await SignRequest(request);
-            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject returnArray = (JObject)await GetReturnAsJToken(response, JTokenType.Object);
-
-            return Parsers.ParseMarketDepthBook(returnArray, marketId);
+            return Parsers.ParseMarketDepthBook(returnObj, marketId);
         }
 
         /// <summary>
