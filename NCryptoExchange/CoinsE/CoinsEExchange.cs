@@ -54,7 +54,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         public override async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
         {
             JObject marketsJson = (JObject)await CallPublic(MARKETS_LIST, "markets", JTokenType.Object);
-            return await Parsers.ParseMarkets(marketsJson);
+            return await CoinsEParsers.ParseMarkets(marketsJson);
         }
 
         public override Task<List<Model.Transaction>> GetMyTransactions()

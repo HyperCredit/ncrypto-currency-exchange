@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public static class Parsers
+    public static class CoinsEParsers
     {
         internal static Task<List<Model.Market<CoinsEMarketId>>> ParseMarkets(Newtonsoft.Json.Linq.JObject marketsJson)
         {
