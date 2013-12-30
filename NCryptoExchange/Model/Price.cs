@@ -56,23 +56,18 @@ namespace Lostics.NCryptoExchange.Model
 
         public static Price operator *(Price c1, Price c2)
         {
-            // If they're of equivalent precision (which they generally should be),
-            // simply add the counts
-            if (c1.tickSize == c2.tickSize)
-            {
-                return new Price(c1.count * c2.count, c1.tickSize);
-            }
-
-            return new Price(c1.Value * c2.Value);
+            return new Price(c1.count * c2.count, c1.tickSize * c2.tickSize);
         }
 
         public static Price operator /(Price c1, Price c2)
         {
             // If they're of equivalent precision (which they generally should be),
-            // simply add the counts
+            // the tick sizes cancel out each other.
             if (c1.tickSize == c2.tickSize)
             {
-                return new Price(c1.count / c2.count, c1.tickSize);
+                double countDivision = ((double)c1.count) / c2.count;
+
+                return new Price(countDivision);
             }
 
             return new Price(c1.Value / c2.Value);
