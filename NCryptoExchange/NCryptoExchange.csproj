@@ -53,7 +53,9 @@
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />
     <Compile Include="Cryptsy\CryptsyResponseException.cs" />
+    <Compile Include="Cryptsy\CryptsyTradeId.cs" />
     <Compile Include="ExchangeException.cs" />
+    <Compile Include="Model\AbstractStringBasedId.cs" />
     <Compile Include="Model\AccountInfo.cs" />
     <Compile Include="Model\Address.cs" />
     <Compile Include="IExchange.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Model\OrderType.cs" />
     <Compile Include="Model\Quantity.cs" />
     <Compile Include="Model\Trade.cs" />
+    <Compile Include="Model\TradeId.cs" />
     <Compile Include="Model\Transaction.cs" />
     <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />

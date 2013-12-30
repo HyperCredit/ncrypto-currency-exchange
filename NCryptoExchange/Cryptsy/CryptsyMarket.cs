@@ -34,8 +34,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             JObject marketObj = (JObject)marketToken;
 
-            int marketId = int.Parse(marketObj["marketid"].ToString());
-            CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketId),
+            CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketObj["marketid"].ToString()),
                 marketObj["primary_currency_code"].ToString(), marketObj["primary_currency_name"].ToString(),
                 marketObj["secondary_currency_code"].ToString(), marketObj["secondary_currency_name"].ToString(),
                 marketObj["label"].ToString());

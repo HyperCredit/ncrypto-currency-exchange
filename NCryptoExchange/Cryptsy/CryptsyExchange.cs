@@ -12,11 +12,12 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, Wallet> , IDisposable
+    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet> , IDisposable
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
+        public const string METHOD_ALL_MY_TRADES = "allmytrades";
         public const string METHOD_CANCEL_ORDER = "cancelorder";
         public const string METHOD_CANCEL_ALL_ORDERS = "cancelallorders";
         public const string METHOD_CANCEL_MARKET_ORDERS = "cancelmarketorder";
@@ -25,6 +26,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string METHOD_GET_INFO = "getinfo";
         public const string METHOD_GET_MARKETS = "getmarkets";
         public const string METHOD_MARKET_ORDERS = "marketorders";
+        public const string METHOD_MY_TRADES = "mytrades";
         public const string METHOD_MY_TRANSACTIONS = "mytransactions";
 
         public const string PARAM_MARKET_ID = "marketid";
@@ -249,19 +251,38 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return ParseTransactions(returnArray);
         }
 
-        public async Task<List<MarketTrade>> GetMarketTrades(CryptsyMarketId marketId)
+        public async Task<List<MarketTrade<CryptsyOrderId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<MyTrade>> GetMyTrades(CryptsyMarketId marketId, int? limit)
+        public async Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_TRADES),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseMyTrades(returnArray);
         }
 
-        public async Task<List<MyTrade>> GetAllMyTrades(int? limit)
+        public async Task<List<MyTrade<CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_ALL_MY_TRADES),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseMyTrades(returnArray);
         }
 
         public async Task<List<MyOrder>> GetMyOrders(CryptsyMarketId marketId, int? limit)
@@ -360,13 +381,25 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
+        private List<MyTrade<CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades)
+        {
+            List<MyTrade<CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyOrderId, CryptsyTradeId>>();
+
+            foreach (JObject jsonTrade in jsonTrades)
+            {
+                // FIXME: Need to correct timezone on this
+                DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+            }
+
+            return trades;
+        }
+
         private List<Transaction> ParseTransactions(JArray jsonTransactions)
         {
             List<Transaction> transactions = new List<Transaction>();
 
-            foreach (JToken token in jsonTransactions)
+            foreach (JObject jsonTransaction in jsonTransactions)
             {
-                JObject jsonTransaction = (JObject)token;
                 // FIXME: Need to correct timezone on this
                 DateTime transactionPosted = DateTime.Parse(jsonTransaction["datetime"].ToString());
                 TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction["type"].ToString());
