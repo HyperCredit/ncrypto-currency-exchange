@@ -15,6 +15,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         [TestMethod]
         public void SignRequestTest()
         {
+            string actual;
             string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                     new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.getinfo)),
@@ -24,16 +25,10 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
                 "topsecret"))
             {
-                cryptsy.SignRequest(request).Wait();
+                actual = CryptsyExchange.GenerateSHA512Signature(request, cryptsy.PrivateKey).Result;
             }
 
-            foreach (string actual in request.Headers.GetValues(CryptsyExchange.HEADER_SIGN))
-            {
-                Assert.AreEqual(expected, actual);
-                return;
-            }
-
-            Assert.Fail("No signature header found.");
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]

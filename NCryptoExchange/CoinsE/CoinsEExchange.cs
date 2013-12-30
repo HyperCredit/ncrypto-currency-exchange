@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEExchange : IExchange<CoinsEMarketId, CoinsEOrderId, CoinsETradeId, Wallet>
+    public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId, CoinsETradeId, Wallet>
     {
         public const string MARKETS_LIST = "https://www.coins-e.com/api/v2/markets/list/";
 
@@ -29,95 +29,90 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             JObject jsonObj;
 
-            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+            try
             {
-                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
-                {
-                    try
-                    {
-                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
-                    }
-                    catch (ArgumentException e)
-                    {
-                        throw new CoinsEResponseException("Could not parse response from Cryptsy.", e);
-                    }
-                }
+                jsonObj = await GetJsonFromResponse(response);
+            }
+            catch (ArgumentException e)
+            {
+                throw new CoinsEResponseException("Could not parse response from Cryptsy.", e);
             }
 
             return jsonObj;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             client.Dispose();
         }
 
-        public Task<Model.AccountInfo<Wallet>> GetAccountInfo()
+        public override Task<Model.AccountInfo<Wallet>> GetAccountInfo()
         {
             throw new NotImplementedException();
         }
 
-        public async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
+        public override async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
         {
             JObject marketsJson = (JObject)await CallPublic(MARKETS_LIST, "markets", JTokenType.Object);
+            return await Parsers.ParseMarkets(marketsJson);
         }
 
-        public Task<List<Model.Transaction>> GetMyTransactions()
+        public override Task<List<Model.Transaction>> GetMyTransactions()
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Model.MarketTrade<CoinsEMarketId, CoinsETradeId>>> GetMarketTrades(CoinsEMarketId marketId)
+        public override Task<List<Model.MarketTrade<CoinsEMarketId, CoinsETradeId>>> GetMarketTrades(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
+        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetAllMyTrades(int? limit)
+        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetAllMyTrades(int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetMyOrders(CoinsEMarketId marketId, int? limit)
+        public override Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetMyOrders(CoinsEMarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetAllMyOrders(int? limit)
+        public override Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetAllMyOrders(int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Model.Book> GetMarketDepth(CoinsEMarketId marketId)
+        public override Task<Model.Book> GetMarketDepth(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public Task CancelOrder(CoinsEOrderId orderId)
+        public override Task CancelOrder(CoinsEOrderId orderId)
         {
             throw new NotImplementedException();
         }
 
-        public Task CancelAllOrders()
+        public override Task CancelAllOrders()
         {
             throw new NotImplementedException();
         }
 
-        public Task CancelMarketOrders(CoinsEMarketId marketId)
+        public override Task CancelMarketOrders(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, Model.OrderType orderType, Model.Price quantity, Model.Price price)
+        public override Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, Model.OrderType orderType, Model.Price quantity, Model.Price price)
         {
             throw new NotImplementedException();
         }
 
-        public string GetNextNonce()
+        public override string GetNextNonce()
         {
             throw new NotImplementedException();
         }

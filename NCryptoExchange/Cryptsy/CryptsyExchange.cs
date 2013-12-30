@@ -21,7 +21,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// will load the keys from that file for you (provided with a path to
     /// a file that does not exist, it will create a blank file as a template).
     /// </summary>
-    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
+    public class CryptsyExchange : AbstractExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -60,7 +60,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns></returns>
         private async Task Call(FormUrlEncodedContent request)
         {
-            await SignRequest(request);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             await GetReturnAsJToken(response, null);
         }
@@ -72,12 +74,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns>The return from Cryptsy as a JSON token</returns>
         private async Task<JToken> Call(FormUrlEncodedContent request, JTokenType returnType)
         {
-            await SignRequest(request);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             return await GetReturnAsJToken(response, returnType);
         }
 
-        public async Task CancelOrder(CryptsyOrderId orderId)
+        public async override Task CancelOrder(CryptsyOrderId orderId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelorder,
                 orderId, (CryptsyMarketId)null, null));
@@ -85,7 +89,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await Call(request);
         }
 
-        public async Task CancelAllOrders()
+        public async override Task CancelAllOrders()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelallorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -93,7 +97,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await Call(request);
         }
 
-        public async Task CancelMarketOrders(CryptsyMarketId marketId)
+        public async override Task CancelMarketOrders(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelmarketorder,
                 (CryptsyOrderId)null, marketId, null));
@@ -113,7 +117,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 Price.Parse(returnObj["net"]));
         }
 
-        public async Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
+        public async override Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
                 OrderType orderType, Price quantity,
                 Price price)
         {
@@ -125,7 +129,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new CryptsyOrderId(returnObj["orderid"].ToString());
         }
 
-        public void Dispose() {
+        public override void Dispose()
+        {
             this.client.Dispose();
         }
 
@@ -202,7 +207,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return parameters.ToArray();
         }
 
-        public async Task<AccountInfo<Wallet>> GetAccountInfo()
+        public async override Task<AccountInfo<Wallet>> GetAccountInfo()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -284,7 +289,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
         }
 
-        public string GetNextNonce()
+        public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
         }
@@ -303,7 +308,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return buyOrders;
         }
 
-        public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
+        public async override Task<List<Market<CryptsyMarketId>>> GetMarkets()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -312,7 +317,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMarkets(returnArray, defaultTimeZone);
         }
 
-        public async Task<List<Transaction>> GetMyTransactions()
+        public async override Task<List<Transaction>> GetMyTransactions()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -321,7 +326,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseTransactions(returnArray);
         }
 
-        public async Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
+        public async override Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
@@ -330,7 +335,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
 
-        public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
+        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
@@ -341,7 +346,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
         }
 
-        public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
+        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
@@ -352,7 +357,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMyTrades(returnArray, null, defaultTimeZone);
         }
 
-        public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
+        public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
@@ -363,7 +368,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMyOrders(returnArray, marketId, defaultTimeZone);
         }
 
-        public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
+        public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
@@ -374,7 +379,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Parsers.ParseMyOrders(returnArray, null, defaultTimeZone);
         }
 
-        public async Task<Book> GetMarketDepth(CryptsyMarketId marketId)
+        public async override Task<Book> GetMarketDepth(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.depth,
                 (CryptsyOrderId)null, marketId, null));
@@ -402,19 +407,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             JObject jsonObj;
 
-            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+            try
             {
-                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
-                {
-                    try
-                    {
-                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
-                    }
-                    catch (ArgumentException e)
-                    {
-                        throw new CryptsyResponseException("Could not parse response from Cryptsy.", e);
-                    }
-                }
+                jsonObj = await GetJsonFromResponse(response);
+            }
+            catch (ArgumentException e)
+            {
+                throw new CryptsyResponseException("Could not parse response from Cryptsy.", e);
             }
 
             if (null == jsonObj["success"])
@@ -451,18 +450,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
 
             return returnObj;
-        }
-
-        public async Task<FormUrlEncodedContent> SignRequest(FormUrlEncodedContent request)
-        {
-            HMAC digester = new HMACSHA512(this.PrivateKey);
-            StringBuilder hex = new StringBuilder();
-            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(await request.ReadAsStringAsync());
-
-            request.Headers.Add(HEADER_SIGN, BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower());
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-
-            return request;
         }
     }
 }
