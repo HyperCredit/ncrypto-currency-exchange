@@ -12,6 +12,15 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
+    /// <summary>
+    /// Wrapper around the Cryptsy (https://www.cryptsy.com/) API.
+    /// 
+    /// To use, requires a public and private key (these can be generated from the
+    /// "Settings" page within Cryptsy, once logged in). It's suggested these are
+    /// stored in a configuration file, and the method GetExchange()
+    /// will load the keys from that file for you (provided with a path to
+    /// a file that does not exist, it will create a blank file as a template).
+    /// </summary>
     public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
     {
         public const string HEADER_SIGN = "Sign";
@@ -70,7 +79,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelOrder(CryptsyOrderId orderId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelorder,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelorder,
                 orderId, (CryptsyMarketId)null, null));
 
             await Call(request);
@@ -78,7 +87,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelAllOrders()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelallorders,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelallorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
             await Call(request);
@@ -86,7 +95,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task CancelMarketOrders(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelmarketorder,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelmarketorder,
                 (CryptsyOrderId)null, marketId, null));
 
             await Call(request);
@@ -95,8 +104,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public async Task<Fees> CalculateFees(OrderType orderType, Price quantity,
                 Price price)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.calculatefees,
-                orderType, quantity, price));
+            FormUrlEncodedContent request = new FormUrlEncodedContent(
+                GenerateOrderParameters(CryptsyMethod.calculatefees, null,
+                    orderType, quantity, price));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return new Fees(Price.Parse(returnObj["fee"]),
@@ -107,8 +117,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 OrderType orderType, Price quantity,
                 Price price)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.createorder,
-                orderType, quantity, price));
+            FormUrlEncodedContent request = new FormUrlEncodedContent(
+                GenerateOrderParameters(CryptsyMethod.createorder, marketId,
+                    orderType, quantity, price));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
             return new CryptsyOrderId(returnObj["orderid"].ToString());
@@ -130,7 +141,15 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return Address.Parse(returnObj);
         }
 
-        private KeyValuePair<string, string>[] GenerateRequest(CryptsyMethod method,
+        /// <summary>
+        /// Constructs parameters to be sent as part of a request to Cryptsy.
+        /// </summary>
+        /// <param name="method">The API method to call</param>
+        /// <param name="orderId">An optional order ID to be passed as a parameter to the method</param>
+        /// <param name="marketId">An optional market ID to be passsed as a parameter to the method</param>
+        /// <param name="limit">An optional limit on number of returned items, to be passed as a parameter to the method</param>
+        /// <returns>An array of key-value pairs</returns>
+        private KeyValuePair<string, string>[] GenerateParameters(CryptsyMethod method,
             CryptsyOrderId orderId, CryptsyMarketId marketId, int? limit)
         {
             List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
@@ -146,7 +165,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             if (null != orderId)
             {
-                parameters.Add(new KeyValuePair<string, string>(PARAM_MARKET_ID, orderId.ToString()));
+                parameters.Add(new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString()));
             }
 
             if (null != limit)
@@ -157,21 +176,35 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return parameters.ToArray();
         }
 
-        private KeyValuePair<string, string>[] GenerateOrderRequest(CryptsyMethod method,
-            OrderType orderType, Price quantity, Price price)
+        /// <summary>
+        /// Constructs parameters to be sent as part of a request to Cryptsy.
+        /// </summary>
+        /// <param name="method">The API method to call</param>
+        /// <param name="marketId">An optional market ID to be passsed as a parameter to the method</param>
+        /// <returns>An array of key-value pairs</returns>
+        private KeyValuePair<string, string>[] GenerateOrderParameters(CryptsyMethod method,
+            CryptsyMarketId marketId, OrderType orderType, Price quantity, Price price)
         {
-            return new[] {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
                 new KeyValuePair<string, string>(PARAM_METHOD, System.Enum.GetName(typeof(CryptsyMethod), method)),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
                 new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
                 new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
             };
+
+            if (null != marketId)
+            {
+                parameters.Add(new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString()));
+            }
+
+            return parameters.ToArray();
         }
 
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getinfo,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
@@ -258,7 +291,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.marketorders,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
@@ -272,7 +305,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getmarkets,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -281,7 +314,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<Transaction>> GetMyTransactions()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.mytransactions,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -290,7 +323,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.markettrades,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -299,7 +332,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.mytrades,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -310,7 +343,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.allmytrades,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -321,7 +354,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.myorders,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -332,7 +365,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.allmyorders,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
@@ -343,7 +376,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<Book> GetMarketDepth(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.depth,
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.depth,
                 (CryptsyOrderId)null, marketId, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
