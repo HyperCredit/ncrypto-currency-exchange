@@ -54,7 +54,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Cryptsy\AbstractCryptsyExample.cs" />
-    <Compile Include="Cryptsy\ConfigurationException.cs" />
     <Compile Include="Cryptsy\GetInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

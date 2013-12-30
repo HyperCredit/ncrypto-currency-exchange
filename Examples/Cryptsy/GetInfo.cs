@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Lostics.NCryptoExchange.Cryptsy;
 using Lostics.NCryptoExchange.Model;
+using Lostics.NCryptoExchange;
 
 namespace Lostics.NCryptoExchangeExamples.Cryptsy
 {
