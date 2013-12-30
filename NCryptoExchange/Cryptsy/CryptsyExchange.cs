@@ -71,8 +71,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await GetReturnAsJToken(response);
         }
 
-        public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
-                Quantity price)
+        public async Task<Fees> CalculateFees(OrderType orderType, Price quantity,
+                Price price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.calculatefees,
                 orderType, quantity, price));
@@ -81,13 +81,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
-            return new Fees(Quantity.Parse(returnObj["fee"]),
-                Quantity.Parse(returnObj["net"]));
+            return new Fees(Price.Parse(returnObj["fee"]),
+                Price.Parse(returnObj["net"]));
         }
 
         public async Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
-                OrderType orderType, Quantity quantity,
-                Quantity price)
+                OrderType orderType, Price quantity,
+                Price price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.createorder,
                 orderType, quantity, price));
@@ -146,7 +146,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         }
 
         private KeyValuePair<string, string>[] GenerateOrderRequest(CryptsyMethod method,
-            OrderType orderType, Quantity quantity, Quantity price)
+            OrderType orderType, Price quantity, Price price)
         {
             return new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, System.Enum.GetName(typeof(CryptsyMethod), method)),
@@ -380,8 +380,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject depthJson in sideJson)
             {
-                side.Add(new MarketDepth(Quantity.Parse(depthJson["price"]),
-                    Quantity.Parse(depthJson["quantity"])));
+                side.Add(new MarketDepth(Price.Parse(depthJson["price"]),
+                    Price.Parse(depthJson["quantity"])));
             }
 
             return side;
@@ -395,16 +395,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
             {
                 foreach (JObject jsonOrder in jArray)
                 {
-                    Quantity quantity = Quantity.Parse(jsonOrder["quantity"]);
-                    Quantity price;
+                    Price quantity = Price.Parse(jsonOrder["quantity"]);
+                    Price price;
 
                     switch (orderType)
                     {
                         case OrderType.Buy:
-                            price = Quantity.Parse(jsonOrder["buyprice"]);
+                            price = Price.Parse(jsonOrder["buyprice"]);
                             break;
                         case OrderType.Sell:
-                            price = Quantity.Parse(jsonOrder["sellprice"]);
+                            price = Price.Parse(jsonOrder["sellprice"]);
                             break;
                         default:
                             throw new ArgumentException("Unknown order type \"" + orderType.ToString() + "\".");
@@ -437,8 +437,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
                 trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
-                    Quantity.Parse(jsonTrade["tradeprice"]),
-                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"]),
+                    Price.Parse(jsonTrade["tradeprice"]),
+                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["fee"]),
                     marketId
                 ));
             }
@@ -462,8 +462,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["ordertype"].ToString());
                 orders.Add(new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
                     orderType, created,
-                    Quantity.Parse(jsonTrade["price"]),
-                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["orig_quantity"]),
+                    Price.Parse(jsonTrade["price"]),
+                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["orig_quantity"]),
                     marketId
                 ));
             }
@@ -488,8 +488,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
                 trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
-                    Quantity.Parse(jsonTrade["tradeprice"]),
-                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"]),
+                    Price.Parse(jsonTrade["tradeprice"]),
+                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["fee"]),
                     marketId, orderId
                 ));
             }
@@ -509,8 +509,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 Transaction transaction = new Transaction(jsonTransaction["currency"].ToString(),
                     transactionPosted, transactionType, 
-                    Address.Parse(jsonTransaction["address"]), Quantity.Parse(jsonTransaction["amount"]),
-                    Quantity.Parse(jsonTransaction["fee"]));
+                    Address.Parse(jsonTransaction["address"]), Price.Parse(jsonTransaction["amount"]),
+                    Price.Parse(jsonTransaction["fee"]));
                 transactions.Add(transaction);
             }
 

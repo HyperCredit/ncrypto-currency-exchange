@@ -43,7 +43,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
 
             using (CryptsyExchange cryptsy = GetExchange())
             {
-                response = cryptsy.CalculateFees(OrderType.Buy, new Quantity(0.05), new Quantity(1.0));
+                response = cryptsy.CalculateFees(OrderType.Buy, new Price(0.05), new Price(1.0));
                 response.Wait();
             }
 

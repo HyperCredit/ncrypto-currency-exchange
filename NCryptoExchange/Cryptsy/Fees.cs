@@ -6,10 +6,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class Fees
     {
-        private Quantity fee;
-        private Quantity net;
+        private Price fee;
+        private Price net;
 
-        public Fees(Quantity setFee, Quantity setNet)
+        public Fees(Price setFee, Price setNet)
         {
             this.fee = setFee;
             this.net = setNet;
@@ -17,8 +17,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public Fees(double setFee, double setNet)
         {
-            this.fee = new Quantity(setFee);
-            this.net = new Quantity(setNet);
+            this.fee = new Price(setFee);
+            this.net = new Price(setNet);
         }
 
         public override string ToString()

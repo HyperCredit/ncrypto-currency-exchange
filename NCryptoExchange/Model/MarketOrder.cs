@@ -4,7 +4,7 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class MarketOrder : Order
     {
-        public MarketOrder(OrderType orderType, Quantity price, Quantity quantity)
+        public MarketOrder(OrderType orderType, Price price, Price quantity)
             : base (orderType, price, quantity)
         {
         }

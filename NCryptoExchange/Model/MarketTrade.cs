@@ -6,8 +6,8 @@ namespace Lostics.NCryptoExchange.Model
         where T : TradeId
     {
         public MarketTrade(T tradeId, OrderType tradeType,
-            DateTime dateTime, Quantity price,
-            Quantity quantity, Quantity fee,
+            DateTime dateTime, Price price,
+            Price quantity, Price fee,
             M marketId) : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
         {
         }

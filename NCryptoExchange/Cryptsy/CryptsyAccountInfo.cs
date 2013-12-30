@@ -39,7 +39,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 JProperty balanceHeld = balancesHold.Property(balanceAvailable.Name);
 
                 wallets.Add(new Wallet(balanceAvailable.Name,
-                    Quantity.Parse(balanceAvailable), Quantity.Parse(balanceHeld)));
+                    Price.Parse(balanceAvailable), Price.Parse(balanceHeld)));
             }
 
             return new CryptsyAccountInfo(wallets, DateTime.Parse(serverDateTime));

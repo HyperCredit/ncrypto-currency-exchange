@@ -3,7 +3,7 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public class Quantity : IComparable<Quantity>
+    public class Price : IComparable<Price>
     {
         private readonly long count;
         private readonly double tickSize;
@@ -12,19 +12,19 @@ namespace Lostics.NCryptoExchange.Model
         public double TickSize { get { return this.tickSize; } }
         public double Value { get { return this.count * this.tickSize; } }
 
-        public Quantity(long setCount, double setTickSize)
+        public Price(long setCount, double setTickSize)
         {
             this.count = setCount;
             this.tickSize = setTickSize;
         }
 
-        public Quantity(double setValue)
+        public Price(double setValue)
         {
             this.count = (long)Math.Round(setValue / Constants.DEFAULT_TICK_SIZE);
             this.tickSize = Constants.DEFAULT_TICK_SIZE;
         }
 
-        public int CompareTo(Quantity other)
+        public int CompareTo(Price other)
         {
             double otherValue = other.Value;
             double diff = this.Value - other.Value;
@@ -46,12 +46,12 @@ namespace Lostics.NCryptoExchange.Model
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Quantity))
+            if (!(obj is Price))
             {
                 return false;
             }
 
-            Quantity other = (Quantity)obj;
+            Price other = (Price)obj;
 
             return Math.Abs(this.Value - other.Value) < Math.Min(this.tickSize, other.tickSize);
         }
@@ -67,16 +67,16 @@ namespace Lostics.NCryptoExchange.Model
         /// <param name="valueAsStr"></param>
         /// <returns></returns>
         /// <exception cref="System.FormatException">valueAsStr does not represent a number in a valid format.</exception>
-        public static Quantity Parse(string valueAsStr)
+        public static Price Parse(string valueAsStr)
         {
             double value = Double.Parse(valueAsStr);
 
             // Should derive tick size from formatted string
 
-            return new Quantity(value);
+            return new Price(value);
         }
 
-        public static Quantity Parse(JToken valueAsJson)
+        public static Price Parse(JToken valueAsJson)
         {
             switch (valueAsJson.Type) {
                 case JTokenType.Property:

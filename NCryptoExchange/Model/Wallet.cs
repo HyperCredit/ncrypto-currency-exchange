@@ -8,20 +8,20 @@ namespace Lostics.NCryptoExchange.Model
     public class Wallet
     {
         private readonly string currencyCode;
-        private readonly Quantity balance;
-        private readonly Quantity heldBalance;
+        private readonly Price balance;
+        private readonly Price heldBalance;
 
-        public Quantity Balance
+        public Price Balance
         {
             get { return this.balance; }
         }
 
-        public Quantity HeldBalance
+        public Price HeldBalance
         {
             get { return this.heldBalance; }
         }
 
-        public Wallet(string currencyCode, Quantity setBalance, Quantity setHeldBalance)
+        public Wallet(string currencyCode, Price setBalance, Price setHeldBalance)
         {
             this.currencyCode = currencyCode;
             this.balance = setBalance;
