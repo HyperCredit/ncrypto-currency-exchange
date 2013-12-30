@@ -25,6 +25,30 @@ namespace Lostics.NCryptoExchange.Model
             this.fee = fee;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Trade<O, T>))
+            {
+                return false;
+            }
+
+            Trade<O, T> other = (Trade<O, T>)obj;
+
+            return this.tradeId.Equals(other.tradeId);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.tradeId.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return this.tradeType.ToString() + " "
+                + this.quantity + " at "
+                + this.price + " each";
+        }
+
         public T TradeId { get { return this.tradeId; } }
         public OrderType OrderType { get { return this.tradeType; } }
         public DateTime DateTime { get { return this.dateTime; } }
