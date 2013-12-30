@@ -53,7 +53,7 @@ namespace Lostics.NCryptoExchange.Model
         }
 
         public T TradeId { get { return this.tradeId; } }
-        public OrderType OrderType { get { return this.tradeType; } }
+        public OrderType TradeType { get { return this.tradeType; } }
         public DateTime DateTime { get { return this.dateTime; } }
         public Quantity Price { get { return this.price; } }
         public Quantity Quantity { get { return this.quantity; } }

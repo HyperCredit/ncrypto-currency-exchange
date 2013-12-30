@@ -24,9 +24,9 @@ namespace Lostics.NCryptoExchange
 
         Task<List<MyTrade<M, O, T>>> GetAllMyTrades(int? limit);
 
-        Task<List<MyOrder>> GetMyOrders(M marketId, int? limit);
+        Task<List<MyOrder<M, O>>> GetMyOrders(M marketId, int? limit);
 
-        Task<List<MyOrder>> GetAllMyOrders(int? limit);
+        Task<List<MyOrder<M, O>>> GetAllMyOrders(int? limit);
 
         Task<List<MarketDepth>> GetMarketDepth(M marketId);
 

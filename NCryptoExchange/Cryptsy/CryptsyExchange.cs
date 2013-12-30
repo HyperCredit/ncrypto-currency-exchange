@@ -17,6 +17,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
+        public const string METHOD_ALL_MY_ORDERS = "allmyorders";
         public const string METHOD_ALL_MY_TRADES = "allmytrades";
         public const string METHOD_CANCEL_ORDER = "cancelorder";
         public const string METHOD_CANCEL_ALL_ORDERS = "cancelallorders";
@@ -26,6 +27,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string METHOD_GET_INFO = "getinfo";
         public const string METHOD_GET_MARKETS = "getmarkets";
         public const string METHOD_MARKET_ORDERS = "marketorders";
+        public const string METHOD_MARKET_TRADES = "markettrades";
+        public const string METHOD_MY_ORDERS = "myorders";
         public const string METHOD_MY_TRADES = "mytrades";
         public const string METHOD_MY_TRANSACTIONS = "mytransactions";
 
@@ -253,7 +256,17 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MARKET_TRADES),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseMarketTrades(returnArray, marketId);
         }
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
@@ -285,14 +298,33 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return ParseMyTrades(returnArray, null);
         }
 
-        public async Task<List<MyOrder>> GetMyOrders(CryptsyMarketId marketId, int? limit)
+        public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_ORDERS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseMyOrders(returnArray, marketId);
         }
 
-        public async Task<List<MyOrder>> GetAllMyOrders(int? limit)
+        public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_ALL_MY_ORDERS),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JArray returnArray = (JArray)await GetReturnAsJToken(response);
+
+            return ParseMyOrders(returnArray, null);
         }
 
         public async Task<List<MarketDepth>> GetMarketDepth(CryptsyMarketId marketId)
@@ -376,6 +408,56 @@ namespace Lostics.NCryptoExchange.Cryptsy
             catch (System.FormatException e)
             {
                 throw new CryptsyResponseException("Encountered invalid quantity/price while parsing market orders.", e);
+            }
+
+            return orders;
+        }
+
+        private List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
+        {
+            List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = new List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>();
+
+            foreach (JObject jsonTrade in jsonTrades)
+            {
+                // FIXME: Need to correct timezone on this
+                DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+                JToken marketIdToken = jsonTrade["marketid"];
+                CryptsyMarketId marketId = null == marketIdToken
+                    ? defaultMarketId
+                    : CryptsyMarketId.Parse(marketIdToken);
+                CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
+                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+                trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
+                    tradeType, tradeDateTime,
+                    Quantity.Parse(jsonTrade["tradeprice"]),
+                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["fee"]),
+                    marketId
+                ));
+            }
+
+            return trades;
+        }
+
+        private List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders, CryptsyMarketId defaultMarketId)
+        {
+            List<MyOrder<CryptsyMarketId, CryptsyOrderId>> orders = new List<MyOrder<CryptsyMarketId, CryptsyOrderId>>();
+
+            foreach (JObject jsonTrade in jsonOrders)
+            {
+                // FIXME: Need to correct timezone on this
+                DateTime created = DateTime.Parse(jsonTrade["created"].ToString());
+                JToken marketIdToken = jsonTrade["marketid"];
+                CryptsyMarketId marketId = null == marketIdToken
+                    ? defaultMarketId
+                    : CryptsyMarketId.Parse(marketIdToken);
+                CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["orderid"]);
+                OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["ordertype"].ToString());
+                orders.Add(new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
+                    orderType, created,
+                    Quantity.Parse(jsonTrade["price"]),
+                    Quantity.Parse(jsonTrade["quantity"]), Quantity.Parse(jsonTrade["orig_quantity"]),
+                    marketId
+                ));
             }
 
             return orders;
