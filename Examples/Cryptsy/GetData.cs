@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Lostics.NCryptoExchangeExamples.Cryptsy
 {
-    public abstract class AbstractCryptsyExample
+    public class GetData
     {
         public const string CONFIG_FILENAME = "cryptsy.conf";
 
@@ -14,9 +14,17 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             return new FileInfo(Path.Combine(dir.FullName, CONFIG_FILENAME));
         }
 
-        public static CryptsyExchange GetExchange()
+        static void Main()
         {
-            return Lostics.NCryptoExchange.Cryptsy.CryptsyExchange.GetExchange(GetDefaultConfigurationFile());
+            CryptsyExchange cryptsy = CryptsyExchange.GetExchange(GetDefaultConfigurationFile());
+
+            cryptsy.DumpResponse = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent;
+
+            cryptsy.GetAccountInfo().Wait();
+            cryptsy.GetMarkets().Wait();
+
+            Console.WriteLine("Requests completed, press any key to exit.");
+            Console.ReadKey();
         }
     }
 }

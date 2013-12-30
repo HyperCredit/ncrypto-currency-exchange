@@ -41,11 +41,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
         private readonly TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
         private HttpClient client = new HttpClient();
+        private DirectoryInfo dumpResponse = null;
         private readonly string privateUrl = "https://www.cryptsy.com/api";
         private readonly string publicKey;
         private readonly byte[] privateKey;
-
-        public byte[] PrivateKey { get { return this.privateKey; } }
 
         public CryptsyExchange(string publicKey, string privateKey)
         {
@@ -64,7 +63,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            await GetReturnAsJToken(response, null);
+            await ParseResponseToJson(response, null);
         }
 
         /// <summary>
@@ -78,7 +77,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            return await GetReturnAsJToken(response, returnType);
+            return await ParseResponseToJson(response, returnType);
         }
 
         public async override Task CancelOrder(CryptsyOrderId orderId)
@@ -279,16 +278,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new CryptsyExchange(publicKey, privateKey);
         }
 
-        private static void WriteDefaultFile(FileInfo file)
-        {
-            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
-            {
-                writer.WriteLine("# Configuration file for specifying API public & private key.");
-                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
-                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
-            }
-        }
-
         public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
@@ -403,7 +392,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <exception cref="CryptsyFailureException">Where Cryptsy returned an error.</exception>
         /// <exception cref="CryptsyResponseException">Where there was a problem
         /// parsing the response from Cryptsy.</exception>
-        private static async Task<JToken> GetReturnAsJToken(HttpResponseMessage response, JTokenType? requiredType)
+        private async Task<JToken> ParseResponseToJson(HttpResponseMessage response, JTokenType? requiredType)
         {
             JObject jsonObj;
 
@@ -414,6 +403,21 @@ namespace Lostics.NCryptoExchange.Cryptsy
             catch (ArgumentException e)
             {
                 throw new CryptsyResponseException("Could not parse response from Cryptsy.", e);
+            }
+
+            // Log the response from Cryptsy if configured to do so
+            if (null != this.DumpResponse)
+            {
+                string filename = DateTime.Now.Millisecond.ToString() + ".txt";
+                FileInfo logFile = new FileInfo(Path.Combine(this.DumpResponse.FullName, filename));
+
+                Console.WriteLine("Writing log to "
+                    + logFile.FullName);
+
+                using (StreamWriter dumpTo = new StreamWriter(new FileStream(logFile.FullName, FileMode.CreateNew)))
+                {
+                    dumpTo.Write(jsonObj.ToString());
+                }
             }
 
             if (null == jsonObj["success"])
@@ -451,5 +455,22 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             return returnObj;
         }
+
+        private static void WriteDefaultFile(FileInfo file)
+        {
+            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
+            {
+                writer.WriteLine("# Configuration file for specifying API public & private key.");
+                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
+                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
+            }
+        }
+
+        /// <summary>
+        /// Directory to dump responses from Cryptsy into, as plain text.
+        /// Normally left unset (null), in which case responses are not dumped.
+        /// </summary>
+        public DirectoryInfo DumpResponse { get; set; }
+        public string PublicKey { get { return this.publicKey; } }
     }
 }
