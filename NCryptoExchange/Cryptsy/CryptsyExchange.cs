@@ -26,6 +26,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string PARAM_ORDER_TYPE = "ordertype";
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
+        public const string PROPERTY_PUBLIC_KEY = "public_key";
+        public const string PROPERTY_PRIVATE_KEY = "private_key";
 
         private HttpClient client = new HttpClient();
         private readonly string publicUrl = "http://pubapi.cryptsy.com/api.php";
@@ -167,6 +169,79 @@ namespace Lostics.NCryptoExchange.Cryptsy
             JObject returnObj = (JObject)await GetReturnAsJToken(response);
 
             return CryptsyAccountInfo.Parse(returnObj);
+        }
+
+        public static CryptsyExchange GetExchange(FileInfo configurationFile)
+        {
+            string publicKey = null;
+            string privateKey = null;
+
+            if (!configurationFile.Exists)
+            {
+                WriteDefaultFile(configurationFile);
+                throw new ConfigurationException("No configuration file exists; blank default created. "
+                    + "Please enter public and private key values and try again.");
+            }
+
+            using (StreamReader reader = new StreamReader(new FileStream(configurationFile.FullName, FileMode.Open)))
+            {
+                string line = reader.ReadLine();
+
+                while (null != line)
+                {
+                    line = line.Trim();
+
+                    // Ignore comment lines
+                    if (!line.StartsWith("#"))
+                    {
+                        string[] parts = line.Split(new[] { '=' });
+                        if (parts.Length >= 2)
+                        {
+                            string name = parts[0].Trim().ToLower();
+
+                            switch (name)
+                            {
+                                case PROPERTY_PUBLIC_KEY:
+                                    publicKey = parts[1].Trim();
+                                    break;
+                                case PROPERTY_PRIVATE_KEY:
+                                    privateKey = parts[1].Trim();
+                                    break;
+                                default:
+                                    Console.Error.WriteLine("Found unknown property \""
+                                        + parts[0] + "\".");
+                                    break;
+                            }
+                        }
+                    }
+
+                    line = reader.ReadLine();
+                }
+            }
+
+            if (null == publicKey)
+            {
+                throw new ConfigurationException("No public key specified in configuration file \""
+                    + configurationFile.FullName + "\".");
+            }
+
+            if (null == privateKey)
+            {
+                throw new ConfigurationException("No public key specified in configuration file \""
+                    + configurationFile.FullName + "\".");
+            }
+
+            return new CryptsyExchange(publicKey, privateKey);
+        }
+
+        private static void WriteDefaultFile(FileInfo file)
+        {
+            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
+            {
+                writer.WriteLine("# Configuration file for specifying API public & private key.");
+                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
+                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
+            }
         }
 
         public string GetNextNonce()

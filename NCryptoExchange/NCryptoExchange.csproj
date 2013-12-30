@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyExchange.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />
     <Compile Include="Cryptsy\CryptsyResponseException.cs" />
     <Compile Include="Cryptsy\CryptsyTradeId.cs" />
+    <Compile Include="Cryptsy\TimezoneResolver.cs" />
     <Compile Include="ExchangeException.cs" />
     <Compile Include="Model\AbstractStringBasedId.cs" />
     <Compile Include="Model\AccountInfo.cs" />
@@ -79,7 +81,6 @@
     <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimeZoneResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CoinsE\" />

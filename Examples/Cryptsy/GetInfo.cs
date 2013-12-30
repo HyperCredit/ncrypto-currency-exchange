@@ -7,29 +7,30 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchangeExamples.Cryptsy
 {
-    public class GetInfo
+    public class GetInfo : AbstractCryptsyExample
     {
         static void Main()
         {
-            Task<AccountInfo<Wallet>> response;
-
-            using (CryptsyExchange cryptsy = GetExchange())
+            try
             {
-                response = cryptsy.GetAccountInfo();
-                response.Wait();
-            }
+                Task<AccountInfo<Wallet>> response;
 
-            Console.WriteLine(response.Result.ToString());
+                using (CryptsyExchange cryptsy = GetExchange())
+                {
+                    response = cryptsy.GetAccountInfo();
+                    response.Wait();
+                }
+
+                Console.WriteLine(response.Result.ToString());
+            }
+            catch (ConfigurationException e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
 
             // Keep the console window open in debug mode.
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
-        }
-
-        private static CryptsyExchange GetExchange()
-        {
-            return new CryptsyExchange("publicKey",
-                "privateKey");
         }
     }
 }
