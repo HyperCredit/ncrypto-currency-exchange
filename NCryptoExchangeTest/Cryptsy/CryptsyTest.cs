@@ -51,20 +51,6 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         }
 
         [TestMethod]
-        public void GetAccountInfoTest()
-        {
-            Task<AccountInfo<Wallet>> response;
-
-            using (CryptsyExchange cryptsy = GetExchange())
-            {
-                response = cryptsy.GetAccountInfo();
-                response.Wait();
-            }
-
-            System.Console.Write(response.Result.SystemTime.ToString());
-        }
-
-        [TestMethod]
         public void GetMarketOrdersTest()
         {
             CryptsyMarketId marketId = new CryptsyMarketId("132");
@@ -79,24 +65,6 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             foreach (MarketOrder order in response.Result)
             {
                 Console.WriteLine(order.ToString());
-            }
-        }
-
-        [TestMethod]
-        public void GetMarketsTest()
-        {
-            Task<List<Market<CryptsyMarketId>>> response;
-
-            using (CryptsyExchange cryptsy = GetExchange())
-            {
-                response = cryptsy.GetMarkets();
-                response.Wait();
-            }
-
-
-            foreach (Market<CryptsyMarketId> market in response.Result)
-            {
-                Console.WriteLine(market.ToString());
             }
         }
 
