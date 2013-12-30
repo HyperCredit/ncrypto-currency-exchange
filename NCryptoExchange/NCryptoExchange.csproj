@@ -63,10 +63,11 @@
     <Compile Include="Model\Market.cs" />
     <Compile Include="Model\MarketDepth.cs" />
     <Compile Include="Model\MarketId.cs" />
-    <Compile Include="Cryptsy\MarketOrder.cs" />
+    <Compile Include="Model\MarketOrder.cs" />
     <Compile Include="Model\MarketTrade.cs" />
     <Compile Include="Model\MyOrder.cs" />
     <Compile Include="Model\MyTrade.cs" />
+    <Compile Include="Model\Order.cs" />
     <Compile Include="Model\OrderId.cs" />
     <Compile Include="Model\OrderType.cs" />
     <Compile Include="Model\Quantity.cs" />
