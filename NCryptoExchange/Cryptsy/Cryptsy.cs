@@ -12,7 +12,7 @@ using Lostics.NCryptoExchange.Model;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyExchange : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
+    public class Cryptsy : IExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -39,7 +39,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public byte[] PrivateKey { get { return this.privateKey; } }
 
-        public CryptsyExchange(string publicKey, string privateKey)
+        public Cryptsy(string publicKey, string privateKey)
         {
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
@@ -173,7 +173,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyAccountInfo.Parse(returnObj);
         }
 
-        public static CryptsyExchange GetExchange(FileInfo configurationFile)
+        public static Cryptsy GetExchange(FileInfo configurationFile)
         {
             string publicKey = null;
             string privateKey = null;
@@ -233,7 +233,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     + configurationFile.FullName + "\".");
             }
 
-            return new CryptsyExchange(publicKey, privateKey);
+            return new Cryptsy(publicKey, privateKey);
         }
 
         private static void WriteDefaultFile(FileInfo file)

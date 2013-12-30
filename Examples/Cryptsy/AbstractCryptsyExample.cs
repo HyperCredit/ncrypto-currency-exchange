@@ -15,9 +15,9 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             return new FileInfo(Path.Combine(dir.FullName, CONFIG_FILENAME));
         }
 
-        public static CryptsyExchange GetExchange()
+        public static Cryptsy GetExchange()
         {
-            return CryptsyExchange.GetExchange(GetDefaultConfigurationFile());
+            return Cryptsy.GetExchange(GetDefaultConfigurationFile());
         }
     }
 }
