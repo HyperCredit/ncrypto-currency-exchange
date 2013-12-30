@@ -34,6 +34,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
+        public const string PARAM_LIMIT = "limit";
         public const string PARAM_NONCE = "nonce";
         public const string PARAM_ORDER_ID = "orderid";
         public const string PARAM_ORDER_TYPE = "ordertype";
@@ -271,11 +272,19 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_TRADES),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
-            });
+            };
+
+            if (null != limit)
+            {
+                parameters.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(parameters.ToArray());
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -286,10 +295,18 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_ALL_MY_TRADES),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            };
+
+            if (null != limit)
+            {
+                parameters.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(parameters.ToArray());
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -300,11 +317,19 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_ORDERS),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
-            });
+            };
+
+            if (null != limit)
+            {
+                parameters.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(parameters.ToArray());
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -315,10 +340,18 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
                 new KeyValuePair<string, string>(PARAM_METHOD, METHOD_ALL_MY_ORDERS),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            };
+
+            if (null != limit)
+            {
+                parameters.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(parameters.ToArray());
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
