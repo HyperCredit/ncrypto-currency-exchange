@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoinsE\CoinsEException.cs" />
+    <Compile Include="CoinsE\CoinsEExchange.cs" />
+    <Compile Include="CoinsE\CoinsEResponseException.cs" />
+    <Compile Include="CoinsE\CoinsEMarketId.cs" />
+    <Compile Include="CoinsE\CoinsEOrderId.cs" />
+    <Compile Include="CoinsE\CoinsETradeId.cs" />
     <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
@@ -85,9 +91,7 @@
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CoinsE\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
