@@ -17,6 +17,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
+        public const string PARAM_CURRENCY_CODE = "currencycode";
         public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
         public const string PARAM_LIMIT = "limit";
@@ -104,7 +105,17 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<Address> GenerateNewAddress(string currencyCode)
         {
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, System.Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.generatenewaddress)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_CURRENCY_CODE, currencyCode)
+            });
+
+            await SignRequest(request);
+            HttpResponseMessage response = await client.PostAsync(privateUrl, request);
+            JObject returnObj = (JObject)await GetReturnAsJToken(response);
+
+            return Address.Parse(returnObj);
         }
 
         private KeyValuePair<string, string>[] GenerateRequest(CryptsyMethod method,
