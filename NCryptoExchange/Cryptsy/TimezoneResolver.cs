@@ -16,6 +16,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     {
         private static Dictionary<string, TimeZoneInfo> timezonesByShortCode = new Dictionary<string, TimeZoneInfo>()
         {
+            { "CST" , TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time") },
             { "EST" , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time") },
             { "PST" , TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time") },
             { "UTC" , TimeZoneInfo.FindSystemTimeZoneById("UTC") }
