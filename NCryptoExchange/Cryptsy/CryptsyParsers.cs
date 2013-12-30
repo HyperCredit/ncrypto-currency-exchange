@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    class Parsers
+    public class CryptsyParsers
     {
-        internal static List<Market<CryptsyMarketId>> ParseMarkets(JArray marketsJson, TimeZoneInfo timeZone)
+        public static List<Market<CryptsyMarketId>> ParseMarkets(JArray marketsJson, TimeZoneInfo timeZone)
         {
             List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
 
@@ -35,7 +35,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return markets;
         }
 
-        internal static Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
+        public static Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
         {
             JToken buyJson = bookJson["buy"];
             JToken sellJson = bookJson["sell"];
@@ -61,7 +61,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new Book(sell, buy);
         }
 
-        internal static List<MarketDepth> ParseMarketDepth(JArray sideJson, CryptsyMarketId marketId)
+        public static List<MarketDepth> ParseMarketDepth(JArray sideJson, CryptsyMarketId marketId)
         {
             List<MarketDepth> side = new List<MarketDepth>(sideJson.Count);
 
@@ -74,7 +74,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return side;
         }
 
-        internal static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
+        public static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
         {
             List<MarketOrder> orders = new List<MarketOrder>(jArray.Count);
 
@@ -108,7 +108,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        internal static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades,
+        public static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = new List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>();
@@ -136,7 +136,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return trades;
         }
 
-        internal static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders,
+        public static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MyOrder<CryptsyMarketId, CryptsyOrderId>> orders = new List<MyOrder<CryptsyMarketId, CryptsyOrderId>>();
@@ -164,7 +164,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        internal static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades,
+        public static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>();
@@ -193,7 +193,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return trades;
         }
 
-        internal static List<Transaction> ParseTransactions(JArray jsonTransactions)
+        public static List<Transaction> ParseTransactions(JArray jsonTransactions)
         {
             List<Transaction> transactions = new List<Transaction>();
 

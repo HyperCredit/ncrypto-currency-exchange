@@ -289,8 +289,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, marketId, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
-            List<MarketOrder> buyOrders = Parsers.ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
-            List<MarketOrder> sellOrders = Parsers.ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
+            List<MarketOrder> buyOrders = CryptsyParsers.ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
+            List<MarketOrder> sellOrders = CryptsyParsers.ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
 
             buyOrders.AddRange(sellOrders);
 
@@ -303,7 +303,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
-            return Parsers.ParseMarkets(returnArray, defaultTimeZone);
+            return CryptsyParsers.ParseMarkets(returnArray, defaultTimeZone);
         }
 
         public async override Task<List<Transaction>> GetMyTransactions()
@@ -312,7 +312,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
-            return Parsers.ParseTransactions(returnArray);
+            return CryptsyParsers.ParseTransactions(returnArray);
         }
 
         public async override Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
@@ -321,7 +321,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, marketId, null));
             JArray returnArray = (JArray)await Call(request, JTokenType.Array);
 
-            return Parsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
+            return CryptsyParsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
 
         public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
@@ -332,7 +332,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return Parsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
+            return CryptsyParsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
         }
 
         public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
@@ -343,7 +343,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return Parsers.ParseMyTrades(returnArray, null, defaultTimeZone);
+            return CryptsyParsers.ParseMyTrades(returnArray, null, defaultTimeZone);
         }
 
         public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
@@ -354,7 +354,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return Parsers.ParseMyOrders(returnArray, marketId, defaultTimeZone);
+            return CryptsyParsers.ParseMyOrders(returnArray, marketId, defaultTimeZone);
         }
 
         public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
@@ -365,7 +365,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return Parsers.ParseMyOrders(returnArray, null, defaultTimeZone);
+            return CryptsyParsers.ParseMyOrders(returnArray, null, defaultTimeZone);
         }
 
         public async override Task<Book> GetMarketDepth(CryptsyMarketId marketId)
@@ -374,7 +374,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, marketId, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
-            return Parsers.ParseMarketDepthBook(returnObj, marketId);
+            return CryptsyParsers.ParseMarketDepthBook(returnObj, marketId);
         }
 
         /// <summary>
