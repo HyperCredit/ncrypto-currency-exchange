@@ -13,25 +13,29 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyAccountInfo : AccountInfo<Wallet>
     {
-        private string servertimezone;
-        private DateTime serverdatetime;
-        private int openordercount;
+        private string serverTimeZone;
+        private int openOrderCount;
 
-        public CryptsyAccountInfo()
-            : base(new List<Wallet>(), DateTime.Now)
+        public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setSystemTime,
+            string serverTimeZone, int openOrderCount) : base(setWallets, setSystemTime)
         {
+            this.serverTimeZone = serverTimeZone;
+            this.openOrderCount = openOrderCount;
         }
 
-        public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setSystemTime) : base(setWallets, setSystemTime)
+        public override string ToString()
         {
-
+            return this.SystemTime.ToString() + ": "
+                + this.OpenOrderCount + " open orders.";
         }
 
         internal static AccountInfo<Wallet> Parse(Newtonsoft.Json.Linq.JObject returnObj)
         {
             JObject balancesAvailable = (JObject)returnObj["balances_available"];
             JObject balancesHold = (JObject)returnObj["balances_hold"];
-            string serverDateTime = returnObj["serverdatetime"].ToString();
+            string serverDateTimeStr = returnObj["serverdatetime"].ToString();
+            string serverTimeZone = returnObj["servertimezone"].ToString();
+            int openOrderCount = int.Parse(returnObj["openordercount"].ToString());
             List<Wallet> wallets = new List<Wallet>();
 
             foreach (JProperty balanceAvailable in balancesAvailable.Properties())
@@ -42,7 +46,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     Price.Parse(balanceAvailable), Price.Parse(balanceHeld)));
             }
 
-            return new CryptsyAccountInfo(wallets, DateTime.Parse(serverDateTime));
+            return new CryptsyAccountInfo(wallets, DateTime.Parse(serverDateTimeStr),
+                serverTimeZone, openOrderCount);
         }
+
+        public int OpenOrderCount { get { return this.openOrderCount;  } }
+        public string ServerTimeZone { get { return this.serverTimeZone; } }
     }
 }

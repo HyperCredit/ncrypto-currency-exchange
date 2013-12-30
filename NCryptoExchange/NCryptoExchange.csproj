@@ -72,7 +72,7 @@
     <Compile Include="Model\Order.cs" />
     <Compile Include="Model\OrderId.cs" />
     <Compile Include="Model\OrderType.cs" />
-    <Compile Include="Model\Quantity.cs" />
+    <Compile Include="Model\Price.cs" />
     <Compile Include="Model\Trade.cs" />
     <Compile Include="Model\TradeId.cs" />
     <Compile Include="Model\Transaction.cs" />
