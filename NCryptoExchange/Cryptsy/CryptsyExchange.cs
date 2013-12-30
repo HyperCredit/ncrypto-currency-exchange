@@ -299,7 +299,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <exception cref="CryptsyFailureException">Where Cryptsy returned an error.</exception>
         /// <exception cref="CryptsyResponseException">Where there was a problem
         /// parsing the response from Cryptsy.</exception>
-        private async Task<JToken> GetReturnAsJToken(HttpResponseMessage response)
+        private static async Task<JToken> GetReturnAsJToken(HttpResponseMessage response)
         {
             JObject jsonObj;
 
@@ -341,7 +341,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return jsonObj["return"];
         }
 
-        private List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
+        private static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
         {
             List<MarketOrder> orders = new List<MarketOrder>(jArray.Count);
 
@@ -375,7 +375,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        private List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
+        private static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
         {
             List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = new List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>();
 
@@ -400,7 +400,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return trades;
         }
 
-        private List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders, CryptsyMarketId defaultMarketId)
+        private static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders, CryptsyMarketId defaultMarketId)
         {
             List<MyOrder<CryptsyMarketId, CryptsyOrderId>> orders = new List<MyOrder<CryptsyMarketId, CryptsyOrderId>>();
 
@@ -425,7 +425,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        private List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
+        private static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades, CryptsyMarketId defaultMarketId)
         {
             List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>();
 
@@ -451,7 +451,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return trades;
         }
 
-        private List<Transaction> ParseTransactions(JArray jsonTransactions)
+        private static List<Transaction> ParseTransactions(JArray jsonTransactions)
         {
             List<Transaction> transactions = new List<Transaction>();
 
