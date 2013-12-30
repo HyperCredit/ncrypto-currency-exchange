@@ -17,22 +17,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
 
-        public const string METHOD_ALL_MY_ORDERS = "allmyorders";
-        public const string METHOD_ALL_MY_TRADES = "allmytrades";
-        public const string METHOD_CANCEL_ORDER = "cancelorder";
-        public const string METHOD_CANCEL_ALL_ORDERS = "cancelallorders";
-        public const string METHOD_CANCEL_MARKET_ORDERS = "cancelmarketorder";
-        public const string METHOD_CALCULATE_FEES = "calculatefees";
-        public const string METHOD_CREATE_ORDER = "createorder";
-        public const string METHOD_GENERATE_NEW_ADDRESS = "generatenewaddress";
-        public const string METHOD_GET_INFO = "getinfo";
-        public const string METHOD_GET_MARKETS = "getmarkets";
-        public const string METHOD_MARKET_ORDERS = "marketorders";
-        public const string METHOD_MARKET_TRADES = "markettrades";
-        public const string METHOD_MY_ORDERS = "myorders";
-        public const string METHOD_MY_TRADES = "mytrades";
-        public const string METHOD_MY_TRANSACTIONS = "mytransactions";
-
         public const string PARAM_MARKET_ID = "marketid";
         public const string PARAM_METHOD = "method";
         public const string PARAM_LIMIT = "limit";
@@ -56,96 +40,41 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
-        /// <summary>
-        /// Asserts that the response from Cryptsy indicates success, and throws an exception
-        /// if not.
-        /// </summary>
-        /// <param name="jsonObj"></param>
-        /// <exception cref="CryptsyFailureException">Where there was an error reported by Cryptsy.</exception>
-        /// <exception cref="CryptsyResponseException">Where there was a problem parsing the response from Cryptsy.</exception>
-        private void AssertSuccess(JObject jsonObj)
-        {
-            if (null == jsonObj["success"])
-            {
-                throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
-            }
-
-            if (!(jsonObj["success"].ToString().Equals("1")))
-            {
-                string errorMessage = jsonObj["error"].ToString();
-
-                if (null == errorMessage)
-                {
-                    throw new CryptsyFailureException("Error response returned from Cryptsy.");
-                }
-                else
-                {
-                    throw new CryptsyFailureException("Error response returned from Cryptsy: "
-                        + errorMessage);
-                }
-            }
-        }
-
         public async Task CancelOrder(CryptsyOrderId orderId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ORDER),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelorder,
+                orderId, (CryptsyMarketId)null, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject jsonObj = await GetResponseAsJObject(response);
-
-            AssertSuccess(jsonObj);
-
-            return;
+            await GetReturnAsJToken(response);
         }
 
         public async Task CancelAllOrders()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_ALL_ORDERS),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelallorders,
+                (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject jsonObj = await GetResponseAsJObject(response);
-
-            AssertSuccess(jsonObj);
-
-            return;
+            await GetReturnAsJToken(response);
         }
 
         public async Task CancelMarketOrders(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CANCEL_MARKET_ORDERS),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.cancelmarketorder,
+                (CryptsyOrderId)null, marketId, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            JObject jsonObj = await GetResponseAsJObject(response);
-
-            AssertSuccess(jsonObj);
-
-            return;
+            await GetReturnAsJToken(response);
         }
 
         public async Task<Fees> CalculateFees(OrderType orderType, Quantity quantity,
                 Quantity price)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CALCULATE_FEES),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
-                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
-                new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.calculatefees,
+                orderType, quantity, price));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -159,13 +88,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 OrderType orderType, Quantity quantity,
                 Quantity price)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_CREATE_ORDER),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
-                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
-                new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateOrderRequest(CryptsyMethod.createorder,
+                orderType, quantity, price));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -210,12 +134,22 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return parameters.ToArray();
         }
 
+        private KeyValuePair<string, string>[] GenerateOrderRequest(CryptsyMethod method,
+            OrderType orderType, Quantity quantity, Quantity price)
+        {
+            return new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, System.Enum.GetName(typeof(CryptsyMethod), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, orderType.ToString()),
+                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString()),
+                new KeyValuePair<string, string>(PARAM_PRICE, price.ToString())
+            };
+        }
+
         public async Task<AccountInfo<Wallet>> GetAccountInfo()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_INFO),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getinfo,
+                (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -231,11 +165,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MARKET_ORDERS),
-                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString()),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.marketorders,
+                (CryptsyOrderId)null, marketId, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -251,10 +182,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<Market<CryptsyMarketId>>> GetMarkets()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_GET_MARKETS),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.getmarkets,
+                (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -271,10 +200,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<Transaction>> GetMyTransactions()
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MY_TRANSACTIONS),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.mytransactions,
+                (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -285,11 +212,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public async Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, METHOD_MARKET_TRADES),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_MARKET_ID, marketId.ToString())
-            });
+            FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateRequest(CryptsyMethod.markettrades,
+                (CryptsyOrderId)null, marketId, null));
 
             await SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -352,13 +276,19 @@ namespace Lostics.NCryptoExchange.Cryptsy
         }
 
         /// <summary>
-        /// Gets the entire response from Cryptsy as a JObject.
+        /// Gets the "return" property from the response from Cryptsy, and returns
+        /// it as a JToken. In case of an error response, throws a suitable Exception
+        /// instead.
         /// </summary>
         /// <param name="response">The HTTP response to read from</param>
-        /// <returns>The response as a JObject</returns>
-        /// <exception cref="IOException">Where there was a problem reading the response from Cryptsy.</exception>
-        /// <exception cref="CryptsyResponseException">Where there was a problem parsing the response from Cryptsy.</exception>
-        private async Task<JObject> GetResponseAsJObject(HttpResponseMessage response)
+        /// <returns>The returned content from Cryptsy as a JToken. May be null
+        /// if no return was provided.</returns>
+        /// <exception cref="IOException">Where there was a problem reading the
+        /// response from Cryptsy.</exception>
+        /// <exception cref="CryptsyFailureException">Where Cryptsy returned an error.</exception>
+        /// <exception cref="CryptsyResponseException">Where there was a problem
+        /// parsing the response from Cryptsy.</exception>
+        private async Task<JToken> GetReturnAsJToken(HttpResponseMessage response)
         {
             JObject jsonObj;
 
@@ -377,23 +307,25 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 }
             }
 
-            return jsonObj;
-        }
+            if (null == jsonObj["success"])
+            {
+                throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
+            }
 
-        /// <summary>
-        /// Gets the "return" property from the response from Cryptsy, and returns
-        /// it as a JObject. In case of an error response, throws a suitable Exception
-        /// instead.
-        /// </summary>
-        /// <param name="response">The HTTP response to read from</param>
-        /// <returns>The returned content from Cryptsy as a JObject</returns>
-        /// <exception cref="IOException">Where there was a problem reading the response from Cryptsy.</exception>
-        /// <exception cref="CryptsyResponseException">Where there was a problem parsing the response from Cryptsy.</exception>
-        private async Task<JToken> GetReturnAsJToken(HttpResponseMessage response)
-        {
-            JObject jsonObj = await GetResponseAsJObject(response);
+            if (!(jsonObj["success"].ToString().Equals("1")))
+            {
+                string errorMessage = jsonObj["error"].ToString();
 
-            AssertSuccess(jsonObj);
+                if (null == errorMessage)
+                {
+                    throw new CryptsyFailureException("Error response returned from Cryptsy.");
+                }
+                else
+                {
+                    throw new CryptsyFailureException("Error response returned from Cryptsy: "
+                        + errorMessage);
+                }
+            }
 
             return jsonObj["return"];
         }

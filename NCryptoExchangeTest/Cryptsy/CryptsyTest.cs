@@ -17,7 +17,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         {
             string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, CryptsyExchange.METHOD_GET_INFO),
+                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.getinfo)),
                     new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
                 });
 
