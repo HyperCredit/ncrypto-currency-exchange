@@ -13,11 +13,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyAccountInfo : AccountInfo<Wallet>
     {
-        private string serverTimeZone;
+        private TimeZoneInfo serverTimeZone;
         private int openOrderCount;
 
         public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setSystemTime,
-            string serverTimeZone, int openOrderCount) : base(setWallets, setSystemTime)
+            TimeZoneInfo serverTimeZone, int openOrderCount)
+            : base(setWallets, setSystemTime)
         {
             this.serverTimeZone = serverTimeZone;
             this.openOrderCount = openOrderCount;
@@ -34,9 +35,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             JObject balancesAvailable = (JObject)returnObj["balances_available"];
             JObject balancesHold = (JObject)returnObj["balances_hold"];
             string serverDateTimeStr = returnObj["serverdatetime"].ToString();
-            string serverTimeZone = returnObj["servertimezone"].ToString();
             int openOrderCount = int.Parse(returnObj["openordercount"].ToString());
             List<Wallet> wallets = new List<Wallet>();
+            TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(returnObj["servertimezone"].ToString());
+            DateTime serverDateTime = DateTime.Parse(serverDateTimeStr);
+
+            serverDateTime = TimeZoneInfo.ConvertTimeToUtc(serverDateTime, serverTimeZone);
 
             foreach (JProperty balanceAvailable in balancesAvailable.Properties())
             {
@@ -46,11 +50,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     Price.Parse(balanceAvailable), Price.Parse(balanceHeld)));
             }
 
-            return new CryptsyAccountInfo(wallets, DateTime.Parse(serverDateTimeStr),
+            return new CryptsyAccountInfo(wallets, serverDateTime,
                 serverTimeZone, openOrderCount);
         }
 
         public int OpenOrderCount { get { return this.openOrderCount;  } }
-        public string ServerTimeZone { get { return this.serverTimeZone; } }
+        public TimeZoneInfo ServerTimeZone { get { return this.serverTimeZone; } }
     }
 }

@@ -79,6 +79,7 @@
     <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimeZoneResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CoinsE\" />
