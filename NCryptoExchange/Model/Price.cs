@@ -3,6 +3,12 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
+    /// <summary>
+    /// Represents the price of one currency, as measured in another currency. Can also
+    /// be used to represent a quantity of a currency. This is used in place of double
+    /// as it provides fixed-precision like functionality for ensuring correct handling
+    /// of calculations involving prices.
+    /// </summary>
     public class Price : IComparable<Price>
     {
         private readonly long count;
@@ -22,6 +28,54 @@ namespace Lostics.NCryptoExchange.Model
         {
             this.count = (long)Math.Round(setValue / Constants.DEFAULT_TICK_SIZE);
             this.tickSize = Constants.DEFAULT_TICK_SIZE;
+        }
+
+        public static Price operator +(Price c1, Price c2)
+        {
+            // If they're of equivalent precision (which they generally should be),
+            // simply add the counts
+            if (c1.tickSize == c2.tickSize)
+            {
+                return new Price(c1.count + c2.count, c1.tickSize);
+            }
+
+            return new Price(c1.Value + c2.Value);
+        }
+
+        public static Price operator -(Price c1, Price c2)
+        {
+            // If they're of equivalent precision (which they generally should be),
+            // simply add the counts
+            if (c1.tickSize == c2.tickSize)
+            {
+                return new Price(c1.count - c2.count, c1.tickSize);
+            }
+
+            return new Price(c1.Value - c2.Value);
+        }
+
+        public static Price operator *(Price c1, Price c2)
+        {
+            // If they're of equivalent precision (which they generally should be),
+            // simply add the counts
+            if (c1.tickSize == c2.tickSize)
+            {
+                return new Price(c1.count * c2.count, c1.tickSize);
+            }
+
+            return new Price(c1.Value * c2.Value);
+        }
+
+        public static Price operator /(Price c1, Price c2)
+        {
+            // If they're of equivalent precision (which they generally should be),
+            // simply add the counts
+            if (c1.tickSize == c2.tickSize)
+            {
+                return new Price(c1.count / c2.count, c1.tickSize);
+            }
+
+            return new Price(c1.Value / c2.Value);
         }
 
         public int CompareTo(Price other)
