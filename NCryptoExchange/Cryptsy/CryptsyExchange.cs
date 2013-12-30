@@ -503,9 +503,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject jsonTransaction in jsonTransactions)
             {
-                // FIXME: Need to correct timezone on this
+                TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(jsonTransaction["timezone"].ToString());
                 DateTime transactionPosted = DateTime.Parse(jsonTransaction["datetime"].ToString());
                 TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction["type"].ToString());
+
+                TimeZoneInfo.ConvertTimeToUtc(transactionPosted, serverTimeZone);
 
                 Transaction transaction = new Transaction(jsonTransaction["currency"].ToString(),
                     transactionPosted, transactionType, 
