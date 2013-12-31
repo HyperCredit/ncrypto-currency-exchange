@@ -144,12 +144,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     ? defaultMarketId
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
-                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("tradetype"));
+                OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("initiate_ordertype"));
 
                 tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
                 trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
-                    tradeType, tradeDateTime,
+                    orderType, tradeDateTime,
                     jsonTrade.Value<decimal>("tradeprice"),
                     jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
                     marketId
