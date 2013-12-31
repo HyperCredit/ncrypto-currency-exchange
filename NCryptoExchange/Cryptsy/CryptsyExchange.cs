@@ -59,14 +59,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <param name="cryptsyResponse">Response from Cryptsy as JSON</param>
         private static void AssertResponseIsSuccess(JObject cryptsyResponse)
         {
-            if (null == cryptsyResponse["success"])
+            string success = cryptsyResponse.Value<string>("success");
+
+            if (null == success)
             {
                 throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
             }
 
-            if (!(cryptsyResponse["success"].ToString().Equals("1")))
+            if (!(success.Equals("1")))
             {
-                string errorMessage = cryptsyResponse["error"].ToString();
+                string errorMessage = cryptsyResponse.Value<string>("error");
 
                 if (null == errorMessage)
                 {
@@ -80,9 +82,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         }
 
         /// <summary>
-        /// Make a call to Cryptsy's private API
+        /// Make a call to Cryptsy's private API, where no return value is expected.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The request to send to Cryptsy</param>
         /// <returns></returns>
         private async Task Call(FormUrlEncodedContent request)
         {
@@ -96,7 +98,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <summary>
         /// Make a call to Cryptsy's private API
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">The request to send to Cryptsy</param>
         /// <returns>The return from Cryptsy as a JSON token</returns>
         private async Task<T> Call<T>(FormUrlEncodedContent request)
         {

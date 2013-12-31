@@ -15,15 +15,34 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
     public class CryptsyTest
     {
         [TestMethod]
+        public void TestParseAccountInfo()
+        {
+            JObject jsonObj = LoadTestData("accountinfo.json");
+            CryptsyAccountInfo accountInfo = CryptsyParsers.ParseAccountInfo(jsonObj.Value<JObject>("return"));
+
+            Assert.AreEqual(93, accountInfo.Wallets.Count);
+            Assert.AreEqual(TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"), accountInfo.ServerTimeZone);
+
+            foreach (Wallet wallet in accountInfo.Wallets)
+            {
+                if (wallet.CurrencyCode.Equals("BTC"))
+                {
+                    Assert.AreEqual((decimal)0.00001458, wallet.Balance);
+                }
+            }
+        }
+
+        [TestMethod]
         public void TestParseMarkets()
         {
             JObject jsonObj = LoadTestData("getmarkets.json");
-            List<Market<CryptsyMarketId>> markets = CryptsyParsers.ParseMarkets((JArray)jsonObj["return"],
+            List<Market<CryptsyMarketId>> markets = CryptsyParsers.ParseMarkets(jsonObj.Value<JArray>("return"),
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
             Assert.AreEqual(114, markets.Count);
 
-            foreach (Market<CryptsyMarketId> market in markets) {
+            foreach (Market<CryptsyMarketId> market in markets)
+            {
                 // DOGE/BTC
                 if (market.MarketId.ToString().Equals("132"))
                 {
@@ -31,6 +50,19 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
                     Assert.AreEqual(market.QuoteCurrencyCode, "BTC");
                 }
             }
+        }
+
+        [TestMethod]
+        public void TestParseMyTrades()
+        {
+            JObject jsonObj = LoadTestData("getmytrades.json");
+            List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = CryptsyParsers.ParseMyTrades(jsonObj.Value<JArray>("return"),
+                new CryptsyMarketId("132"),
+                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+
+            Assert.AreEqual(2, trades.Count);
+            Assert.AreEqual("9373209", trades[0].TradeId.ToString());
+            Assert.AreEqual("9164163", trades[1].TradeId.ToString());
         }
 
         private JObject LoadTestData(string filename)

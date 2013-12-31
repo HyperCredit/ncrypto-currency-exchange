@@ -11,16 +11,6 @@ namespace Lostics.NCryptoExchange.Model
         private readonly decimal balance;
         private readonly decimal heldBalance;
 
-        public decimal Balance
-        {
-            get { return this.balance; }
-        }
-
-        public decimal HeldBalance
-        {
-            get { return this.heldBalance; }
-        }
-
         public Wallet(string currencyCode, decimal setBalance, decimal setHeldBalance)
         {
             this.currencyCode = currencyCode;
@@ -33,5 +23,14 @@ namespace Lostics.NCryptoExchange.Model
             return balance + " "
                 + currencyCode;
         }
+
+        public decimal Balance
+        { get { return this.balance; } }
+
+        public string CurrencyCode
+        { get { return this.currencyCode; } }
+
+        public decimal HeldBalance
+        { get { return this.heldBalance; } }
     }
 }

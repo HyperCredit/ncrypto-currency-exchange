@@ -10,7 +10,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyParsers
     {
-        public static AccountInfo<Wallet> ParseAccountInfo(Newtonsoft.Json.Linq.JObject returnObj)
+        public static CryptsyAccountInfo ParseAccountInfo(JObject returnObj)
         {
             JObject balancesAvailable = (JObject)returnObj["balances_available"];
             JObject balancesHold = (JObject)returnObj["balances_hold"];
