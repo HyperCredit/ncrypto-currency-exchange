@@ -312,18 +312,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return DateTime.Now.Ticks.ToString();
         }
 
-        public async Task<List<MarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
+        public override async Task<MarketOrders> GetMarketOrders(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
             JObject returnObj = await Call<JObject>(request);
-
-            List<MarketOrder> buyOrders = CryptsyParsers.ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
-            List<MarketOrder> sellOrders = CryptsyParsers.ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
-
-            buyOrders.AddRange(sellOrders);
-
-            return buyOrders;
+            return CryptsyParsers.ParseMarketOrders(returnObj);
         }
 
         public async override Task<List<Market<CryptsyMarketId>>> GetMarkets()

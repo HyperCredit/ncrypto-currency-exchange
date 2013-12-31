@@ -28,7 +28,8 @@ namespace Lostics.NCryptoExchangeExamples.Cryptsy
             if (markets.Count > 0)
             {
                 Book marketDepth = cryptsy.GetMarketDepth(markets[0].MarketId).Result;
-                List<MarketOrder> orders = cryptsy.GetMarketOrders(markets[0].MarketId).Result;
+                MarketOrders orders = cryptsy.GetMarketOrders(markets[0].MarketId).Result;
+                List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = cryptsy.GetMarketTrades(markets[0].MarketId).Result;
             }
 
             cryptsy.GetAllMyOrders(null).Wait();

@@ -3,16 +3,11 @@ namespace Lostics.NCryptoExchange.Model
 {
     public abstract class AbstractStringBasedId
     {
-        private readonly string value;
-
-        public string Value
-        {
-            get { return this.value; }
-        }
+        public string Value { get; private set; }
 
         public AbstractStringBasedId(string setValue)
         {
-            this.value = setValue;
+            this.Value = setValue;
         }
 
         public override bool Equals(object obj)
@@ -24,17 +19,17 @@ namespace Lostics.NCryptoExchange.Model
 
             AbstractStringBasedId other = (AbstractStringBasedId)obj;
 
-            return other.value.Equals(this.value);
+            return other.Value.Equals(this.Value);
         }
 
         public override int GetHashCode()
         {
-            return this.value.GetHashCode();
+            return this.Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.value;
+            return this.Value;
         }
     }
 }

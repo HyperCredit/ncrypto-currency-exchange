@@ -5,22 +5,21 @@ namespace Lostics.NCryptoExchange.Model
 {
     public abstract class AccountInfo<W> where W: Wallet
     {
-        private readonly List<W> wallets;
-        private readonly DateTime systemTime;
-
         public List<W> Wallets
         {
-            get { return this.wallets; }
+            get;
+            private set;
         }
 
         public DateTime SystemTime
         {
-            get { return this.systemTime; }
+            get;
+            private set;
         }
 
         protected   AccountInfo(List<W> setWallets, DateTime setSystemTime) {
-            this.wallets = setWallets;
-            this.systemTime = setSystemTime;
+            this.Wallets = setWallets;
+            this.SystemTime = setSystemTime;
         }
     }
 }

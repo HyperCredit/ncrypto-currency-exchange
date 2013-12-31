@@ -6,26 +6,18 @@ namespace Lostics.NCryptoExchange.Model
         where M : MarketId
         where T : TradeId
     {
-        private readonly T tradeId;
-        private readonly OrderType tradeType;
-        private readonly DateTime dateTime;
-        private readonly decimal price;
-        private readonly decimal quantity;
-        private readonly decimal fee;
-        private readonly M marketId;
-
         public Trade(T tradeId, OrderType tradeType,
             DateTime dateTime, decimal price,
             decimal quantity, decimal fee,
             M marketId)
         {
-            this.tradeId = tradeId;
-            this.tradeType = tradeType;
-            this.dateTime = dateTime;
-            this.price = price;
-            this.quantity = quantity;
-            this.fee = fee;
-            this.marketId = marketId;
+            this.TradeId = tradeId;
+            this.TradeType = tradeType;
+            this.DateTime = dateTime;
+            this.Price = price;
+            this.Quantity = quantity;
+            this.Fee = fee;
+            this.MarketId = marketId;
         }
 
         public override bool Equals(object obj)
@@ -37,27 +29,27 @@ namespace Lostics.NCryptoExchange.Model
 
             Trade<M, T> other = (Trade<M, T>)obj;
 
-            return this.tradeId.Equals(other.tradeId);
+            return this.TradeId.Equals(other.TradeId);
         }
 
         public override int GetHashCode()
         {
-            return this.tradeId.GetHashCode();
+            return this.TradeId.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.tradeType.ToString() + " "
-                + this.quantity + " at "
-                + this.price + " each";
+            return this.TradeType.ToString() + " "
+                + this.Quantity + " at "
+                + this.Price + " each";
         }
 
-        public T TradeId { get { return this.tradeId; } }
-        public OrderType TradeType { get { return this.tradeType; } }
-        public DateTime DateTime { get { return this.dateTime; } }
-        public decimal Price { get { return this.price; } }
-        public decimal Quantity { get { return this.quantity; } }
-        public decimal Fee { get { return this.fee; } }
-        public M MarketId { get { return this.marketId; } }
+        public T TradeId { get; private set; }
+        public OrderType TradeType { get; private set; }
+        public DateTime DateTime { get; private set; }
+        public decimal Price { get; private set; }
+        public decimal Quantity { get; private set; }
+        public decimal Fee { get; private set; }
+        public M MarketId { get; private set; }
     }
 }

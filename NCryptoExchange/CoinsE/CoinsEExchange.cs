@@ -78,6 +78,11 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
+        public override Task<MarketOrders> GetMarketOrders(CoinsEMarketId marketId)
+        {
+            throw new NotImplementedException();
+        }
+
         public override Task<List<Model.MarketTrade<CoinsEMarketId, CoinsETradeId>>> GetMarketTrades(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();

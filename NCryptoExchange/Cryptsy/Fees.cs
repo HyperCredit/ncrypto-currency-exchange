@@ -6,18 +6,19 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class Fees
     {
-        private decimal fee;
-        private decimal net;
-
         public Fees(decimal setFee, decimal setNet)
         {
-            this.fee = setFee;
-            this.net = setNet;
+            this.Fee = setFee;
+            this.Net = setNet;
         }
 
         public override string ToString()
         {
-            return fee.ToString();
+            return this.Fee.ToString();
         }
+
+        public decimal Fee { get; private set; }
+
+        public decimal Net { get; private set; }
     }
 }

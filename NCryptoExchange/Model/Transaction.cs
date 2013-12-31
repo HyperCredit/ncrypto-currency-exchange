@@ -4,38 +4,31 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Transaction
     {
-        private readonly string currencyCode;
-        private readonly DateTime transactionPosted;
-        private readonly TransactionType transactionType;
-        private readonly Address address;
-        private readonly decimal amountExFees;
-        private readonly decimal fee;
-
         public Transaction(string currencyCode, DateTime transactionPosted, TransactionType transactionType,
             Address address, decimal amountExFees, decimal fee)
         {
-            this.currencyCode = currencyCode;
-            this.transactionPosted = transactionPosted;
-            this.transactionType = transactionType;
-            this.address = address;
-            this.amountExFees = amountExFees;
-            this.fee = fee;
+            this.CurrencyCode = currencyCode;
+            this.TransactionPosted = transactionPosted;
+            this.TransactionType = transactionType;
+            this.Address = address;
+            this.AmountExFees = amountExFees;
+            this.Fee = fee;
         }
 
         public override string ToString()
         {
-            return this.transactionType.ToString() + " "
-                + this.amountExFees + " "
-                + this.currencyCode + " to "
-                + this.address + " at "
-                + this.transactionPosted;
+            return this.TransactionType.ToString() + " "
+                + this.AmountExFees + " "
+                + this.CurrencyCode + " to "
+                + this.Address + " at "
+                + this.TransactionPosted;
         }
 
-        public string CurrencyCode { get { return this.currencyCode; } }
-        public DateTime TransactionPosted { get { return this.transactionPosted; } }
-        public TransactionType TransactionType { get { return this.transactionType; } }
-        public Address Address { get { return this.address;  } }
-        public decimal AmountExFees { get { return this.amountExFees; } }
-        public decimal Fee { get { return this.fee;  } }
+        public string CurrencyCode { get; private set; }
+        public DateTime TransactionPosted { get; private set; }
+        public TransactionType TransactionType { get; private set; }
+        public Address Address { get; private set; }
+        public decimal AmountExFees { get; private set; }
+        public decimal Fee { get; private set; }
     }
 }

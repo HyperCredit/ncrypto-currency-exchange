@@ -2,16 +2,13 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class MarketDepth
     {
-        private readonly decimal price;
-        private readonly decimal quantity;
-
         public MarketDepth(decimal setPrice, decimal setQuantity)
         {
-            this.price = setPrice;
-            this.quantity = setQuantity;
+            this.Price = setPrice;
+            this.Quantity = setQuantity;
         }
 
-        public decimal Price { get { return this.price; } }
-        public decimal Quantity { get { return this.quantity;  } }
+        public decimal Price { get; private set; }
+        public decimal Quantity { get; private set; }
     }
 }

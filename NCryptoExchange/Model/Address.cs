@@ -3,21 +3,14 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Address
     {
-        private readonly string address;
-
-        public string Value
-        {
-            get { return this.address; }
-        }
-
         public Address(string setAddress)
         {
-            this.address = setAddress;
+            this.Value = setAddress;
         }
 
         public override string ToString()
         {
-            return this.address;
+            return this.Value;
         }
 
         public static Address Parse(Newtonsoft.Json.Linq.JToken jToken)
@@ -28,6 +21,12 @@ namespace Lostics.NCryptoExchange.Model
             }
 
             return new Address(jToken.ToString());
+        }
+
+        public string Value
+        {
+            get;
+            private set;
         }
     }
 }

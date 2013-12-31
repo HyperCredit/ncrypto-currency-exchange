@@ -8,22 +8,15 @@ namespace Lostics.NCryptoExchange.Model
     /// <typeparam name="I">The type of ID this market wraps around.</typeparam>
     public abstract class Market<I> where I: MarketId
     {
-        private readonly I marketId;
-        private readonly string baseCurrencyCode;
-        private readonly string baseCurrencyName;
-        private readonly string quoteCurrencyCode;
-        private readonly string quoteCurrencyName;
-        private readonly string label;
-
         public Market(I setMarketId, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label)
         {
-            this.marketId = setMarketId;
-            this.baseCurrencyCode = baseCurrencyCode;
-            this.baseCurrencyName = baseCurrencyName;
-            this.quoteCurrencyCode = quoteCurrencyCode;
-            this.quoteCurrencyName = quoteCurrencyName;
-            this.label = label;
+            this.MarketId = setMarketId;
+            this.BaseCurrencyCode = baseCurrencyCode;
+            this.BaseCurrencyName = baseCurrencyName;
+            this.QuoteCurrencyCode = quoteCurrencyCode;
+            this.QuoteCurrencyName = quoteCurrencyName;
+            this.Label = label;
         }
 
         public override bool Equals(Object obj)
@@ -39,24 +32,24 @@ namespace Lostics.NCryptoExchange.Model
             // a Cryptsy market ID must only ever match another Cryptsy market ID),
             // such that markets on different exchanges are never considered the same
 
-            return this.marketId.Equals(other.marketId);
+            return this.MarketId.Equals(other.MarketId);
         }
 
         public override int GetHashCode()
         {
-            return this.marketId.GetHashCode();
+            return this.MarketId.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.label;
+            return this.Label;
         }
 
-        public I MarketId { get { return this.marketId; } }
-        public string BaseCurrencyCode { get { return this.baseCurrencyCode; } }
-        public string BaseCurrencyName { get { return this.baseCurrencyName; } }
-        public string QuoteCurrencyCode { get { return this.quoteCurrencyCode; } }
-        public string QuoteCurrencyName { get { return this.quoteCurrencyName; } }
-        public string Label { get { return this.label; } }
+        public I MarketId { get; private set; }
+        public string BaseCurrencyCode { get; private set; }
+        public string BaseCurrencyName { get; private set; }
+        public string QuoteCurrencyCode { get; private set; }
+        public string QuoteCurrencyName { get; private set; }
+        public string Label { get; private set; }
     }
 }

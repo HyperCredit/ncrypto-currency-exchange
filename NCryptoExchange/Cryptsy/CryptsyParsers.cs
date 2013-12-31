@@ -12,17 +12,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
     {
         public static CryptsyAccountInfo ParseAccountInfo(JObject returnObj)
         {
-            JObject balancesAvailable = (JObject)returnObj["balances_available"];
-            JObject balancesHold = (JObject)returnObj["balances_hold"];
-            string serverDateTimeStr = returnObj["serverdatetime"].ToString();
-            int openOrderCount = int.Parse(returnObj["openordercount"].ToString());
-            TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(returnObj["servertimezone"].ToString());
-            DateTime serverDateTime = DateTime.Parse(serverDateTimeStr);
+            TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(returnObj.Value<string>("servertimezone"));
+            DateTime serverDateTime = DateTime.Parse(returnObj.Value<string>("serverdatetime"));
 
             serverDateTime = TimeZoneInfo.ConvertTimeToUtc(serverDateTime, serverTimeZone);
 
-            return new CryptsyAccountInfo(ParseWallets(balancesAvailable, balancesHold),
-                serverDateTime, serverTimeZone, openOrderCount);
+            return new CryptsyAccountInfo(
+                ParseWallets(returnObj.Value<JObject>("balances_available"), returnObj.Value<JObject>("balances_hold")),
+                serverDateTime, serverTimeZone,
+                returnObj.Value<int>("openordercount")
+            );
         }
 
         public static List<Market<CryptsyMarketId>> ParseMarkets(JArray marketsJson, TimeZoneInfo timeZone)
@@ -87,6 +86,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
 
             return side;
+        }
+
+        public static MarketOrders ParseMarketOrders(JObject returnObj)
+        {
+            List<MarketOrder> buyOrders = CryptsyParsers.ParseMarketOrders(OrderType.Buy, returnObj.Value<JArray>("buyorders"));
+            List<MarketOrder> sellOrders = CryptsyParsers.ParseMarketOrders(OrderType.Sell, returnObj.Value<JArray>("sellorders"));
+
+            return new MarketOrders(sellOrders, buyOrders);
         }
 
         public static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
