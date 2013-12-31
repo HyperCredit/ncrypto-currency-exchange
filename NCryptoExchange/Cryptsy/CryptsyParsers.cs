@@ -16,14 +16,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject marketObj in marketsJson)
             {
-                DateTime created = DateTime.Parse(marketObj["created"].ToString());
+                DateTime created = DateTime.Parse(marketObj.Value<string>("created"));
 
                 TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
 
-                CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketObj["marketid"].ToString()),
-                    marketObj["primary_currency_code"].ToString(), marketObj["primary_currency_name"].ToString(),
-                    marketObj["secondary_currency_code"].ToString(), marketObj["secondary_currency_name"].ToString(),
-                    marketObj["label"].ToString(),
+                CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketObj.Value<string>("marketid")),
+                    marketObj.Value<string>("primary_currency_code"), marketObj.Value<string>("primary_currency_name"),
+                    marketObj.Value<string>("secondary_currency_code"), marketObj.Value<string>("secondary_currency_name"),
+                    marketObj.Value<string>("label"),
                     Price.Parse(marketObj["current_volume"]), Price.Parse(marketObj["last_trade"]),
                     Price.Parse(marketObj["high_trade"]), Price.Parse(marketObj["low_trade"]),
                     created
@@ -94,7 +94,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                             price = Price.Parse(jsonOrder["sellprice"]);
                             break;
                         default:
-                            throw new ArgumentException("Unknown order type \"" + orderType.ToString() + "\".");
+                            throw new ArgumentException("Unknown order type \""
+                                + Enum.GetName(typeof(OrderType), orderType) + "\".");
                     }
 
                     orders.Add(new MarketOrder(orderType, price, quantity));
@@ -115,13 +116,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject jsonTrade in jsonTrades)
             {
-                DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+                DateTime tradeDateTime = DateTime.Parse(jsonTrade.Value<string>("datetime"));
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
                     ? defaultMarketId
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
-                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("tradetype"));
 
                 tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
@@ -143,13 +144,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject jsonTrade in jsonOrders)
             {
-                DateTime created = DateTime.Parse(jsonTrade["created"].ToString());
+                DateTime created = DateTime.Parse(jsonTrade.Value<string>("created"));
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
                     ? defaultMarketId
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["orderid"]);
-                OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["ordertype"].ToString());
+                OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("ordertype"));
 
                 created = TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
 
@@ -171,14 +172,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject jsonTrade in jsonTrades)
             {
-                DateTime tradeDateTime = DateTime.Parse(jsonTrade["datetime"].ToString());
+                DateTime tradeDateTime = DateTime.Parse(jsonTrade.Value<string>("datetime"));
                 JToken marketIdToken = jsonTrade["marketid"];
                 CryptsyMarketId marketId = null == marketIdToken
                     ? defaultMarketId
                     : CryptsyMarketId.Parse(marketIdToken);
                 CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["order_id"]);
                 CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
-                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade["tradetype"].ToString());
+                OrderType tradeType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("tradetype"));
 
                 tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
@@ -199,13 +200,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JObject jsonTransaction in jsonTransactions)
             {
-                TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(jsonTransaction["timezone"].ToString());
-                DateTime transactionPosted = DateTime.Parse(jsonTransaction["datetime"].ToString());
-                TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction["type"].ToString());
+                TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(jsonTransaction.Value<string>("timezone"));
+                DateTime transactionPosted = DateTime.Parse(jsonTransaction.Value<string>("datetime"));
+                TransactionType transactionType = (TransactionType)Enum.Parse(typeof(TransactionType), jsonTransaction.Value<string>("type"));
 
                 transactionPosted = TimeZoneInfo.ConvertTimeToUtc(transactionPosted, serverTimeZone);
 
-                Transaction transaction = new Transaction(jsonTransaction["currency"].ToString(),
+                Transaction transaction = new Transaction(jsonTransaction.Value<string>("currency"),
                     transactionPosted, transactionType,
                     Address.Parse(jsonTransaction["address"]), Price.Parse(jsonTransaction["amount"]),
                     Price.Parse(jsonTransaction["fee"]));

@@ -48,11 +48,11 @@
     <Compile Include="AbstractExchange.cs" />
     <Compile Include="CoinsE\CoinsEException.cs" />
     <Compile Include="CoinsE\CoinsEExchange.cs" />
+    <Compile Include="CoinsE\CoinsEParsers.cs" />
     <Compile Include="CoinsE\CoinsEResponseException.cs" />
     <Compile Include="CoinsE\CoinsEMarketId.cs" />
     <Compile Include="CoinsE\CoinsEOrderId.cs" />
     <Compile Include="CoinsE\CoinsETradeId.cs" />
-    <Compile Include="CoinsE\Parsers.cs" />
     <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
