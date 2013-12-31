@@ -20,13 +20,10 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
         /// <param name="propertyName"></param>
-        /// <param name="propertyType"></param>
         /// <returns></returns>
-        private async Task<JToken> CallPublic(string url, string propertyName, JTokenType propertyType)
+        private async Task<T> CallPublic<T>(string url, string propertyName)
         {
-            HttpContent request = new StringContent("");
-            HttpResponseMessage response = await client.PostAsync(url, request);
-
+            HttpResponseMessage response = await client.GetAsync(url);
             JObject jsonObj;
 
             try
@@ -35,10 +32,30 @@ namespace Lostics.NCryptoExchange.CoinsE
             }
             catch (ArgumentException e)
             {
-                throw new CoinsEResponseException("Could not parse response from Cryptsy.", e);
+                throw new CoinsEResponseException("Could not parse response from Coins-E.", e);
             }
 
-            return jsonObj;
+            string status = jsonObj.Value<string>("status");
+            if (null == status)
+            {
+                throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
+            }
+            if (!status.Equals("true"))
+            {
+                string message = jsonObj.Value<string>("message");
+
+                if (null != message)
+                {
+                    throw new CoinsEResponseException(message);
+                }
+                else
+                {
+                    throw new CoinsEResponseException("Success status from Coins-E was \""
+                        + status + "\", expected \"true\".");
+                }
+            }
+
+            return jsonObj.Value<T>(propertyName);
         }
 
         public override void Dispose()
@@ -53,8 +70,7 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
         {
-            JObject marketsJson = (JObject)await CallPublic(MARKETS_LIST, "markets", JTokenType.Object);
-            return await CoinsEParsers.ParseMarkets(marketsJson);
+            return CoinsEParsers.ParseMarkets(await CallPublic<JArray>(MARKETS_LIST, "markets"));
         }
 
         public override Task<List<Model.Transaction>> GetMyTransactions()

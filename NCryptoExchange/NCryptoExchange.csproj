@@ -48,6 +48,7 @@
     <Compile Include="AbstractExchange.cs" />
     <Compile Include="CoinsE\CoinsEException.cs" />
     <Compile Include="CoinsE\CoinsEExchange.cs" />
+    <Compile Include="CoinsE\CoinsEMarket.cs" />
     <Compile Include="CoinsE\CoinsEParsers.cs" />
     <Compile Include="CoinsE\CoinsEResponseException.cs" />
     <Compile Include="CoinsE\CoinsEMarketId.cs" />

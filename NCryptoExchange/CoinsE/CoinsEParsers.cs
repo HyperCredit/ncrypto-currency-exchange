@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +10,22 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public static class CoinsEParsers
     {
-        internal static Task<List<Model.Market<CoinsEMarketId>>> ParseMarkets(Newtonsoft.Json.Linq.JObject marketsJson)
+        internal static List<Market<CoinsEMarketId>> ParseMarkets(Newtonsoft.Json.Linq.JArray marketsJson)
         {
-            throw new NotImplementedException();
+            List<Market<CoinsEMarketId>> markets = new List<Market<CoinsEMarketId>>();
+
+            foreach (JObject marketObj in marketsJson) {
+                CoinsEMarket market = new CoinsEMarket(new CoinsEMarketId(marketObj.Value<string>("pair")),
+                    marketObj.Value<string>("c1"), marketObj.Value<string>("coin1"),
+                    marketObj.Value<string>("c2"), marketObj.Value<string>("coin2"),
+                    marketObj.Value<string>("pair"),
+                    marketObj.Value<string>("status"), marketObj.Value<decimal>("trade_fee")
+                );
+
+                markets.Add(market);
+            }
+
+            return markets;
         }
     }
 }
