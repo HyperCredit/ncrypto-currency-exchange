@@ -104,21 +104,21 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await Call(request);
         }
 
-        public async Task<Fees> CalculateFees(OrderType orderType, Price quantity,
-                Price price)
+        public async Task<Fees> CalculateFees(OrderType orderType, decimal quantity,
+                decimal price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.calculatefees, null,
                     orderType, quantity, price));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
-            return new Fees(Price.Parse(returnObj["fee"]),
-                Price.Parse(returnObj["net"]));
+            return new Fees(returnObj.Value<decimal>("fee"),
+                returnObj.Value<decimal>("net"));
         }
 
         public async override Task<CryptsyOrderId> CreateOrder(CryptsyMarketId marketId,
-                OrderType orderType, Price quantity,
-                Price price)
+                OrderType orderType, decimal quantity,
+                decimal price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.createorder, marketId,
@@ -187,7 +187,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <param name="marketId">An optional market ID to be passsed as a parameter to the method</param>
         /// <returns>An array of key-value pairs</returns>
         private KeyValuePair<string, string>[] GenerateOrderParameters(CryptsyMethod method,
-            CryptsyMarketId marketId, OrderType orderType, Price quantity, Price price)
+            CryptsyMarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
             {

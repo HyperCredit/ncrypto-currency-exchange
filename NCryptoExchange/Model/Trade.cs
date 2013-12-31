@@ -9,14 +9,14 @@ namespace Lostics.NCryptoExchange.Model
         private readonly T tradeId;
         private readonly OrderType tradeType;
         private readonly DateTime dateTime;
-        private readonly Price price;
-        private readonly Price quantity;
-        private readonly Price fee;
+        private readonly decimal price;
+        private readonly decimal quantity;
+        private readonly decimal fee;
         private readonly M marketId;
 
         public Trade(T tradeId, OrderType tradeType,
-            DateTime dateTime, Price price,
-            Price quantity, Price fee,
+            DateTime dateTime, decimal price,
+            decimal quantity, decimal fee,
             M marketId)
         {
             this.tradeId = tradeId;
@@ -55,9 +55,9 @@ namespace Lostics.NCryptoExchange.Model
         public T TradeId { get { return this.tradeId; } }
         public OrderType TradeType { get { return this.tradeType; } }
         public DateTime DateTime { get { return this.dateTime; } }
-        public Price Price { get { return this.price; } }
-        public Price Quantity { get { return this.quantity; } }
-        public Price Fee { get { return this.fee; } }
+        public decimal Price { get { return this.price; } }
+        public decimal Quantity { get { return this.quantity; } }
+        public decimal Fee { get { return this.fee; } }
         public M MarketId { get { return this.marketId; } }
     }
 }

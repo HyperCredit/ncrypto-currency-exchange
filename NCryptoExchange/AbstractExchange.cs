@@ -67,7 +67,7 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task CancelMarketOrders(M marketId);
 
-        public abstract Task<O> CreateOrder(M marketId, Model.OrderType orderType, Model.Price quantity, Model.Price price);
+        public abstract Task<O> CreateOrder(M marketId, OrderType orderType, decimal quantity, decimal price);
 
         public abstract string GetNextNonce();
     }

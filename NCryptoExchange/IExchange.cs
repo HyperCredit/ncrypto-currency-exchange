@@ -37,8 +37,8 @@ namespace Lostics.NCryptoExchange
         Task CancelMarketOrders(M marketId);
 
         Task<O> CreateOrder(M marketId,
-                OrderType orderType, Price quantity,
-                Price price);
+                OrderType orderType, decimal quantity,
+                decimal price);
 
         string GetNextNonce();
     }

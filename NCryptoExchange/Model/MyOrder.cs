@@ -9,10 +9,10 @@ namespace Lostics.NCryptoExchange.Model
         private readonly O orderId;
         private readonly M marketId;
         private readonly DateTime created;
-        private readonly Price originalQuantity;
+        private readonly decimal originalQuantity;
 
         public MyOrder(O orderId, OrderType orderType,
-            DateTime created, Price price, Price quantity, Price originalQuantity,
+            DateTime created, decimal price, decimal quantity, decimal originalQuantity,
             M marketId) : base(orderType, price, quantity)
         {
             this.orderId = orderId;
@@ -23,7 +23,7 @@ namespace Lostics.NCryptoExchange.Model
 
         public O OrderId { get { return this.orderId; } }
         public DateTime Created { get { return this.created; } }
-        public Price OriginalQuantity { get { return this.originalQuantity; } }
+        public decimal OriginalQuantity { get { return this.originalQuantity; } }
         public M MarketId { get { return this.marketId; } }
     }
 }

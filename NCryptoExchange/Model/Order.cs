@@ -8,10 +8,10 @@ namespace Lostics.NCryptoExchange.Model
     public abstract class Order : IComparable<Order>
     {
         private readonly OrderType orderType;
-        private readonly Price price;
-        private readonly Price quantity;
+        private readonly decimal price;
+        private readonly decimal quantity;
 
-        public  Order(OrderType orderType, Price price, Price quantity)
+        public  Order(OrderType orderType, decimal price, decimal quantity)
         {
             this.orderType = orderType;
             this.price = price;
@@ -51,7 +51,7 @@ namespace Lostics.NCryptoExchange.Model
         }
 
         public OrderType OrderType { get { return this.orderType;  } }
-        public Price Quantity { get { return this.quantity; } }
-        public Price Price { get { return this.price;  } }
+        public decimal Quantity { get { return this.quantity; } }
+        public decimal Price { get { return this.price;  } }
     }
 }

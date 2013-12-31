@@ -9,8 +9,8 @@ namespace Lostics.NCryptoExchange.Model
         private readonly O orderId;
 
         public MyTrade(T tradeId, OrderType tradeType,
-            DateTime dateTime, Price price,
-            Price quantity, Price fee,
+            DateTime dateTime, decimal price,
+            decimal quantity, decimal fee,
             M marketId, O orderId)
             : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
         {

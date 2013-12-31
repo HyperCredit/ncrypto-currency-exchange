@@ -11,15 +11,15 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyMarket : Market<CryptsyMarketId>
     {
-        private readonly Price currentVolume;
-        private readonly Price lastTrade;
-        private readonly Price highTrade;
-        private readonly Price lowTrade;
+        private readonly decimal currentVolume;
+        private readonly decimal lastTrade;
+        private readonly decimal highTrade;
+        private readonly decimal lowTrade;
         private readonly DateTime created;
 
         public CryptsyMarket(CryptsyMarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,
-            Price currentVolume, Price lastTrade, Price highTrade, Price lowTrade, DateTime created)
+            decimal currentVolume, decimal lastTrade, decimal highTrade, decimal lowTrade, DateTime created)
             : base(setMarketId, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label)
         {
             this.currentVolume = currentVolume;
@@ -29,10 +29,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.created = created;
         }
 
-        public Price CurrentVolume { get { return this.currentVolume; } }
-        public Price LastTrade { get { return this.lastTrade; } }
-        public Price HighTrade { get { return this.highTrade; } }
-        public Price LowTrade { get { return this.lowTrade; } }
+        public decimal CurrentVolume { get { return this.currentVolume; } }
+        public decimal LastTrade { get { return this.lastTrade; } }
+        public decimal HighTrade { get { return this.highTrade; } }
+        public decimal LowTrade { get { return this.lowTrade; } }
         public DateTime Created { get { return this.created; } }
     }
 }

@@ -56,7 +56,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Cryptsy\CryptsyTest.cs" />
-    <Compile Include="PriceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

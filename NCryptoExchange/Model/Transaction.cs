@@ -8,11 +8,11 @@ namespace Lostics.NCryptoExchange.Model
         private readonly DateTime transactionPosted;
         private readonly TransactionType transactionType;
         private readonly Address address;
-        private readonly Price amountExFees;
-        private readonly Price fee;
+        private readonly decimal amountExFees;
+        private readonly decimal fee;
 
         public Transaction(string currencyCode, DateTime transactionPosted, TransactionType transactionType,
-            Address address, Price amountExFees, Price fee)
+            Address address, decimal amountExFees, decimal fee)
         {
             this.currencyCode = currencyCode;
             this.transactionPosted = transactionPosted;
@@ -35,7 +35,7 @@ namespace Lostics.NCryptoExchange.Model
         public DateTime TransactionPosted { get { return this.transactionPosted; } }
         public TransactionType TransactionType { get { return this.transactionType; } }
         public Address Address { get { return this.address;  } }
-        public Price AmountExFees { get { return this.amountExFees; } }
-        public Price Fee { get { return this.fee;  } }
+        public decimal AmountExFees { get { return this.amountExFees; } }
+        public decimal Fee { get { return this.fee;  } }
     }
 }

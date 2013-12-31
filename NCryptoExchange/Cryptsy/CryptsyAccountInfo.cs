@@ -36,22 +36,28 @@ namespace Lostics.NCryptoExchange.Cryptsy
             JObject balancesHold = (JObject)returnObj["balances_hold"];
             string serverDateTimeStr = returnObj["serverdatetime"].ToString();
             int openOrderCount = int.Parse(returnObj["openordercount"].ToString());
-            List<Wallet> wallets = new List<Wallet>();
             TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(returnObj["servertimezone"].ToString());
             DateTime serverDateTime = DateTime.Parse(serverDateTimeStr);
 
             serverDateTime = TimeZoneInfo.ConvertTimeToUtc(serverDateTime, serverTimeZone);
 
-            foreach (JProperty balanceAvailable in balancesAvailable.Properties())
-            {
-                JProperty balanceHeld = balancesHold.Property(balanceAvailable.Name);
-
-                wallets.Add(new Wallet(balanceAvailable.Name,
-                    Price.Parse(balanceAvailable), Price.Parse(balanceHeld)));
-            }
+            List<Wallet> wallets = ParseWallets(balancesAvailable, balancesHold);
 
             return new CryptsyAccountInfo(wallets, serverDateTime,
                 serverTimeZone, openOrderCount);
+        }
+
+        private static List<Wallet> ParseWallets(JObject balancesAvailable, JObject balancesHold)
+        {
+            List<Wallet> wallets = new List<Wallet>();
+            foreach (JProperty balanceAvailable in balancesAvailable.Properties())
+            {
+                JProperty balanceHeld = balancesHold.Property(balanceAvailable.Name);
+                Wallet wallet = new Wallet(balanceAvailable.Name,
+                    decimal.Parse(balanceAvailable.Value.ToString()), decimal.Parse(balanceHeld.Value.ToString()));
+                wallets.Add(wallet);
+            }
+            return wallets;
         }
 
         public int OpenOrderCount { get { return this.openOrderCount;  } }

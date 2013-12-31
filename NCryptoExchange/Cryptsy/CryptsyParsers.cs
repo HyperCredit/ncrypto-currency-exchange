@@ -24,8 +24,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     marketObj.Value<string>("primary_currency_code"), marketObj.Value<string>("primary_currency_name"),
                     marketObj.Value<string>("secondary_currency_code"), marketObj.Value<string>("secondary_currency_name"),
                     marketObj.Value<string>("label"),
-                    Price.Parse(marketObj["current_volume"]), Price.Parse(marketObj["last_trade"]),
-                    Price.Parse(marketObj["high_trade"]), Price.Parse(marketObj["low_trade"]),
+                    marketObj.Value<decimal>("current_volume"), marketObj.Value<decimal>("last_trade"),
+                    marketObj.Value<decimal>("high_trade"), marketObj.Value<decimal>("low_trade"),
                     created
                 );
 
@@ -67,8 +67,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             foreach (JArray depthJson in sideJson)
             {
-                side.Add(new MarketDepth(Price.Parse(depthJson[0]),
-                    Price.Parse(depthJson[1])));
+                side.Add(new MarketDepth(depthJson[0].Value<decimal>(),
+                    depthJson[1].Value<decimal>()));
             }
 
             return side;
@@ -82,16 +82,16 @@ namespace Lostics.NCryptoExchange.Cryptsy
             {
                 foreach (JObject jsonOrder in jArray)
                 {
-                    Price quantity = Price.Parse(jsonOrder["quantity"]);
-                    Price price;
+                    decimal quantity = jsonOrder.Value<decimal>("quantity");
+                    decimal price;
 
                     switch (orderType)
                     {
                         case OrderType.Buy:
-                            price = Price.Parse(jsonOrder["buyprice"]);
+                            price = jsonOrder.Value<decimal>("buyprice");
                             break;
                         case OrderType.Sell:
-                            price = Price.Parse(jsonOrder["sellprice"]);
+                            price = jsonOrder.Value<decimal>("sellprice");
                             break;
                         default:
                             throw new ArgumentException("Unknown order type \""
@@ -128,8 +128,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
-                    Price.Parse(jsonTrade["tradeprice"]),
-                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["fee"]),
+                    jsonTrade.Value<decimal>("tradeprice"),
+                    jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
                     marketId
                 ));
             }
@@ -156,8 +156,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 orders.Add(new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
                     orderType, created,
-                    Price.Parse(jsonTrade["price"]),
-                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["orig_quantity"]),
+                    jsonTrade.Value<decimal>("price"),
+                    jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("orig_quantity"),
                     marketId
                 ));
             }
@@ -185,8 +185,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>(tradeId,
                     tradeType, tradeDateTime,
-                    Price.Parse(jsonTrade["tradeprice"]),
-                    Price.Parse(jsonTrade["quantity"]), Price.Parse(jsonTrade["fee"]),
+                    jsonTrade.Value<decimal>("tradeprice"),
+                    jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
                     marketId, orderId
                 ));
             }
@@ -208,8 +208,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 Transaction transaction = new Transaction(jsonTransaction.Value<string>("currency"),
                     transactionPosted, transactionType,
-                    Address.Parse(jsonTransaction["address"]), Price.Parse(jsonTransaction["amount"]),
-                    Price.Parse(jsonTransaction["fee"]));
+                    Address.Parse(jsonTransaction["address"]), jsonTransaction.Value<decimal>("amount"),
+                    jsonTransaction.Value<decimal>("fee"));
                 transactions.Add(transaction);
             }
 

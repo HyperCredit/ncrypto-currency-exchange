@@ -107,7 +107,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, Model.OrderType orderType, Model.Price quantity, Model.Price price)
+        public override Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             throw new NotImplementedException();
         }
