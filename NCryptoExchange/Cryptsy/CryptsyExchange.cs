@@ -212,7 +212,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
             JObject returnObj = (JObject)await Call(request, JTokenType.Object);
 
-            return CryptsyAccountInfo.Parse(returnObj);
+            return CryptsyParsers.ParseAccountInfo(returnObj);
         }
 
         public static CryptsyExchange GetExchange(FileInfo configurationFile)
@@ -222,7 +222,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             if (!configurationFile.Exists)
             {
-                WriteDefaultFile(configurationFile);
+                WriteDefaultConfigurationFile(configurationFile);
                 throw new ConfigurationException("No configuration file exists; blank default created. "
                     + "Please enter public and private key values and try again.");
             }
@@ -460,7 +460,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return returnObj;
         }
 
-        private static void WriteDefaultFile(FileInfo file)
+        private static void WriteDefaultConfigurationFile(FileInfo file)
         {
             using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
             {
