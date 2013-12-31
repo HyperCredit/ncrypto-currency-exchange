@@ -53,6 +53,33 @@ namespace Lostics.NCryptoExchange.Cryptsy
         }
 
         /// <summary>
+        /// Asserts that the response sent by Cryptsy indicates success, and throws a relevant
+        /// exception otherwise.
+        /// </summary>
+        /// <param name="cryptsyResponse">Response from Cryptsy as JSON</param>
+        private static void AssertResponseIsSuccess(JObject cryptsyResponse)
+        {
+            if (null == cryptsyResponse["success"])
+            {
+                throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
+            }
+
+            if (!(cryptsyResponse["success"].ToString().Equals("1")))
+            {
+                string errorMessage = cryptsyResponse["error"].ToString();
+
+                if (null == errorMessage)
+                {
+                    throw new CryptsyFailureException("Error response returned from Cryptsy.");
+                }
+                else
+                {
+                    throw new CryptsyFailureException(errorMessage);
+                }
+            }
+        }
+
+        /// <summary>
         /// Make a call to Cryptsy's private API
         /// </summary>
         /// <param name="request"></param>
@@ -63,7 +90,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            await ParseResponseToJson(response, null);
+            await ParseResponseToJson(response);
         }
 
         /// <summary>
@@ -71,13 +98,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// </summary>
         /// <param name="request"></param>
         /// <returns>The return from Cryptsy as a JSON token</returns>
-        private async Task<JToken> Call(FormUrlEncodedContent request, JTokenType returnType)
+        private async Task<T> Call<T>(FormUrlEncodedContent request)
         {
             request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
-            return await ParseResponseToJson(response, returnType);
+            return await ParseResponseToJson<T>(response);
         }
 
         public async override Task CancelOrder(CryptsyOrderId orderId)
@@ -110,7 +137,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.calculatefees, null,
                     orderType, quantity, price));
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             return new Fees(returnObj.Value<decimal>("fee"),
                 returnObj.Value<decimal>("net"));
@@ -123,7 +150,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.createorder, marketId,
                     orderType, quantity, price));
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             return new CryptsyOrderId(returnObj["orderid"].ToString());
         }
@@ -140,7 +167,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_CURRENCY_CODE, currencyCode)
             });
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             return Address.Parse(returnObj);
         }
@@ -210,7 +237,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             return CryptsyParsers.ParseAccountInfo(returnObj);
         }
@@ -287,7 +314,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             List<MarketOrder> buyOrders = CryptsyParsers.ParseMarketOrders(OrderType.Buy, (JArray)returnObj["buyorders"]);
             List<MarketOrder> sellOrders = CryptsyParsers.ParseMarketOrders(OrderType.Sell, (JArray)returnObj["sellorders"]);
@@ -301,7 +328,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             return CryptsyParsers.ParseMarkets(returnArray, defaultTimeZone);
         }
@@ -310,7 +337,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             return CryptsyParsers.ParseTransactions(returnArray);
         }
@@ -319,7 +346,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             return CryptsyParsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
@@ -328,7 +355,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -339,7 +366,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -350,7 +377,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -361,7 +388,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray returnArray = (JArray)await Call(request, JTokenType.Array);
+            JArray returnArray = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -372,7 +399,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.depth,
                 (CryptsyOrderId)null, marketId, null));
-            JObject returnObj = (JObject)await Call(request, JTokenType.Object);
+            JObject returnObj = await Call<JObject>(request);
 
             return CryptsyParsers.ParseMarketDepthBook(returnObj, marketId);
         }
@@ -383,16 +410,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// instead.
         /// </summary>
         /// <param name="response">The HTTP response to read from</param>
-        /// <param name="requiredType">The JSON token type of the return. If no
-        /// return value is expected, pass in null.</param>
-        /// <returns>The returned content from Cryptsy as a JToken. May be null
-        /// if no return was provided.</returns>
+        /// <returns>The returned content from Cryptsy as a JToken.</returns>
         /// <exception cref="IOException">Where there was a problem reading the
         /// response from Cryptsy.</exception>
         /// <exception cref="CryptsyFailureException">Where Cryptsy returned an error.</exception>
         /// <exception cref="CryptsyResponseException">Where there was a problem
         /// parsing the response from Cryptsy.</exception>
-        private async Task<JToken> ParseResponseToJson(HttpResponseMessage response, JTokenType? requiredType)
+        private async Task<T> ParseResponseToJson<T>(HttpResponseMessage response)
         {
             JObject jsonObj;
 
@@ -408,56 +432,59 @@ namespace Lostics.NCryptoExchange.Cryptsy
             // Log the response from Cryptsy if configured to do so
             if (null != this.DumpResponse)
             {
-                string filename = DateTime.Now.Millisecond.ToString() + ".txt";
-                FileInfo logFile = new FileInfo(Path.Combine(this.DumpResponse.FullName, filename));
-
-                Console.WriteLine("Writing log to "
-                    + logFile.FullName);
-
-                using (StreamWriter dumpTo = new StreamWriter(new FileStream(logFile.FullName, FileMode.CreateNew)))
-                {
-                    dumpTo.Write(jsonObj.ToString());
-                }
+                WriteResponseToFile(jsonObj);
             }
 
-            if (null == jsonObj["success"])
+            AssertResponseIsSuccess(jsonObj);
+
+            return jsonObj.Value<T>("return");
+        }
+
+        /// <summary>
+        /// Gets the "return" property from the response from Cryptsy, and returns
+        /// it as a JToken. In case of an error response, throws a suitable Exception
+        /// instead.
+        /// </summary>
+        /// <param name="response">The HTTP response to read from</param>
+        /// <exception cref="IOException">Where there was a problem reading the
+        /// response from Cryptsy.</exception>
+        /// <exception cref="CryptsyFailureException">Where Cryptsy returned an error.</exception>
+        /// <exception cref="CryptsyResponseException">Where there was a problem
+        /// parsing the response from Cryptsy.</exception>
+        private async Task ParseResponseToJson(HttpResponseMessage response)
+        {
+            JObject jsonObj;
+
+            try
             {
-                throw new CryptsyResponseException("No success value returned in response from Cryptsy.");
+                jsonObj = await GetJsonFromResponse(response);
             }
-
-            if (!(jsonObj["success"].ToString().Equals("1")))
+            catch (ArgumentException e)
             {
-                string errorMessage = jsonObj["error"].ToString();
-
-                if (null == errorMessage)
-                {
-                    throw new CryptsyFailureException("Error response returned from Cryptsy.");
-                }
-                else
-                {
-                    throw new CryptsyFailureException("Error response returned from Cryptsy: "
-                        + errorMessage);
-                }
+                throw new CryptsyResponseException("Could not parse response from Cryptsy.", e);
             }
 
-            JToken returnObj = jsonObj["return"];
-
-            // For methods where we expect a response, verify the type of the
-            // response (typically an array or object)
-            if (null != requiredType)
+            // Log the response from Cryptsy if configured to do so
+            if (null != this.DumpResponse)
             {
-                if (null == returnObj)
-                {
-                    throw new CryptsyResponseException("Expected \"return\" JSON token in response from Cryptsy, but was missing.");
-                }
-
-                if (returnObj.Type != requiredType)
-                {
-                    throw new CryptsyResponseException("Expected \"return\" JSON token in response from Cryptsy, but was missing or the wrong type.");
-                }
+                WriteResponseToFile(jsonObj);
             }
 
-            return returnObj;
+            AssertResponseIsSuccess(jsonObj);
+        }
+
+        private void WriteResponseToFile(JToken jsonObj)
+        {
+            string filename = DateTime.Now.Millisecond.ToString() + ".txt";
+            FileInfo logFile = new FileInfo(Path.Combine(this.DumpResponse.FullName, filename));
+
+            Console.WriteLine("Writing log to "
+                + logFile.FullName);
+
+            using (StreamWriter dumpTo = new StreamWriter(new FileStream(logFile.FullName, FileMode.CreateNew)))
+            {
+                dumpTo.Write(jsonObj.ToString());
+            }
         }
 
         private static void WriteDefaultConfigurationFile(FileInfo file)
