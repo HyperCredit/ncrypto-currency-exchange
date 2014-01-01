@@ -10,20 +10,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyParsers
     {
-        public static CryptsyAccountInfo ParseAccountInfo(JObject returnObj)
-        {
-            TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(returnObj.Value<string>("servertimezone"));
-            DateTime serverDateTime = DateTime.Parse(returnObj.Value<string>("serverdatetime"));
-
-            serverDateTime = TimeZoneInfo.ConvertTimeToUtc(serverDateTime, serverTimeZone);
-
-            return new CryptsyAccountInfo(
-                ParseWallets(returnObj.Value<JObject>("balances_available"), returnObj.Value<JObject>("balances_hold")),
-                serverDateTime, serverTimeZone,
-                returnObj.Value<int>("openordercount")
-            );
-        }
-
         public static List<Market<CryptsyMarketId>> ParseMarkets(JArray marketsJson, TimeZoneInfo timeZone)
         {
             List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
@@ -173,18 +159,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             }
 
             return transactions;
-        }
-
-        public static List<Wallet> ParseWallets(JObject balancesAvailable, JObject balancesHold)
-        {
-            List<Wallet> wallets = new List<Wallet>();
-            foreach (JProperty balanceAvailable in balancesAvailable.Properties())
-            {
-                wallets.Add(new Wallet(balanceAvailable.Name,
-                    balancesAvailable.Value<decimal>(balanceAvailable.Name),
-                    balancesHold.Value<decimal>(balanceAvailable.Name)));
-            }
-            return wallets;
         }
     }
 }

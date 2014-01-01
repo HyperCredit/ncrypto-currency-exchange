@@ -240,16 +240,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JObject returnObj = await Call<JObject>(request);
 
-            return CryptsyParsers.ParseAccountInfo(returnObj);
+            return CryptsyAccountInfo.Parse(await Call<JObject>(request));
         }
 
         public static CryptsyExchange GetExchange(FileInfo configurationFile)
         {
-            string publicKey = null;
-            string privateKey = null;
-
             if (!configurationFile.Exists)
             {
                 WriteDefaultConfigurationFile(configurationFile);
@@ -257,41 +253,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
                     + "Please enter public and private key values and try again.");
             }
 
-            using (StreamReader reader = new StreamReader(new FileStream(configurationFile.FullName, FileMode.Open)))
-            {
-                string line = reader.ReadLine();
-
-                while (null != line)
-                {
-                    line = line.Trim();
-
-                    // Ignore comment lines
-                    if (!line.StartsWith("#"))
-                    {
-                        string[] parts = line.Split(new[] { '=' });
-                        if (parts.Length >= 2)
-                        {
-                            string name = parts[0].Trim().ToLower();
-
-                            switch (name)
-                            {
-                                case PROPERTY_PUBLIC_KEY:
-                                    publicKey = parts[1].Trim();
-                                    break;
-                                case PROPERTY_PRIVATE_KEY:
-                                    privateKey = parts[1].Trim();
-                                    break;
-                                default:
-                                    Console.Error.WriteLine("Found unknown property \""
-                                        + parts[0] + "\".");
-                                    break;
-                            }
-                        }
-                    }
-
-                    line = reader.ReadLine();
-                }
-            }
+            Dictionary<string, string> properties = GetConfiguration(configurationFile);
+            string publicKey = properties[PROPERTY_PUBLIC_KEY];
+            string privateKey = properties[PROPERTY_PRIVATE_KEY];
 
             if (null == publicKey)
             {

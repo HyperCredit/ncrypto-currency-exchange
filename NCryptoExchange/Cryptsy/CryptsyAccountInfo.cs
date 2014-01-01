@@ -21,6 +21,32 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.OpenOrderCount = openOrderCount;
         }
 
+        public static CryptsyAccountInfo Parse(JObject accountInfoJson)
+        {
+            TimeZoneInfo serverTimeZone = TimeZoneResolver.GetByShortCode(accountInfoJson.Value<string>("servertimezone"));
+            DateTime serverDateTime = DateTime.Parse(accountInfoJson.Value<string>("serverdatetime"));
+
+            serverDateTime = TimeZoneInfo.ConvertTimeToUtc(serverDateTime, serverTimeZone);
+
+            return new CryptsyAccountInfo(
+                ParseWallets(accountInfoJson.Value<JObject>("balances_available"), accountInfoJson.Value<JObject>("balances_hold")),
+                serverDateTime, serverTimeZone,
+                accountInfoJson.Value<int>("openordercount")
+            );
+        }
+
+        internal static List<Wallet> ParseWallets(JObject balancesAvailable, JObject balancesHold)
+        {
+            List<Wallet> wallets = new List<Wallet>();
+            foreach (JProperty balanceAvailable in balancesAvailable.Properties())
+            {
+                wallets.Add(new Wallet(balanceAvailable.Name,
+                    balancesAvailable.Value<decimal>(balanceAvailable.Name),
+                    balancesHold.Value<decimal>(balanceAvailable.Name)));
+            }
+            return wallets;
+        }
+
         public override string ToString()
         {
             return this.SystemTime.ToString() + ": "

@@ -25,6 +25,37 @@ namespace Lostics.NCryptoExchange
             return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
         }
 
+        public static Dictionary<string, string> GetConfiguration(FileInfo configurationFile)
+        {
+            Dictionary<string, string> properties = new Dictionary<string,string>();
+
+            using (StreamReader reader = new StreamReader(new FileStream(configurationFile.FullName, FileMode.Open)))
+            {
+                string line = reader.ReadLine();
+
+                while (null != line)
+                {
+                    line = line.Trim();
+
+                    // Ignore comment lines
+                    if (!line.StartsWith("#"))
+                    {
+                        string[] parts = line.Split(new[] { '=' });
+                        if (parts.Length >= 2)
+                        {
+                            string name = parts[0].Trim().ToLower();
+
+                            properties.Add(name, parts[1].Trim());
+                        }
+                    }
+
+                    line = reader.ReadLine();
+                }
+            }
+
+            return properties;
+        }
+
         public static async Task<JObject> GetJsonFromResponse(HttpResponseMessage response)
         {
             JObject jsonObj;
