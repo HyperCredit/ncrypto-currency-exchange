@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public class MarketOrders
+    public class MarketOrders<O>
+        where O : MarketOrder
     {
-        public  MarketOrders(List<MarketOrder> sell, List<MarketOrder> buy)
+        public  MarketOrders(List<O> sell, List<O> buy)
         {
             this.Sell = sell;
             this.Buy = buy;
         }
 
-        public List<MarketOrder> Buy { get; private set; }
-        public List<MarketOrder> Sell { get; private set; }
+        public List<O> Buy { get; private set; }
+        public List<O> Sell { get; private set; }
     }
 }

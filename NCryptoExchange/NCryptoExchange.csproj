@@ -64,6 +64,7 @@
     <Compile Include="Cryptsy\CryptsyFailureException.cs" />
     <Compile Include="Cryptsy\CryptsyMarket.cs" />
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />
+    <Compile Include="Cryptsy\CryptsyMarketOrder.cs" />
     <Compile Include="Cryptsy\CryptsyMethod.cs" />
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />
     <Compile Include="Cryptsy\CryptsyParsers.cs" />

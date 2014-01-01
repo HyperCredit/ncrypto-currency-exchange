@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,7 +22,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// will load the keys from that file for you (provided with a path to
     /// a file that does not exist, it will create a blank file as a template).
     /// </summary>
-    public class CryptsyExchange : AbstractExchange<CryptsyMarketId, CryptsyOrderId>
+    public class CryptsyExchange : AbstractExchange<CryptsyMarketId, CryptsyOrderId, CryptsyMarketOrder>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -312,12 +313,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return DateTime.Now.Ticks.ToString();
         }
 
-        public override async Task<MarketOrders> GetMarketOrders(CryptsyMarketId marketId)
+        public override async Task<MarketOrders<CryptsyMarketOrder>> GetMarketOrders(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
-            JObject returnObj = await Call<JObject>(request);
-            return CryptsyParsers.ParseMarketOrders(returnObj);
+            JObject marketOrdersJson = await Call<JObject>(request);
+
+            return CryptsyParsers.ParseMarketOrders(marketOrdersJson);
         }
 
         public async override Task<List<Market<CryptsyMarketId>>> GetMarkets()

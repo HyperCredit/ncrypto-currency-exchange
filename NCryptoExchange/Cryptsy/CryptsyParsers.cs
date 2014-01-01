@@ -88,47 +88,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return side;
         }
 
-        public static MarketOrders ParseMarketOrders(JObject returnObj)
+        public static MarketOrders<CryptsyMarketOrder> ParseMarketOrders(JObject marketOrdersJson)
         {
-            List<MarketOrder> buyOrders = CryptsyParsers.ParseMarketOrders(OrderType.Buy, returnObj.Value<JArray>("buyorders"));
-            List<MarketOrder> sellOrders = CryptsyParsers.ParseMarketOrders(OrderType.Sell, returnObj.Value<JArray>("sellorders"));
+            List<CryptsyMarketOrder> buyOrders = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => CryptsyMarketOrder.ParseBuy(marketOrder as JObject)).ToList();
+            List<CryptsyMarketOrder> sellOrders = marketOrdersJson.Value<JArray>("sellorders").Select(marketOrder => CryptsyMarketOrder.ParseSell(marketOrder as JObject)).ToList();
 
-            return new MarketOrders(sellOrders, buyOrders);
-        }
-
-        public static List<MarketOrder> ParseMarketOrders(OrderType orderType, JArray jArray)
-        {
-            List<MarketOrder> orders = new List<MarketOrder>(jArray.Count);
-
-            try
-            {
-                foreach (JObject jsonOrder in jArray)
-                {
-                    decimal quantity = jsonOrder.Value<decimal>("quantity");
-                    decimal price;
-
-                    switch (orderType)
-                    {
-                        case OrderType.Buy:
-                            price = jsonOrder.Value<decimal>("buyprice");
-                            break;
-                        case OrderType.Sell:
-                            price = jsonOrder.Value<decimal>("sellprice");
-                            break;
-                        default:
-                            throw new ArgumentException("Unknown order type \""
-                                + Enum.GetName(typeof(OrderType), orderType) + "\".");
-                    }
-
-                    orders.Add(new MarketOrder(orderType, price, quantity));
-                }
-            }
-            catch (System.FormatException e)
-            {
-                throw new CryptsyResponseException("Encountered invalid quantity/price while parsing market orders.", e);
-            }
-
-            return orders;
+            return new MarketOrders<CryptsyMarketOrder>(sellOrders, buyOrders);
         }
 
         public static List<MarketTrade<CryptsyMarketId>> ParseMarketTrades(JArray jsonTrades,
