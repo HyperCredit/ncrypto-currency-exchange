@@ -1,13 +1,12 @@
-﻿using System;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Lostics.NCryptoExchange.Cryptsy;
-using System.Threading.Tasks;
-using System.Net.Http;
+﻿using Lostics.NCryptoExchange.Cryptsy;
 using Lostics.NCryptoExchange.Model;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json.Linq;
+using System.Linq;
+using System.Net.Http;
 
 namespace Lostics.NCryptoExchangeTest.Cryptsy
 {
@@ -68,9 +67,12 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarketTrades()
         {
             JObject jsonObj = LoadTestData("getmarkettrades.json");
-            List<MarketTrade<CryptsyMarketId>> marketTrades = CryptsyParsers.ParseMarketTrades(jsonObj.Value<JArray>("return"),
-                new CryptsyMarketId("1"),
-                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            CryptsyMarketId marketId = new CryptsyMarketId("1");
+            JArray marketTradesJson = jsonObj.Value<JArray>("return");
+            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            List<CryptsyMarketTrade> marketTrades = marketTradesJson.Select(
+                marketTrade => CryptsyMarketTrade.Parse(marketTrade as JObject, marketId, defaultTimeZone)
+            ).ToList();
 
             MarketTrade<CryptsyMarketId> mostRecentTrade = marketTrades[0];
 

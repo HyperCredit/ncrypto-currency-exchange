@@ -96,34 +96,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new MarketOrders<CryptsyMarketOrder>(sellOrders, buyOrders);
         }
 
-        public static List<MarketTrade<CryptsyMarketId>> ParseMarketTrades(JArray jsonTrades,
-            CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
-        {
-            List<MarketTrade<CryptsyMarketId>> trades = new List<MarketTrade<CryptsyMarketId>>();
-
-            foreach (JObject jsonTrade in jsonTrades)
-            {
-                DateTime tradeDateTime = DateTime.Parse(jsonTrade.Value<string>("datetime"));
-                JToken marketIdToken = jsonTrade["marketid"];
-                CryptsyMarketId marketId = null == marketIdToken
-                    ? defaultMarketId
-                    : CryptsyMarketId.Parse(marketIdToken);
-                CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
-                OrderType orderType = (OrderType)Enum.Parse(typeof(OrderType), jsonTrade.Value<string>("initiate_ordertype"));
-
-                tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
-
-                trades.Add(new MarketTrade<CryptsyMarketId>(tradeId,
-                    orderType, tradeDateTime,
-                    jsonTrade.Value<decimal>("tradeprice"),
-                    jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
-                    marketId
-                ));
-            }
-
-            return trades;
-        }
-
         public static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
