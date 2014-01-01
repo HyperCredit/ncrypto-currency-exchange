@@ -290,9 +290,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JArray returnArray = await Call<JArray>(request);
+            JArray marketsJson = await Call<JArray>(request);
 
-            return CryptsyParsers.ParseMarkets(returnArray, defaultTimeZone);
+            return marketsJson.Select(
+                market => (Market<CryptsyMarketId>)CryptsyMarket.Parse(market as JObject, this.defaultTimeZone)
+            ).ToList();
         }
 
         public async override Task<List<Transaction>> GetMyTransactions()

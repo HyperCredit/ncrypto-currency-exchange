@@ -23,6 +23,21 @@ namespace Lostics.NCryptoExchange.Cryptsy
             this.Created = created;
         }
 
+        public static CryptsyMarket Parse(JObject marketObj, TimeZoneInfo timeZone) {
+            DateTime created = DateTime.Parse(marketObj.Value<string>("created"));
+
+            TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
+
+            return new CryptsyMarket(new CryptsyMarketId(marketObj.Value<string>("marketid")),
+                marketObj.Value<string>("primary_currency_code"), marketObj.Value<string>("primary_currency_name"),
+                marketObj.Value<string>("secondary_currency_code"), marketObj.Value<string>("secondary_currency_name"),
+                marketObj.Value<string>("label"),
+                marketObj.Value<decimal>("current_volume"), marketObj.Value<decimal>("last_trade"),
+                marketObj.Value<decimal>("high_trade"), marketObj.Value<decimal>("low_trade"),
+                created
+            );
+        }
+
         public decimal CurrentVolume { get; private set; }
         public decimal LastTrade { get; private set; }
         public decimal HighTrade { get; private set; }

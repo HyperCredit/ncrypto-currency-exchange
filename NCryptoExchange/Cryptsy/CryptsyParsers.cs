@@ -10,31 +10,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyParsers
     {
-        public static List<Market<CryptsyMarketId>> ParseMarkets(JArray marketsJson, TimeZoneInfo timeZone)
-        {
-            List<Market<CryptsyMarketId>> markets = new List<Market<CryptsyMarketId>>();
-
-            foreach (JObject marketObj in marketsJson)
-            {
-                DateTime created = DateTime.Parse(marketObj.Value<string>("created"));
-
-                TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
-
-                CryptsyMarket market = new CryptsyMarket(new CryptsyMarketId(marketObj.Value<string>("marketid")),
-                    marketObj.Value<string>("primary_currency_code"), marketObj.Value<string>("primary_currency_name"),
-                    marketObj.Value<string>("secondary_currency_code"), marketObj.Value<string>("secondary_currency_name"),
-                    marketObj.Value<string>("label"),
-                    marketObj.Value<decimal>("current_volume"), marketObj.Value<decimal>("last_trade"),
-                    marketObj.Value<decimal>("high_trade"), marketObj.Value<decimal>("low_trade"),
-                    created
-                );
-
-                markets.Add(market);
-            }
-
-            return markets;
-        }
-
         public static Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
         {
             JToken buyJson = bookJson["buy"];

@@ -17,7 +17,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseAccountInfo()
         {
             JObject jsonObj = LoadTestData("accountinfo.json");
-            CryptsyAccountInfo accountInfo = CryptsyParsers.ParseAccountInfo(jsonObj.Value<JObject>("return"));
+            CryptsyAccountInfo accountInfo = CryptsyAccountInfo.Parse(jsonObj.Value<JObject>("return"));
 
             Assert.AreEqual(93, accountInfo.Wallets.Count);
             Assert.AreEqual(TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"), accountInfo.ServerTimeZone);
@@ -35,8 +35,11 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarkets()
         {
             JObject jsonObj = LoadTestData("getmarkets.json");
-            List<Market<CryptsyMarketId>> markets = CryptsyParsers.ParseMarkets(jsonObj.Value<JArray>("return"),
-                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            JArray marketsJson = jsonObj.Value<JArray>("return");
+            List<CryptsyMarket> markets = marketsJson.Select(
+                market => CryptsyMarket.Parse(market as JObject, defaultTimeZone)
+            ).ToList();
 
             Assert.AreEqual(114, markets.Count);
 
