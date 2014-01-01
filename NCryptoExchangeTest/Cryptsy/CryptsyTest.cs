@@ -68,11 +68,11 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarketTrades()
         {
             JObject jsonObj = LoadTestData("getmarkettrades.json");
-            List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> marketTrades = CryptsyParsers.ParseMarketTrades(jsonObj.Value<JArray>("return"),
+            List<MarketTrade<CryptsyMarketId>> marketTrades = CryptsyParsers.ParseMarketTrades(jsonObj.Value<JArray>("return"),
                 new CryptsyMarketId("1"),
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
-            MarketTrade<CryptsyMarketId, CryptsyTradeId> mostRecentTrade = marketTrades[0];
+            MarketTrade<CryptsyMarketId> mostRecentTrade = marketTrades[0];
 
             Assert.AreEqual("10958207", mostRecentTrade.TradeId.ToString());
             Assert.AreEqual((decimal)16433.01498728, mostRecentTrade.Quantity);
@@ -83,7 +83,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMyTrades()
         {
             JObject jsonObj = LoadTestData("getmytrades.json");
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = CryptsyParsers.ParseMyTrades(jsonObj.Value<JArray>("return"),
+            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = CryptsyParsers.ParseMyTrades(jsonObj.Value<JArray>("return"),
                 new CryptsyMarketId("132"),
                 TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 

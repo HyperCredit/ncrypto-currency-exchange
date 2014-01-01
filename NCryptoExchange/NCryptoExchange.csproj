@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractExchange.cs" />
+    <Compile Include="CoinsE\CoinsECurrency.cs" />
     <Compile Include="CoinsE\CoinsEException.cs" />
     <Compile Include="CoinsE\CoinsEExchange.cs" />
     <Compile Include="CoinsE\CoinsEMarket.cs" />
@@ -73,8 +74,8 @@
     <Compile Include="Model\AbstractStringBasedId.cs" />
     <Compile Include="Model\AccountInfo.cs" />
     <Compile Include="Model\Address.cs" />
-    <Compile Include="IExchange.cs" />
     <Compile Include="Cryptsy\Fees.cs" />
+    <Compile Include="Model\Currency.cs" />
     <Compile Include="Model\MarketOrders.cs" />
     <Compile Include="Model\Book.cs" />
     <Compile Include="Model\Market.cs" />

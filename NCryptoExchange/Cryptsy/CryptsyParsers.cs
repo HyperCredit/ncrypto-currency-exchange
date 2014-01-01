@@ -131,10 +131,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        public static List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> ParseMarketTrades(JArray jsonTrades,
+        public static List<MarketTrade<CryptsyMarketId>> ParseMarketTrades(JArray jsonTrades,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
-            List<MarketTrade<CryptsyMarketId, CryptsyTradeId>> trades = new List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>();
+            List<MarketTrade<CryptsyMarketId>> trades = new List<MarketTrade<CryptsyMarketId>>();
 
             foreach (JObject jsonTrade in jsonTrades)
             {
@@ -148,7 +148,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
-                trades.Add(new MarketTrade<CryptsyMarketId, CryptsyTradeId>(tradeId,
+                trades.Add(new MarketTrade<CryptsyMarketId>(tradeId,
                     orderType, tradeDateTime,
                     jsonTrade.Value<decimal>("tradeprice"),
                     jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
@@ -187,10 +187,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return orders;
         }
 
-        public static List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> ParseMyTrades(JArray jsonTrades,
+        public static List<MyTrade<CryptsyMarketId, CryptsyOrderId>> ParseMyTrades(JArray jsonTrades,
             CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
         {
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>();
+            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = new List<MyTrade<CryptsyMarketId, CryptsyOrderId>>();
 
             foreach (JObject jsonTrade in jsonTrades)
             {
@@ -205,7 +205,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
                 tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
-                trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>(tradeId,
+                trades.Add(new MyTrade<CryptsyMarketId, CryptsyOrderId>(tradeId,
                     tradeType, tradeDateTime,
                     jsonTrade.Value<decimal>("tradeprice"),
                     jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),

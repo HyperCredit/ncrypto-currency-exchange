@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using Lostics.NCryptoExchange.Model;
+﻿using Lostics.NCryptoExchange.Model;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.IO;
+using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId, CoinsETradeId, Wallet>
+    public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId>
     {
+        public const string COINS_LIST = "https://www.coins-e.com/api/v2/coins/list/";
         public const string MARKETS_LIST = "https://www.coins-e.com/api/v2/markets/list/";
 
         private HttpClient client = new HttpClient();
@@ -63,9 +63,16 @@ namespace Lostics.NCryptoExchange.CoinsE
             client.Dispose();
         }
 
-        public override Task<Model.AccountInfo<Wallet>> GetAccountInfo()
+        public override Task<Model.AccountInfo> GetAccountInfo()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<CoinsECurrency>> GetCoins()
+        {
+            JArray coinsJson = await CallPublic<JArray>(COINS_LIST, "coins");
+
+            return coinsJson.Select(coin => CoinsECurrency.Parse(coin as JObject)).ToList();
         }
 
         public override async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
@@ -83,17 +90,17 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task<List<Model.MarketTrade<CoinsEMarketId, CoinsETradeId>>> GetMarketTrades(CoinsEMarketId marketId)
+        public override Task<List<Model.MarketTrade<CoinsEMarketId>>> GetMarketTrades(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
+        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId, CoinsETradeId>>> GetAllMyTrades(int? limit)
+        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetAllMyTrades(int? limit)
         {
             throw new NotImplementedException();
         }

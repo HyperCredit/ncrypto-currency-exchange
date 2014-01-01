@@ -21,7 +21,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// will load the keys from that file for you (provided with a path to
     /// a file that does not exist, it will create a blank file as a template).
     /// </summary>
-    public class CryptsyExchange : AbstractExchange<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId, Wallet>
+    public class CryptsyExchange : AbstractExchange<CryptsyMarketId, CryptsyOrderId>
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -235,7 +235,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return parameters.ToArray();
         }
 
-        public async override Task<AccountInfo<Wallet>> GetAccountInfo()
+        public async override Task<AccountInfo> GetAccountInfo()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -338,7 +338,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyParsers.ParseTransactions(returnArray);
         }
 
-        public async override Task<List<MarketTrade<CryptsyMarketId, CryptsyTradeId>>> GetMarketTrades(CryptsyMarketId marketId)
+        public async override Task<List<MarketTrade<CryptsyMarketId>>> GetMarketTrades(CryptsyMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
@@ -347,7 +347,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyParsers.ParseMarketTrades(returnArray, marketId, defaultTimeZone);
         }
 
-        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
+        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId>>> GetMyTrades(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
@@ -358,7 +358,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyParsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
         }
 
-        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId, CryptsyTradeId>>> GetAllMyTrades(int? limit)
+        public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId>>> GetAllMyTrades(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));

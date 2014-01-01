@@ -11,11 +11,9 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
-    public abstract class AbstractExchange<M, O, T, W> : IExchange<M, O, T, W>
+    public abstract class AbstractExchange<M, O> : IDisposable
         where M : MarketId
         where O : OrderId
-        where T : TradeId
-        where W : Wallet
     {
         public static async Task<string> GenerateSHA512Signature(FormUrlEncodedContent request, byte[] privateKey)
         {
@@ -43,19 +41,19 @@ namespace Lostics.NCryptoExchange
 
         public abstract void Dispose();
 
-        public abstract Task<Model.AccountInfo<W>> GetAccountInfo();
+        public abstract Task<AccountInfo> GetAccountInfo();
 
-        public abstract Task<List<Model.Market<M>>> GetMarkets();
+        public abstract Task<List<Market<M>>> GetMarkets();
 
-        public abstract Task<List<Model.Transaction>> GetMyTransactions();
+        public abstract Task<List<Transaction>> GetMyTransactions();
 
         public abstract Task<MarketOrders> GetMarketOrders(M marketId);
 
-        public abstract Task<List<Model.MarketTrade<M, T>>> GetMarketTrades(M marketId);
+        public abstract Task<List<Model.MarketTrade<M>>> GetMarketTrades(M marketId);
 
-        public abstract Task<List<Model.MyTrade<M, O, T>>> GetMyTrades(M marketId, int? limit);
+        public abstract Task<List<Model.MyTrade<M, O>>> GetMyTrades(M marketId, int? limit);
 
-        public abstract Task<List<Model.MyTrade<M, O, T>>> GetAllMyTrades(int? limit);
+        public abstract Task<List<Model.MyTrade<M, O>>> GetAllMyTrades(int? limit);
 
         public abstract Task<List<Model.MyOrder<M, O>>> GetMyOrders(M marketId, int? limit);
 

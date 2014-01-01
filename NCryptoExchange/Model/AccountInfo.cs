@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public abstract class AccountInfo<W> where W: Wallet
+    public abstract class AccountInfo
     {
-        public List<W> Wallets
+        public List<Wallet> Wallets
         {
             get;
             private set;
@@ -17,7 +17,7 @@ namespace Lostics.NCryptoExchange.Model
             private set;
         }
 
-        protected   AccountInfo(List<W> setWallets, DateTime setSystemTime) {
+        protected   AccountInfo(List<Wallet> setWallets, DateTime setSystemTime) {
             this.Wallets = setWallets;
             this.SystemTime = setSystemTime;
         }

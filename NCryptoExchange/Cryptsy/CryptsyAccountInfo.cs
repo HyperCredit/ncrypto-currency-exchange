@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyAccountInfo : AccountInfo<Wallet>
+    public class CryptsyAccountInfo : AccountInfo
     {
         public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setSystemTime,
             TimeZoneInfo serverTimeZone, int openOrderCount)

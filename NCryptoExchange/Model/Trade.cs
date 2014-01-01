@@ -2,11 +2,10 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public abstract class Trade<M, T>
+    public abstract class Trade<M>
         where M : MarketId
-        where T : TradeId
     {
-        public Trade(T tradeId, OrderType tradeType,
+        public Trade(TradeId tradeId, OrderType tradeType,
             DateTime dateTime, decimal price,
             decimal quantity, decimal fee,
             M marketId)
@@ -22,12 +21,12 @@ namespace Lostics.NCryptoExchange.Model
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Trade<M, T>))
+            if (!(obj is Trade<M>))
             {
                 return false;
             }
 
-            Trade<M, T> other = (Trade<M, T>)obj;
+            Trade<M> other = (Trade<M>)obj;
 
             return this.TradeId.Equals(other.TradeId);
         }
@@ -44,7 +43,7 @@ namespace Lostics.NCryptoExchange.Model
                 + this.Price + " each";
         }
 
-        public T TradeId { get; private set; }
+        public TradeId TradeId { get; private set; }
         public OrderType TradeType { get; private set; }
         public DateTime DateTime { get; private set; }
         public decimal Price { get; private set; }
