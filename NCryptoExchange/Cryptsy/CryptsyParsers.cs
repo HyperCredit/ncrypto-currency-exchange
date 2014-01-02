@@ -44,20 +44,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new Book(sell, buy);
         }
 
-        public static List<MarketOrder> ParseMarketDepth(OrderType orderType,
-            JArray sideJson, CryptsyMarketId marketId)
-        {
-            List<MarketOrder> side = new List<MarketOrder>(sideJson.Count);
-
-            foreach (JArray depthJson in sideJson)
-            {
-                side.Add(new MarketOrder(orderType, depthJson[0].Value<decimal>(),
-                    depthJson[1].Value<decimal>()));
-            }
-
-            return side;
-        }
-
         public static Book ParseMarketOrders(JObject marketOrdersJson)
         {
             List<MarketOrder> buyOrders = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => (MarketOrder)CryptsyMarketOrder.ParseBuy(marketOrder as JObject)).ToList();
