@@ -58,7 +58,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarketOrders()
         {
             JObject jsonObj = LoadTestData("getmarketorders.json");
-            MarketOrders<CryptsyMarketOrder> marketOrders = CryptsyParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
+            Book marketOrders = CryptsyParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
 
             MarketOrder lowestSellOrder = marketOrders.Sell[0];
 

@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
+    /// <summary>
+    /// Methods for parsing classes where there's no Cryptsy-specific subclass. In other cases, parsers
+    /// are static methods in the relevant classes.
+    /// </summary>
     public class CryptsyParsers
     {
         public static Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
@@ -30,31 +34,36 @@ namespace Lostics.NCryptoExchange.Cryptsy
             JArray buyArray = (JArray)buyJson;
             JArray sellArray = (JArray)sellJson;
 
-            List<MarketDepth> buy = ParseMarketDepth(buyArray, marketId);
-            List<MarketDepth> sell = ParseMarketDepth(sellArray, marketId);
+            List<MarketOrder> buy = buyArray.Select(
+                depth => (MarketOrder)CryptsyMarketOrder.ParseMarketDepth(depth as JArray, OrderType.Buy)
+            ).ToList();
+            List<MarketOrder> sell = sellArray.Select(
+                depth => (MarketOrder)CryptsyMarketOrder.ParseMarketDepth(depth as JArray, OrderType.Sell)
+            ).ToList();
 
             return new Book(sell, buy);
         }
 
-        public static List<MarketDepth> ParseMarketDepth(JArray sideJson, CryptsyMarketId marketId)
+        public static List<MarketOrder> ParseMarketDepth(OrderType orderType,
+            JArray sideJson, CryptsyMarketId marketId)
         {
-            List<MarketDepth> side = new List<MarketDepth>(sideJson.Count);
+            List<MarketOrder> side = new List<MarketOrder>(sideJson.Count);
 
             foreach (JArray depthJson in sideJson)
             {
-                side.Add(new MarketDepth(depthJson[0].Value<decimal>(),
+                side.Add(new MarketOrder(orderType, depthJson[0].Value<decimal>(),
                     depthJson[1].Value<decimal>()));
             }
 
             return side;
         }
 
-        public static MarketOrders<CryptsyMarketOrder> ParseMarketOrders(JObject marketOrdersJson)
+        public static Book ParseMarketOrders(JObject marketOrdersJson)
         {
-            List<CryptsyMarketOrder> buyOrders = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => CryptsyMarketOrder.ParseBuy(marketOrder as JObject)).ToList();
-            List<CryptsyMarketOrder> sellOrders = marketOrdersJson.Value<JArray>("sellorders").Select(marketOrder => CryptsyMarketOrder.ParseSell(marketOrder as JObject)).ToList();
+            List<MarketOrder> buyOrders = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => (MarketOrder)CryptsyMarketOrder.ParseBuy(marketOrder as JObject)).ToList();
+            List<MarketOrder> sellOrders = marketOrdersJson.Value<JArray>("sellorders").Select(marketOrder => (MarketOrder)CryptsyMarketOrder.ParseSell(marketOrder as JObject)).ToList();
 
-            return new MarketOrders<CryptsyMarketOrder>(sellOrders, buyOrders);
+            return new Book(sellOrders, buyOrders);
         }
 
         public static List<MyOrder<CryptsyMarketId, CryptsyOrderId>> ParseMyOrders(JArray jsonOrders,

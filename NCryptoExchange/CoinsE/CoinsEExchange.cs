@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId, MarketOrder>
+    public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId>
     {
         public const string COINS_LIST = "https://www.coins-e.com/api/v2/coins/list/";
         public const string MARKETS_LIST = "https://www.coins-e.com/api/v2/markets/list/";
@@ -85,7 +85,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task<MarketOrders<MarketOrder>> GetMarketOrders(CoinsEMarketId marketId)
+        public override Task<Book> GetMarketOrders(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }
