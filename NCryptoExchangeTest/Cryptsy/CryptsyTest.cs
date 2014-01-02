@@ -81,16 +81,18 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
 
             Assert.AreEqual("10958207", mostRecentTrade.TradeId.ToString());
             Assert.AreEqual((decimal)16433.01498728, mostRecentTrade.Quantity);
-            Assert.AreEqual(OrderType.Sell, mostRecentTrade.TradeType);
+            Assert.AreEqual(OrderType.Sell, mostRecentTrade.OrderType);
         }
 
         [TestMethod]
         public void TestParseMyTrades()
         {
             JObject jsonObj = LoadTestData("getmytrades.json");
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = CryptsyParsers.ParseMyTrades(jsonObj.Value<JArray>("return"),
-                new CryptsyMarketId("132"),
-                TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            CryptsyMarketId marketId = new CryptsyMarketId("132");
+            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = jsonObj.Value<JArray>("return").Select(
+                marketTrade => CryptsyParsers.ParseMyTrade(marketTrade as JObject, marketId, defaultTimeZone)
+            ).ToList();
 
             Assert.AreEqual(2, trades.Count);
             Assert.AreEqual("9373209", trades[0].TradeId.ToString());

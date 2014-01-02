@@ -321,44 +321,46 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray returnArray = await Call<JArray>(request);
+            JArray myTradesJson = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return CryptsyParsers.ParseMyTrades(returnArray, marketId, defaultTimeZone);
+            return myTradesJson.Select(myTradeJson => CryptsyParsers.ParseMyTrade(myTradeJson as JObject, marketId,
+                defaultTimeZone)).ToList();
         }
 
         public async override Task<List<MyTrade<CryptsyMarketId, CryptsyOrderId>>> GetAllMyTrades(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray returnArray = await Call<JArray>(request);
+            JArray myTradesJson = await Call<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
-            return CryptsyParsers.ParseMyTrades(returnArray, null, defaultTimeZone);
+            return myTradesJson.Select(myTradeJson => CryptsyParsers.ParseMyTrade(myTradeJson as JObject, null,
+                defaultTimeZone)).ToList();
         }
 
         public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray returnArray = await Call<JArray>(request);
+            JArray myOrdersJson = await Call<JArray>(request);
 
-            // XXX: Should use timezone provided by Cryptsy, not just presume.
+            // XXX: Should use timezone provided by Cryptsy, not just presume it's EST
 
-            return CryptsyParsers.ParseMyOrders(returnArray, marketId, defaultTimeZone);
+            return myOrdersJson.Select(myOrderJson => CryptsyParsers.ParseMyOrder(myOrderJson as JObject, marketId, defaultTimeZone)).ToList();
         }
 
         public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray returnArray = await Call<JArray>(request);
+            JArray myOrdersJson = await Call<JArray>(request);
 
-            // XXX: Should use timezone provided by Cryptsy, not just presume.
+            // XXX: Should use timezone provided by Cryptsy, not just presume it's EST
 
-            return CryptsyParsers.ParseMyOrders(returnArray, null, defaultTimeZone);
+            return myOrdersJson.Select(myOrderJson => CryptsyParsers.ParseMyOrder(myOrderJson as JObject, defaultTimeZone)).ToList();
         }
 
         public async override Task<Book> GetMarketDepth(CryptsyMarketId marketId)

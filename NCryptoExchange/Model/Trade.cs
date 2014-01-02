@@ -2,19 +2,16 @@ using System;
 
 namespace Lostics.NCryptoExchange.Model
 {
-    public abstract class Trade<M>
+    public abstract class Trade<M> : Order
         where M : MarketId
     {
         public Trade(TradeId tradeId, OrderType tradeType,
             DateTime dateTime, decimal price,
             decimal quantity, decimal fee,
-            M marketId)
+            M marketId) : base(tradeType, price, quantity)
         {
             this.TradeId = tradeId;
-            this.TradeType = tradeType;
             this.DateTime = dateTime;
-            this.Price = price;
-            this.Quantity = quantity;
             this.Fee = fee;
             this.MarketId = marketId;
         }
@@ -38,16 +35,13 @@ namespace Lostics.NCryptoExchange.Model
 
         public override string ToString()
         {
-            return this.TradeType.ToString() + " "
+            return this.OrderType.ToString() + " "
                 + this.Quantity + " at "
                 + this.Price + " each";
         }
 
         public TradeId TradeId { get; private set; }
-        public OrderType TradeType { get; private set; }
         public DateTime DateTime { get; private set; }
-        public decimal Price { get; private set; }
-        public decimal Quantity { get; private set; }
         public decimal Fee { get; private set; }
         public M MarketId { get; private set; }
     }
