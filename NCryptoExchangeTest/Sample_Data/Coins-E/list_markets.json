@@ -1,0 +1,16 @@
+{
+  "status": true,
+  "message": "success",
+  "systime": 1372852975,
+  "markets": [
+    {
+      "status": "healthy",
+      "c2": "BTC",
+      "c1": "WDC",
+      "trade_fee": "0.00300000",
+      "coin2": "bitcoin",
+      "coin1": "worldcoin",
+      "pair": "WDC_BTC"
+    }
+  ]
+}

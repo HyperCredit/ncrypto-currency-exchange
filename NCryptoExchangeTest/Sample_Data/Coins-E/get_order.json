@@ -1,0 +1,17 @@
+{
+  "status": true,
+  "message": "success",
+  "order": {
+    "status": "queued",
+    "order_type": "buy",
+    "quantity_remaining": "1.00000000",
+    "created": 1372846830,
+    "id": "B/0.00212300/5517761665040384",
+    "quantity": "1.00000000",
+    "rate": "0.00212300",
+    "is_open": true,
+    "pair": "WDC_BTC",
+    "fee_rate": "0.00300000"
+  },
+  "systime": 1372846830
+}

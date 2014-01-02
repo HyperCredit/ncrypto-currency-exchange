@@ -1,0 +1,33 @@
+{
+  "status": true,
+  "message": "success",
+  "systime": 1372852975,
+  "coins": [
+    {
+      "confirmations": 4,
+      "trade_fee_percent": "0.30",
+      "trade_fee": "0.003",
+      "status": "maintanance",
+      "tier": 1,
+      "name": "bitcoin",
+      "block_time": 600,
+      "withdrawal_fee": "0.00050000",
+      "coin": "BTC",
+      "confirmation_time": 2400,
+      "folder_name": "bitcoin"
+    },
+    {
+      "confirmations": 5,
+      "trade_fee_percent": "0.30",
+      "trade_fee": "0.00300000",
+      "status": "healthy",
+      "tier": 1,
+      "name": "digitalcoin",
+      "block_time": 20,
+      "withdrawal_fee": "0.20000000",
+      "coin": "DGC",
+      "confirmation_time": 100,
+      "folder_name": "digitalcoin"
+    }
+  ]
+}

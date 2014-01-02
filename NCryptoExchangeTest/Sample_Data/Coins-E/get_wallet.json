@@ -1,0 +1,10 @@
+{
+  "status": true,
+  "message": "success",
+  "wallet": {
+    "available": "98.65045400",
+    "onhold": "1.34954600",
+    "unconfirmed": "0.0"
+  },
+  "systime": 1372852975
+}
