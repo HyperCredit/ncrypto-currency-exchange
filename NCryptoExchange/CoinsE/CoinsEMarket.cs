@@ -1,4 +1,5 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,14 @@ namespace Lostics.NCryptoExchange.CoinsE
             this.tradeFee = tradeFee;
         }
 
-        public static CoinsEMarket Parse(Newtonsoft.Json.Linq.JObject jObject, TimeZoneInfo defaultTimeZone)
+        public static CoinsEMarket Parse(JObject marketObj)
         {
-            throw new NotImplementedException();
+            return new CoinsEMarket(new CoinsEMarketId(marketObj.Value<string>("pair")),
+                marketObj.Value<string>("c1"), marketObj.Value<string>("coin1"),
+                marketObj.Value<string>("c2"), marketObj.Value<string>("coin2"),
+                marketObj.Value<string>("pair"),
+                marketObj.Value<string>("status"), marketObj.Value<decimal>("trade_fee")
+            );
         }
     }
 }

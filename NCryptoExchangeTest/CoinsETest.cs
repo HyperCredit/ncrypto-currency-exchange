@@ -33,24 +33,16 @@ namespace Lostics.NCryptoExchangeTest
         [TestMethod]
         public void TestParseMarkets()
         {
-            JObject jsonObj = LoadTestData("getmarkets.json");
-            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            JArray marketsJson = jsonObj.Value<JArray>("return");
+            JObject jsonObj = LoadTestData("list_markets.json");
+            JArray marketsJson = jsonObj.Value<JArray>("markets");
             List<CoinsEMarket> markets = marketsJson.Select(
-                market => CoinsEMarket.Parse(market as JObject, defaultTimeZone)
+                market => CoinsEMarket.Parse(market as JObject)
             ).ToList();
 
-            Assert.AreEqual(114, markets.Count);
+            Assert.AreEqual(1, markets.Count);
 
-            foreach (Market<CoinsEMarketId> market in markets)
-            {
-                // DOGE/BTC
-                if (market.MarketId.ToString().Equals("132"))
-                {
-                    Assert.AreEqual(market.BaseCurrencyCode, "DOGE");
-                    Assert.AreEqual(market.QuoteCurrencyCode, "BTC");
-                }
-            }
+            Assert.AreEqual(markets[0].BaseCurrencyCode, "WDC");
+            Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
         }
 
         [TestMethod]
@@ -101,7 +93,7 @@ namespace Lostics.NCryptoExchangeTest
         private JObject LoadTestData(string filename)
         {
             string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "CoinsE");
+            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Coins-E");
             FileInfo fileName = new FileInfo(Path.Combine(testDataDir, filename));
             JObject jsonObj;
 

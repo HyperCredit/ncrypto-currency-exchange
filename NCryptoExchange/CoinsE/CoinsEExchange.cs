@@ -75,9 +75,13 @@ namespace Lostics.NCryptoExchange.CoinsE
             return coinsJson.Select(coin => CoinsECurrency.Parse(coin as JObject)).ToList();
         }
 
-        public override async Task<List<Model.Market<CoinsEMarketId>>> GetMarkets()
+        public override async Task<List<Market<CoinsEMarketId>>> GetMarkets()
         {
-            return CoinsEParsers.ParseMarkets(await CallPublic<JArray>(MARKETS_LIST, "markets"));
+            JArray marketsJson = await CallPublic<JArray>(MARKETS_LIST, "markets");
+            
+            return marketsJson.Select(
+                 market => (Market<CoinsEMarketId>)CoinsEMarket.Parse(market as JObject)
+             ).ToList();
         }
 
         public override Task<List<Model.Transaction>> GetMyTransactions()
