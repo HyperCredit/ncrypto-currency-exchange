@@ -1,4 +1,4 @@
-﻿using Lostics.NCryptoExchange.Cryptsy;
+﻿using Lostics.NCryptoExchange.CoinsE;
 using Lostics.NCryptoExchange.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
@@ -8,19 +8,18 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 
-namespace Lostics.NCryptoExchangeTest.Cryptsy
+namespace Lostics.NCryptoExchangeTest
 {
     [TestClass]
-    public class CryptsyTest
+    public class CoinsETest
     {
         [TestMethod]
         public void TestParseAccountInfo()
         {
             JObject jsonObj = LoadTestData("accountinfo.json");
-            CryptsyAccountInfo accountInfo = CryptsyAccountInfo.Parse(jsonObj.Value<JObject>("return"));
+            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
 
             Assert.AreEqual(93, accountInfo.Wallets.Count);
-            Assert.AreEqual(TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"), accountInfo.ServerTimeZone);
 
             foreach (Wallet wallet in accountInfo.Wallets)
             {
@@ -37,13 +36,13 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             JObject jsonObj = LoadTestData("getmarkets.json");
             TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
             JArray marketsJson = jsonObj.Value<JArray>("return");
-            List<CryptsyMarket> markets = marketsJson.Select(
-                market => CryptsyMarket.Parse(market as JObject, defaultTimeZone)
+            List<CoinsEMarket> markets = marketsJson.Select(
+                market => CoinsEMarket.Parse(market as JObject, defaultTimeZone)
             ).ToList();
 
             Assert.AreEqual(114, markets.Count);
 
-            foreach (Market<CryptsyMarketId> market in markets)
+            foreach (Market<CoinsEMarketId> market in markets)
             {
                 // DOGE/BTC
                 if (market.MarketId.ToString().Equals("132"))
@@ -58,7 +57,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarketOrders()
         {
             JObject jsonObj = LoadTestData("getmarketorders.json");
-            Book marketOrders = CryptsyParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
+            Book marketOrders = CoinsEParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
 
             MarketOrder lowestSellOrder = marketOrders.Sell[0];
 
@@ -70,14 +69,14 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMarketTrades()
         {
             JObject jsonObj = LoadTestData("getmarkettrades.json");
-            CryptsyMarketId marketId = new CryptsyMarketId("1");
+            CoinsEMarketId marketId = new CoinsEMarketId("1");
             JArray marketTradesJson = jsonObj.Value<JArray>("return");
             TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            List<CryptsyMarketTrade> marketTrades = marketTradesJson.Select(
-                marketTrade => CryptsyMarketTrade.Parse(marketTrade as JObject, marketId, defaultTimeZone)
+            List<CoinsEMarketTrade> marketTrades = marketTradesJson.Select(
+                marketTrade => CoinsEMarketTrade.Parse(marketTrade as JObject, marketId, defaultTimeZone)
             ).ToList();
 
-            MarketTrade<CryptsyMarketId> mostRecentTrade = marketTrades[0];
+            MarketTrade<CoinsEMarketId> mostRecentTrade = marketTrades[0];
 
             Assert.AreEqual("10958207", mostRecentTrade.TradeId.ToString());
             Assert.AreEqual((decimal)16433.01498728, mostRecentTrade.Quantity);
@@ -88,10 +87,10 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         public void TestParseMyTrades()
         {
             JObject jsonObj = LoadTestData("getmytrades.json");
-            CryptsyMarketId marketId = new CryptsyMarketId("132");
+            CoinsEMarketId marketId = new CoinsEMarketId("132");
             TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = jsonObj.Value<JArray>("return").Select(
-                marketTrade => CryptsyParsers.ParseMyTrade(marketTrade as JObject, marketId, defaultTimeZone)
+            List<MyTrade<CoinsEMarketId, CoinsEOrderId>> trades = jsonObj.Value<JArray>("return").Select(
+                marketTrade => CoinsEParsers.ParseMyTrade(marketTrade as JObject, marketId, defaultTimeZone)
             ).ToList();
 
             Assert.AreEqual(2, trades.Count);
@@ -102,7 +101,7 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
         private JObject LoadTestData(string filename)
         {
             string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Cryptsy");
+            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "CoinsE");
             FileInfo fileName = new FileInfo(Path.Combine(testDataDir, filename));
             JObject jsonObj;
 
@@ -112,27 +111,6 @@ namespace Lostics.NCryptoExchangeTest.Cryptsy
             }
 
             return jsonObj;
-        }
-
-        [TestMethod]
-        public void TestSignCryptsyRequest()
-        {
-            string privateKey = "topsecret";
-            byte[] privateKeyBytes = System.Text.Encoding.ASCII.GetBytes(privateKey);
-            string actual;
-            string expected = "6dd05bfe3104a70768cf76a30474176db356818d3556e536c31d158fc2c3adafa096df144b46b2ccb1ff6128d6a0a07746695eca061547b25fd676c9614e6718";
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_METHOD, Enum.GetName(typeof(CryptsyMethod), CryptsyMethod.getinfo)),
-                    new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
-                });
-
-            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret"))
-            {
-                actual = CryptsyExchange.GenerateSHA512Signature(request, privateKeyBytes).Result;
-            }
-
-            Assert.AreEqual(expected, actual);
         }
     }
 }

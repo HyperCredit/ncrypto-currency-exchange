@@ -50,6 +50,7 @@
     <Compile Include="CoinsE\CoinsEException.cs" />
     <Compile Include="CoinsE\CoinsEExchange.cs" />
     <Compile Include="CoinsE\CoinsEMarket.cs" />
+    <Compile Include="CoinsE\CoinsEMarketTrade.cs" />
     <Compile Include="CoinsE\CoinsEParsers.cs" />
     <Compile Include="CoinsE\CoinsEResponseException.cs" />
     <Compile Include="CoinsE\CoinsEMarketId.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Model\Transaction.cs" />
     <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />
+    <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

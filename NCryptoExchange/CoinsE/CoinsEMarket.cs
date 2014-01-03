@@ -18,5 +18,10 @@ namespace Lostics.NCryptoExchange.CoinsE
             this.status = status;
             this.tradeFee = tradeFee;
         }
+
+        public static CoinsEMarket Parse(Newtonsoft.Json.Linq.JObject jObject, TimeZoneInfo defaultTimeZone)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -27,5 +27,20 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             return markets;
         }
+
+        public static Book ParseMarketOrders(JObject jObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static MyTrade<CoinsEMarketId, CoinsEOrderId> ParseMyTrade(JObject jObject, CoinsEMarketId marketId, TimeZoneInfo defaultTimeZone)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static AccountInfo ParseAccountInfo(JObject jsonObj)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
