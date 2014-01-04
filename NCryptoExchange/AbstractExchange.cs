@@ -90,7 +90,7 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task<List<Model.MyOrder<M, O>>> GetAllMyOrders(int? limit);
 
-        public abstract Task<Model.Book> GetMarketDepth(M marketId);
+        public abstract Task<Book> GetMarketDepth(M marketId);
 
         public abstract Task CancelOrder(O orderId);
 

@@ -58,6 +58,7 @@
     <Compile Include="CoinsE\CoinsEOrderId.cs" />
     <Compile Include="CoinsE\CoinsETradeId.cs" />
     <Compile Include="CoinsE\CoinsEWallet.cs" />
+    <Compile Include="CoinsE\CoinsEMarketOrder.cs" />
     <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />

@@ -10,16 +10,6 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public static class CoinsEParsers
     {
-        public static Book ParseMarketOrders(JObject jObject)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static MyTrade<CoinsEMarketId, CoinsEOrderId> ParseMyTrade(JObject jObject, CoinsEMarketId marketId, TimeZoneInfo defaultTimeZone)
-        {
-            throw new NotImplementedException();
-        }
-
         public static AccountInfo ParseAccountInfo(JObject jsonObj)
         {
             DateTime systemTime = ParseTime(jsonObj.Value<int>("systime"));
@@ -30,7 +20,27 @@ namespace Lostics.NCryptoExchange.CoinsE
             return new AccountInfo(wallets, systemTime);
         }
 
-        private static DateTime ParseTime(int secondsSinceEpoch)
+        public static Book ParseMarketOrders(JObject bookJson)
+        {
+            JArray bidsArray = bookJson.Value<JArray>("bids");
+            JArray asksArray = bookJson.Value<JArray>("asks");
+
+            List<MarketOrder> bids = bidsArray.Select(
+                depth => (MarketOrder)CoinsEMarketOrder.ParseMarketDepth(depth as JObject, OrderType.Buy)
+            ).ToList();
+            List<MarketOrder> asks = asksArray.Select(
+                depth => (MarketOrder)CoinsEMarketOrder.ParseMarketDepth(depth as JObject, OrderType.Sell)
+            ).ToList();
+
+            return new Book(asks, bids);
+        }
+
+        public static MyTrade<CoinsEMarketId, CoinsEOrderId> ParseMyTrade(JObject jObject, CoinsEMarketId marketId, TimeZoneInfo defaultTimeZone)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DateTime ParseTime(int secondsSinceEpoch)
         {
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(secondsSinceEpoch);

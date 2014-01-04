@@ -33,7 +33,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns></returns>
         public static MarketOrder ParseMarketDepth(JArray depthJson, OrderType orderType)
         {
-            return new MarketOrder(orderType, depthJson[0].Value<decimal>(),
+            return new CryptsyMarketOrder(orderType, depthJson[0].Value<decimal>(),
                     depthJson[1].Value<decimal>());
         }
 
