@@ -12,23 +12,51 @@ namespace Lostics.NCryptoExchange.CoinsE
     {
         public const string COINS_LIST = "https://www.coins-e.com/api/v2/coins/list/";
         public const string MARKETS_LIST = "https://www.coins-e.com/api/v2/markets/list/";
+        public const string WALLETS_LIST = "https://www.coins-e.com/api/v2/wallet/all/";
 
+        public const string HEADER_SIGN = "sign";
+        public const string HEADER_KEY = "key";
+
+        public const string PARAM_METHOD = "method";
+        public const string PARAM_NONCE = "nonce";
+
+        private readonly string publicKey;
+        private readonly byte[] privateKey;
         private HttpClient client = new HttpClient();
+
+        public CoinsEExchange(string publicKey, string privateKey)
+        {
+            this.publicKey = publicKey;
+            this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
+        }
 
         /// <summary>
         /// Make a call to a public (non-authenticated) API
         /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
-        /// <param name="propertyName"></param>
-        /// <returns></returns>
+        /// <param name="propertyName">Name of a property within the response JSON, to extract and return</param>
+        /// <returns>The value of the property in the JSON response from Coins-E</returns>
+        /// <typeparam name="T">The type of the property to return from the JSON response (i.e. JArray, JObject)</typeparam>
         private async Task<T> CallPublic<T>(string url, string propertyName)
+            where T : JToken
         {
-            HttpResponseMessage response = await client.GetAsync(url);
+            JObject jsonObj = await CallPublic(url);
+
+            return jsonObj.Value<T>(propertyName);
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPublic(string url)
+        {
             JObject jsonObj;
 
             try
             {
-                jsonObj = await GetJsonFromResponse(response);
+                jsonObj = await GetJsonFromResponse(await client.GetAsync(url));
             }
             catch (ArgumentException e)
             {
@@ -55,7 +83,64 @@ namespace Lostics.NCryptoExchange.CoinsE
                 }
             }
 
+            return jsonObj;
+        }
+
+        private async Task<T> CallPrivate<T>(CoinsEMethod method, string url, string propertyName)
+            where T : JToken
+        {
+            JObject jsonObj = await CallPrivate(method, url);
+
             return jsonObj.Value<T>(propertyName);
+        }
+
+        /// <summary>
+        /// Make a call to a private (authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPrivate(CoinsEMethod method, string url)
+        {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new [] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+
+            JObject jsonObj;
+
+            try
+            {
+                jsonObj = await GetJsonFromResponse(await client.PostAsync(url, request));
+            }
+            catch (ArgumentException e)
+            {
+                throw new CoinsEResponseException("Could not parse response from Coins-E.", e);
+            }
+
+            string status = jsonObj.Value<string>("status");
+            if (null == status)
+            {
+                throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
+            }
+            if (!status.Equals("true"))
+            {
+                string message = jsonObj.Value<string>("message");
+
+                if (null != message)
+                {
+                    throw new CoinsEResponseException(message);
+                }
+                else
+                {
+                    throw new CoinsEResponseException("Success status from Coins-E was \""
+                        + status + "\", expected \"true\".");
+                }
+            }
+
+            return jsonObj;
         }
 
         public override void Dispose()
@@ -63,9 +148,11 @@ namespace Lostics.NCryptoExchange.CoinsE
             client.Dispose();
         }
 
-        public override Task<Model.AccountInfo> GetAccountInfo()
+        public override async Task<Model.AccountInfo> GetAccountInfo()
         {
-            throw new NotImplementedException();
+            JObject responseJson = await CallPrivate(CoinsEMethod.getallwallets, WALLETS_LIST);
+
+            return CoinsEParsers.ParseAccountInfo(responseJson);
         }
 
         public async Task<List<CoinsECurrency>> GetCoins()

@@ -7,30 +7,22 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Wallet
     {
-        private readonly string currencyCode;
-        private readonly decimal balance;
-        private readonly decimal heldBalance;
-
         public Wallet(string currencyCode, decimal setBalance, decimal setHeldBalance)
         {
-            this.currencyCode = currencyCode;
-            this.balance = setBalance;
-            this.heldBalance = setHeldBalance;
+            this.CurrencyCode = currencyCode;
+            this.Balance = setBalance;
+            this.HeldBalance = setHeldBalance;
         }
 
         public override string ToString()
         {
-            return balance + " "
-                + currencyCode;
+            return Balance + " "
+                + CurrencyCode;
         }
 
-        public decimal Balance
-        { get { return this.balance; } }
 
-        public string CurrencyCode
-        { get { return this.currencyCode; } }
-
-        public decimal HeldBalance
-        { get { return this.heldBalance; } }
+        public string CurrencyCode { get; private set; }
+        public decimal Balance { get; private set; }
+        public decimal HeldBalance { get; private set; }
     }
 }

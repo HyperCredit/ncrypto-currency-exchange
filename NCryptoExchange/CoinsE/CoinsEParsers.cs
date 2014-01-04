@@ -22,7 +22,18 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public static AccountInfo ParseAccountInfo(JObject jsonObj)
         {
-            throw new NotImplementedException();
+            DateTime systemTime = ParseTime(jsonObj.Value<int>("systime"));
+            List<Wallet> wallets = jsonObj.Value<JObject>("wallets").Properties().Select(
+                 wallet => (Wallet)CoinsEWallet.Parse(wallet.Name, wallet.First.Value<JObject>())
+             ).ToList();
+
+            return new AccountInfo(wallets, systemTime);
+        }
+
+        private static DateTime ParseTime(int secondsSinceEpoch)
+        {
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(secondsSinceEpoch);
         }
     }
 }

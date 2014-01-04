@@ -16,16 +16,16 @@ namespace Lostics.NCryptoExchangeTest
         [TestMethod]
         public void TestParseAccountInfo()
         {
-            JObject jsonObj = LoadTestData("accountinfo.json");
+            JObject jsonObj = LoadTestData("get_wallets.json");
             AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
 
-            Assert.AreEqual(93, accountInfo.Wallets.Count);
+            Assert.AreEqual(5, accountInfo.Wallets.Count);
 
             foreach (Wallet wallet in accountInfo.Wallets)
             {
                 if (wallet.CurrencyCode.Equals("BTC"))
                 {
-                    Assert.AreEqual((decimal)0.00001458, wallet.Balance);
+                    Assert.AreEqual((decimal)3.05354081, wallet.Balance);
                 }
             }
         }
