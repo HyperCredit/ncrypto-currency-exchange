@@ -7,33 +7,29 @@ namespace Lostics.NCryptoExchange.Model
 {
     public abstract class Order : IComparable<Order>
     {
-        private readonly OrderType orderType;
-        private readonly decimal price;
-        private readonly decimal quantity;
-
         public  Order(OrderType orderType, decimal price, decimal quantity)
         {
-            this.orderType = orderType;
-            this.price = price;
-            this.quantity = quantity;
+            this.OrderType = orderType;
+            this.Price = price;
+            this.Quantity = quantity;
         }
 
         public int CompareTo(Order other)
         {
-            if (this.orderType == other.orderType)
+            if (this.OrderType == other.OrderType)
             {
-                if (this.price.Equals(other.price))
+                if (this.Price.Equals(other.Price))
                 {
-                    return this.quantity.CompareTo(other.quantity);
+                    return this.Quantity.CompareTo(other.Quantity);
                 }
                 else
                 {
-                    return this.price.CompareTo(other.price);
+                    return this.Price.CompareTo(other.Price);
                 }
             }
             else
             {
-                switch (this.orderType)
+                switch (this.OrderType)
                 {
                     case OrderType.Sell:
                         return -1;
@@ -45,13 +41,13 @@ namespace Lostics.NCryptoExchange.Model
 
         public override string ToString()
         {
-            return orderType.ToString().ToUpper() + " "
-                + quantity + " at "
-                + price + " each.";
+            return OrderType.ToString().ToUpper() + " "
+                + Quantity + " at "
+                + Price + " each.";
         }
 
-        public OrderType OrderType { get { return this.orderType;  } }
-        public decimal Quantity { get { return this.quantity; } }
-        public decimal Price { get { return this.price;  } }
+        public OrderType OrderType { get; private set; }
+        public decimal Quantity { get; private set; }
+        public decimal Price { get; private set; }
     }
 }
