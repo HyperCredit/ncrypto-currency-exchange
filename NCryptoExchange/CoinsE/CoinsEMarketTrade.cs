@@ -22,8 +22,8 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
             CoinsETradeId tradeId = new CoinsETradeId(jObject.Value<string>("id"));
             CoinsEMarketId marketId = new CoinsEMarketId(jObject.Value<string>("pair"));
-            CoinsEOrderId buyOrderId = new CoinsEOrderId(jObject.Value<int>("buy_order_no"));
-            CoinsEOrderId sellOrderId = new CoinsEOrderId(jObject.Value<int>("sell_order_no"));
+            CoinsEOrderId buyOrderId = new CoinsEOrderId(jObject.Value<long>("buy_order_no"));
+            CoinsEOrderId sellOrderId = new CoinsEOrderId(jObject.Value<long>("sell_order_no"));
             DateTime dateTime = CoinsEParsers.ParseTime(jObject.Value<int>("created"));
             
             return new CoinsEMarketTrade(tradeId, dateTime, jObject.Value<decimal>("rate"),

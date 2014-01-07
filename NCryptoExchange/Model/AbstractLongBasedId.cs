@@ -1,11 +1,11 @@
 ﻿
 namespace Lostics.NCryptoExchange.Model
 {
-    public abstract class AbstractIntBasedId
+    public abstract class AbstractLongBasedId
     {
-        public int Value { get; private set; }
+        public long Value { get; private set; }
 
-        public AbstractIntBasedId(int setValue)
+        public AbstractLongBasedId(long setValue)
         {
             this.Value = setValue;
         }
@@ -17,14 +17,14 @@ namespace Lostics.NCryptoExchange.Model
                 return false;
             }
 
-            AbstractIntBasedId other = (AbstractIntBasedId)obj;
+            AbstractLongBasedId other = (AbstractLongBasedId)obj;
 
             return other.Value.Equals(this.Value);
         }
 
         public override int GetHashCode()
         {
-            return this.Value.GetHashCode();
+            return (int)this.Value;
         }
 
         public override string ToString()

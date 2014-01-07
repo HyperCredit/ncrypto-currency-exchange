@@ -76,8 +76,11 @@ namespace Lostics.NCryptoExchangeTest
             ).ToList();
 
             Assert.AreEqual(2, trades.Count);
-            Assert.AreEqual("9373209", trades[0].TradeId.ToString());
-            Assert.AreEqual("9164163", trades[1].TradeId.ToString());
+            Assert.AreEqual("0.76124500/5909462682435584-1.52249000/6402043891679232", trades[0].TradeId.ToString());
+            Assert.AreEqual("WDC_BTC", trades[0].MarketId.ToString());
+            Assert.AreEqual((decimal)2.45600000, trades[0].Quantity);
+            Assert.AreEqual((decimal)1.52249000, trades[0].Price);
+            Assert.AreEqual("2.19643500/5205775240658944-2.28373500/4994669008125952", trades[1].TradeId.ToString());
         }
 
         private JObject LoadTestData(string filename)

@@ -43,7 +43,6 @@ namespace Lostics.NCryptoExchange.Model
 
         public TradeId TradeId { get; private set; }
         public DateTime DateTime { get; private set; }
-        public decimal Fee { get; private set; }
         public M MarketId { get; private set; }
         public decimal Quantity { get; private set; }
         public decimal Price { get; private set; }
