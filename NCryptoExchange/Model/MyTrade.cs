@@ -6,14 +6,25 @@ namespace Lostics.NCryptoExchange.Model
         where O : OrderId
     {
         public MyTrade(TradeId tradeId, OrderType tradeType,
-            DateTime dateTime, decimal price,
-            decimal quantity, decimal fee,
+            DateTime dateTime, decimal price, decimal fee,
+            decimal quantity,
             M marketId, O orderId)
-            : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
+            : base(tradeId, dateTime, price, quantity, marketId)
         {
+            this.Fee = fee;
             this.OrderId = orderId;
+            this.TradeType = tradeType;
         }
 
+        public override string ToString()
+        {
+            return Enum.GetName(TradeType.GetType(), TradeType) + " "
+                + this.Quantity + " at "
+                + this.Price + " each";
+        }
+
+        public decimal Fee { get; private set; }
         public OrderId OrderId { get; private set; }
+        public OrderType TradeType { get; private set; }
     }
 }

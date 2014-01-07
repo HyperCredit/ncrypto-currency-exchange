@@ -4,10 +4,8 @@ namespace Lostics.NCryptoExchange.Model
     public class MarketTrade<M> : Trade<M>
         where M : MarketId
     {
-        public MarketTrade(TradeId tradeId, OrderType tradeType,
-            DateTime dateTime, decimal price,
-            decimal quantity, decimal fee,
-            M marketId) : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
+        public MarketTrade(TradeId tradeId, DateTime dateTime, decimal price,
+            decimal quantity, M marketId) : base(tradeId, dateTime, price, quantity, marketId)
         {
         }
     }

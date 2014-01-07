@@ -77,11 +77,11 @@ namespace Lostics.NCryptoExchangeTest
                 marketTrade => CryptsyMarketTrade.Parse(marketTrade as JObject, marketId, defaultTimeZone)
             ).ToList();
 
-            MarketTrade<CryptsyMarketId> mostRecentTrade = marketTrades[0];
+            CryptsyMarketTrade mostRecentTrade = marketTrades[0];
 
             Assert.AreEqual("10958207", mostRecentTrade.TradeId.ToString());
             Assert.AreEqual((decimal)16433.01498728, mostRecentTrade.Quantity);
-            Assert.AreEqual(OrderType.Sell, mostRecentTrade.OrderType);
+            Assert.AreEqual(OrderType.Sell, mostRecentTrade.TradeType);
         }
 
         [TestMethod]

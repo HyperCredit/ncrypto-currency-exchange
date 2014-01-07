@@ -14,8 +14,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
             DateTime dateTime, decimal price,
             decimal quantity, decimal fee,
             CryptsyMarketId marketId)
-            : base(tradeId, tradeType, dateTime, price, quantity, fee, marketId)
+            : base(tradeId, dateTime, price, quantity, marketId)
         {
+            this.TradeType = tradeType;
+            this.Fee = fee;
         }
 
         public static CryptsyMarketTrade Parse(JObject jsonTrade, CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
@@ -37,5 +39,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 marketId
             );
         }
+
+        public OrderType TradeType { get; private set; }
+        public decimal Fee { get; private set; }
     }
 }
