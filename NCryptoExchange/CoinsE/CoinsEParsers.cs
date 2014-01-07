@@ -35,7 +35,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             return new Book(asks, bids);
         }
 
-        public static MyTrade<CoinsEMarketId, CoinsEOrderId> ParseMyTrade(JObject jObject, CoinsEMarketId marketId, TimeZoneInfo defaultTimeZone)
+        public static MyTrade<CoinsEMarketId, CoinsEOrderId> ParseMyTrade(JObject jObject, CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
         }

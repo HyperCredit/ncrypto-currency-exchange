@@ -68,31 +68,11 @@ namespace Lostics.NCryptoExchangeTest
         }
 
         [TestMethod]
-        public void TestParseMarketTrades()
+        public void TestParseRecentTrades()
         {
-            JObject jsonObj = LoadTestData("getmarkettrades.json");
-            CoinsEMarketId marketId = new CoinsEMarketId("1");
-            JArray marketTradesJson = jsonObj.Value<JArray>("return");
-            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            List<CoinsEMarketTrade> marketTrades = marketTradesJson.Select(
-                marketTrade => CoinsEMarketTrade.Parse(marketTrade as JObject, marketId, defaultTimeZone)
-            ).ToList();
-
-            MarketTrade<CoinsEMarketId> mostRecentTrade = marketTrades[0];
-
-            Assert.AreEqual("10958207", mostRecentTrade.TradeId.ToString());
-            Assert.AreEqual((decimal)16433.01498728, mostRecentTrade.Quantity);
-            Assert.AreEqual(OrderType.Sell, mostRecentTrade.OrderType);
-        }
-
-        [TestMethod]
-        public void TestParseMyTrades()
-        {
-            JObject jsonObj = LoadTestData("getmytrades.json");
-            CoinsEMarketId marketId = new CoinsEMarketId("132");
-            TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            List<MyTrade<CoinsEMarketId, CoinsEOrderId>> trades = jsonObj.Value<JArray>("return").Select(
-                marketTrade => CoinsEParsers.ParseMyTrade(marketTrade as JObject, marketId, defaultTimeZone)
+            JObject jsonObj = LoadTestData("recent_trades.json");
+            List<CoinsEMarketTrade> trades = jsonObj.Value<JArray>("trades").Select(
+                marketTrade => CoinsEMarketTrade.Parse(marketTrade as JObject)
             ).ToList();
 
             Assert.AreEqual(2, trades.Count);
