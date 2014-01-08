@@ -2,9 +2,9 @@
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public sealed class CoinsEOrderId : AbstractLongBasedId, OrderId
+    public sealed class CoinsEOrderId : AbstractStringBasedId, OrderId
     {
-        public CoinsEOrderId(long setValue) : base(setValue)
+        public CoinsEOrderId(string setValue) : base(setValue)
         {
         }
     }

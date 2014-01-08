@@ -9,7 +9,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         public CoinsEMarketTrade(TradeId tradeId,
             DateTime dateTime, decimal price,
             decimal quantity, CoinsEMarketId marketId,
-            CoinsEOrderId buyOrderId, CoinsEOrderId sellOrderId,
+            CoinsEOrderNumber buyOrderId, CoinsEOrderNumber sellOrderId,
             string status)
             : base(tradeId, dateTime, price, quantity, marketId)
         {
@@ -22,8 +22,8 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
             CoinsETradeId tradeId = new CoinsETradeId(jObject.Value<string>("id"));
             CoinsEMarketId marketId = new CoinsEMarketId(jObject.Value<string>("pair"));
-            CoinsEOrderId buyOrderId = new CoinsEOrderId(jObject.Value<long>("buy_order_no"));
-            CoinsEOrderId sellOrderId = new CoinsEOrderId(jObject.Value<long>("sell_order_no"));
+            CoinsEOrderNumber buyOrderId = new CoinsEOrderNumber(jObject.Value<long>("buy_order_no"));
+            CoinsEOrderNumber sellOrderId = new CoinsEOrderNumber(jObject.Value<long>("sell_order_no"));
             DateTime dateTime = CoinsEParsers.ParseTime(jObject.Value<int>("created"));
             
             return new CoinsEMarketTrade(tradeId, dateTime, jObject.Value<decimal>("rate"),
@@ -31,9 +31,9 @@ namespace Lostics.NCryptoExchange.CoinsE
                 buyOrderId, sellOrderId, jObject.Value<string>("status"));
         }
 
-        public CoinsEOrderId BuyOrderId { get; private set; }
+        public CoinsEOrderNumber BuyOrderId { get; private set; }
 
-        public CoinsEOrderId SellOrderId { get; private set; }
+        public CoinsEOrderNumber SellOrderId { get; private set; }
 
         public string Status { get; private set; }
     }
