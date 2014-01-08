@@ -7,24 +7,25 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public class CoinsECurrency : Currency
     {
+        public CoinsECurrency(string currencyCode, string label) : base(currencyCode, label)
+        {
+        }
+
         public static CoinsECurrency Parse(JObject coinJson)
         {
-                /* "confirmations": 4,
-        "trade_fee_percent": "0.30",
-        "trade_fee": "0.003",
-        "status": "maintanance",
-        "tier": 1,
-        "name": "bitcoin",
-        "block_time": 600,
-        "withdrawal_fee": "0.00050000",
-        "coin": "BTC",
-        "confirmation_time": 2400,
-        "folder_name": "bitcoin" */
-
-            return null;
+            return new CoinsECurrency(coinJson.Value<string>("coin"), coinJson.Value<string>("name"))
+            {
+                ConfirmationsRequired = coinJson.Value<int>("confirmations"),
+                Status = coinJson.Value<string>("status"),
+                Tier = coinJson.Value<int>("tier"),
+                TradeFeePercent = coinJson.Value<decimal>("trade_fee"),
+                WithdrawalFeeAbsolute = coinJson.Value<decimal>("withdrawal_fee")
+            };
         }
 
         public int ConfirmationsRequired { get; private set; }
+        public string Status { get; private set; }
+        public int Tier { get; private set; }
         public decimal TradeFeePercent { get; private set; }
         public decimal WithdrawalFeeAbsolute { get; private set; }
     }

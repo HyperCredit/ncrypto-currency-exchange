@@ -41,17 +41,15 @@ namespace Lostics.NCryptoExchange
         public void TestParseCoins()
         {
             JObject jsonObj = LoadTestData("list_coins.json");
-            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
-
-            Assert.AreEqual(5, accountInfo.Wallets.Count);
-
-            foreach (Wallet wallet in accountInfo.Wallets)
-            {
-                if (wallet.CurrencyCode.Equals("BTC"))
-                {
-                    Assert.AreEqual((decimal)3.05354081, wallet.Balance);
-                }
-            }
+            List<CoinsECurrency> coins = jsonObj.Value<JArray>("coins").Select(
+                coin => CoinsECurrency.Parse(coin as JObject)
+            ).ToList();
+            
+            Assert.AreEqual(2, coins.Count);
+            Assert.AreEqual("BTC", coins[0].CurrencyCode);
+            Assert.AreEqual("bitcoin", coins[0].Label);
+            Assert.AreEqual("DGC", coins[1].CurrencyCode);
+            Assert.AreEqual("digitalcoin", coins[1].Label);
         }
 
         [TestMethod]
