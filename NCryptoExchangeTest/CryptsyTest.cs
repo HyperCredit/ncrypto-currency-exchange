@@ -96,6 +96,10 @@ namespace Lostics.NCryptoExchange
 
             Assert.AreEqual(2, trades.Count);
             Assert.AreEqual("9373209", trades[0].TradeId.ToString());
+            Assert.AreEqual((decimal)0.00000059, trades[0].Price);
+            Assert.AreEqual((decimal)1500.00000000, trades[0].Quantity);
+            Assert.AreEqual((decimal)0.000000069, trades[0].Fee);
+
             Assert.AreEqual("9164163", trades[1].TradeId.ToString());
         }
 
