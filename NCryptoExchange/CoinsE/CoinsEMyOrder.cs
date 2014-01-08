@@ -15,11 +15,12 @@ namespace Lostics.NCryptoExchange.CoinsE
         public static CoinsEMyOrder Parse(JObject json)
         {
             DateTime dateTime = CoinsEParsers.ParseTime(json.Value<int>("created"));
+            CoinsEMarketId marketId = new CoinsEMarketId(json.Value<string>("pair"));
 
-            return new CoinsEMyOrder(new CoinsEOrderId(json.Value<string>("id")),
+            return new CoinsEMyOrder(new CoinsEOrderId(marketId, json.Value<string>("id")),
                 CoinsEParsers.ParseOrderType(json.Value<string>("order_type")), dateTime,
                 json.Value<decimal>("rate"), json.Value<decimal>("quantity_remaining"), json.Value<decimal>("quantity"),
-                new CoinsEMarketId(json.Value<string>("pair"))
+                marketId
             )
             {
                 IsOpen = json.Value<bool>("is_open"),

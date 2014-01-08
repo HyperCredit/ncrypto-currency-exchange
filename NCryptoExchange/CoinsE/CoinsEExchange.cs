@@ -18,6 +18,9 @@ namespace Lostics.NCryptoExchange.CoinsE
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
 
+        public const string PARAM_CURSOR = "cursor";
+        public const string PARAM_FILTER = "filter";
+        public const string PARAM_LIMIT = "limit";
         public const string PARAM_METHOD = "method";
         public const string PARAM_NONCE = "nonce";
         public const string PARAM_ORDER_ID = "order_id";
@@ -37,48 +40,76 @@ namespace Lostics.NCryptoExchange.CoinsE
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
-        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method)
+        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method)
         {
-            return new FormUrlEncodedContent(new[] {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
             });
+
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+
+            return request;
         }
 
-        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method, OrderType orderType, 
+        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, CoinsEOrderFilter filter,
+            string cursor, int? limit)
+        {
+            List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>(
+                new[] {
+                    new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                    new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                    new KeyValuePair<string, string>(PARAM_FILTER, Enum.GetName(typeof(CoinsEOrderFilter), filter).ToLower())
+                }
+            );
+
+            if (null != cursor)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>(PARAM_CURSOR, cursor));
+            }
+            if (null != limit)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(kvPairs.ToArray());
+
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+
+            return request;
+        }
+
+        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, OrderType orderType, 
             decimal price, decimal quantity)
         {
-            return new FormUrlEncodedContent(new[] {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType)),
                 new KeyValuePair<string, string>(PARAM_RATE, price.ToString()),
                 new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString())
             });
+
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+
+            return request;
         }
 
-        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method, CoinsEOrderId orderId)
+        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, CoinsEOrderId orderId)
         {
-            return new FormUrlEncodedContent(new[] {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
             });
-        }
 
-        /// <summary>
-        /// Make a call to a public (non-authenticated) API
-        /// </summary>
-        /// <param name="url">Endpoint to make a request to</param>
-        /// <param name="propertyName">Name of a property within the response JSON, to extract and return</param>
-        /// <returns>The value of the property in the JSON response from Coins-E</returns>
-        /// <typeparam name="T">The type of the property to return from the JSON response (i.e. JArray, JObject)</typeparam>
-        private async Task<T> CallPublic<T>(string url, string propertyName)
-            where T : JToken
-        {
-            JObject jsonObj = await CallPublic(url);
+            request.Headers.Add(HEADER_KEY, this.publicKey);
+            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
 
-            return jsonObj.Value<T>(propertyName);
+            return request;
         }
 
         /// <summary>
@@ -122,14 +153,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             return jsonObj;
         }
 
-        private async Task<T> CallPrivate<T>(CoinsEMethod method, string url, string propertyName)
-            where T : JToken
-        {
-            JObject jsonObj = await CallPrivate(method, url);
-
-            return jsonObj.Value<T>(propertyName);
-        }
-
         /// <summary>
         /// Make a call to a private (authenticated) API
         /// </summary>
@@ -137,11 +160,38 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, string url)
         {
-            FormUrlEncodedContent request = BuildRequest(method);
+            return await CallPrivate(await BuildPrivateRequest(method), url);
+        }
 
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+        /// <summary>
+        /// Make a call to a private (authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPrivate(CoinsEMethod method, CoinsEOrderId orderId, string url)
+        {
+            return await CallPrivate(await BuildPrivateRequest(method, orderId), url);
+        }
 
+        /// <summary>
+        /// Make a call to a private (authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPrivate(CoinsEMethod method, CoinsEOrderFilter filter,
+            string cursor, int? limit, string url)
+        {
+            return await CallPrivate(await BuildPrivateRequest(method, filter, cursor, limit), url);
+        }
+
+
+        /// <summary>
+        /// Make a call to a private (authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPrivate(FormUrlEncodedContent request, string url)
+        {
             JObject jsonObj;
 
             try
@@ -190,14 +240,14 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public async Task<List<CoinsECurrency>> GetCoins()
         {
-            JArray coinsJson = await CallPublic<JArray>(COINS_LIST, "coins");
+            JArray coinsJson = (await CallPublic(COINS_LIST)).Value<JArray>("coins");
 
             return coinsJson.Select(coin => CoinsECurrency.Parse(coin as JObject)).ToList();
         }
 
         public override async Task<List<Market<CoinsEMarketId>>> GetMarkets()
         {
-            JArray marketsJson = await CallPublic<JArray>(MARKETS_LIST, "markets");
+            JArray marketsJson = (await CallPublic(MARKETS_LIST)).Value<JArray>("markets");
             
             return marketsJson.Select(
                  market => (Market<CoinsEMarketId>)CoinsEMarket.Parse(market as JObject)
@@ -234,7 +284,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         public async Task<List<CoinsEMyOrder>> GetMyOrders(CoinsEMarketId marketId,
             CoinsEOrderFilter filter, string cursor, int? limit)
         {
-            JObject responseJson = await CallPrivate(CoinsEMethod.listorders, GetMarketUrl(marketId));
+            JObject responseJson = await CallPrivate(CoinsEMethod.listorders, filter, cursor, limit, GetMarketUrl(marketId));
 
             return responseJson.Value<JArray>("orders").Select(
                  order => CoinsEMyOrder.Parse(order as JObject)
@@ -252,9 +302,9 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task CancelOrder(CoinsEOrderId orderId)
+        public override async Task CancelOrder(CoinsEOrderId orderId)
         {
-            throw new NotImplementedException();
+            JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(orderId.MarketId));
         }
 
         public override Task CancelAllOrders()
@@ -262,9 +312,18 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task CancelMarketOrders(CoinsEMarketId marketId)
+        /// <summary>
+        /// Cancel all outstanding orders in the given market. Note that Coins-E does not provide this
+        /// functionality natively, so it's emulated client-side, which risks a race condition.
+        /// </summary>
+        /// <param name="marketId"></param>
+        /// <returns></returns>
+        public override async Task CancelMarketOrders(CoinsEMarketId marketId)
         {
-            throw new NotImplementedException();
+            foreach (CoinsEMyOrder order in (await GetMyActiveOrders(marketId, null)))
+            {
+                await CallPrivate(CoinsEMethod.cancelorder, order.OrderId, GetMarketUrl(order.MarketId));
+            }
         }
 
         public override Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, OrderType orderType, decimal quantity, decimal price)
@@ -274,7 +333,7 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override string GetNextNonce()
         {
-            throw new NotImplementedException();
+            return DateTime.Now.Ticks.ToString();
         }
 
         public string BaseUrl { get; private set; }
