@@ -391,7 +391,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             try
             {
-                jsonObj = await GetJsonFromResponse(response);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                    }
+                }
             }
             catch (ArgumentException e)
             {
@@ -426,7 +432,13 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             try
             {
-                jsonObj = await GetJsonFromResponse(response);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                    }
+                }
             }
             catch (ArgumentException e)
             {

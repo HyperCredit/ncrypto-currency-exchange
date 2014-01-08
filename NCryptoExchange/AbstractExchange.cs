@@ -55,21 +55,6 @@ namespace Lostics.NCryptoExchange
             return properties;
         }
 
-        public static async Task<JObject> GetJsonFromResponse(HttpResponseMessage response)
-        {
-            JObject jsonObj;
-
-            using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
-            {
-                using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
-                {
-                    jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
-                }
-            }
-
-            return jsonObj;
-        }
-
         public abstract Task CancelOrder(O orderId);
 
         public abstract Task CancelMarketOrders(M marketId);

@@ -150,7 +150,14 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             try
             {
-                jsonObj = await GetJsonFromResponse(await client.GetAsync(url));
+                HttpResponseMessage response = await client.GetAsync(url);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                    }
+                }
             }
             catch (ArgumentException e)
             {
@@ -216,7 +223,14 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             try
             {
-                jsonObj = await GetJsonFromResponse(await client.PostAsync(url, request));
+                HttpResponseMessage response = await client.PostAsync(url, request);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                    }
+                }
             }
             catch (ArgumentException e)
             {
