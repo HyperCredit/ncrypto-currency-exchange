@@ -91,6 +91,7 @@
     <Compile Include="Model\Market.cs" />
     <Compile Include="Model\MarketId.cs" />
     <Compile Include="Model\MarketOrder.cs" />
+    <Compile Include="Model\MarketStatistics.cs" />
     <Compile Include="Model\MarketTrade.cs" />
     <Compile Include="Model\MyOrder.cs" />
     <Compile Include="Model\MyTrade.cs" />

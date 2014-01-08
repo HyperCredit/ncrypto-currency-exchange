@@ -9,7 +9,8 @@ namespace Lostics.NCryptoExchange.Model
     public abstract class Market<I> where I: MarketId
     {
         public Market(I setMarketId, string baseCurrencyCode, string baseCurrencyName,
-            string quoteCurrencyCode, string quoteCurrencyName, string label)
+            string quoteCurrencyCode, string quoteCurrencyName, string label,
+            MarketStatistics statistics)
         {
             this.MarketId = setMarketId;
             this.BaseCurrencyCode = baseCurrencyCode;
@@ -17,6 +18,7 @@ namespace Lostics.NCryptoExchange.Model
             this.QuoteCurrencyCode = quoteCurrencyCode;
             this.QuoteCurrencyName = quoteCurrencyName;
             this.Label = label;
+            this.Statistics = statistics;
         }
 
         public override bool Equals(Object obj)
@@ -51,5 +53,6 @@ namespace Lostics.NCryptoExchange.Model
         public string QuoteCurrencyCode { get; private set; }
         public string QuoteCurrencyName { get; private set; }
         public string Label { get; private set; }
+        public MarketStatistics Statistics { get; private set; }
     }
 }

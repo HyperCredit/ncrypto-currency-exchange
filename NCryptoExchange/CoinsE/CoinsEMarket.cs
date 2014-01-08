@@ -9,25 +9,47 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public class CoinsEMarket : Market<CoinsEMarketId>
     {
-        private readonly string status;
-        private readonly decimal tradeFee;
-
         public CoinsEMarket(CoinsEMarketId id, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,
-            string status, decimal tradeFee) : base(id, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label)
+            MarketStatistics statistics, string status, decimal tradeFee)
+            : base(id, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label, statistics)
         {
-            this.status = status;
-            this.tradeFee = tradeFee;
+            this.Status = status;
+            this.TradeFee = tradeFee;
         }
 
-        public static CoinsEMarket Parse(JObject marketObj)
+        /// <summary>
+        /// Parse market information from the market data API (as in https://www.coins-e.com/api/v2/markets/data/).
+        /// </summary>
+        /// <param name="coinShortCodeToLabel">A mapping from coin short codes to human readable labels</param>
+        /// <param name="marketObj">The JSON object representing a market</param>
+        /// <returns></returns>
+        public static CoinsEMarket Parse(Dictionary<string, string> coinShortCodeToLabel, JObject marketObj)
         {
+            MarketStatistics marketStats = ParseMarketStatistics(marketObj.Value<JObject>("marketstat"));
+
             return new CoinsEMarket(new CoinsEMarketId(marketObj.Value<string>("pair")),
-                marketObj.Value<string>("c1"), marketObj.Value<string>("coin1"),
-                marketObj.Value<string>("c2"), marketObj.Value<string>("coin2"),
-                marketObj.Value<string>("pair"),
+                marketObj.Value<string>("c1"), coinShortCodeToLabel[marketObj.Value<string>("c1")],
+                marketObj.Value<string>("c2"), coinShortCodeToLabel[marketObj.Value<string>("c2")],
+                marketObj.Value<string>("pair"), marketStats,
                 marketObj.Value<string>("status"), marketObj.Value<decimal>("trade_fee")
             );
         }
+
+        private static MarketStatistics ParseMarketStatistics(JObject statisticsJson)
+        {
+            JObject twentyFourHours = statisticsJson.Value<JObject>("24h");
+
+            return new MarketStatistics()
+            {
+                LastTrade = statisticsJson.Value<decimal>("ltp"),
+                HighTrade = twentyFourHours.Value<decimal>("h"),
+                LowTrade = twentyFourHours.Value<decimal>("l"),
+                Volume24H = twentyFourHours.Value<decimal>("volume")
+            };
+        }
+
+        public string Status { get; private set; }
+        public decimal TradeFee { get; private set; }
     }
 }

@@ -13,6 +13,7 @@ namespace Lostics.NCryptoExchange.CoinsE
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
+        public const string MARKETS_DATA = DEFAULT_BASE_URL + "markets/data/";
         public const string MARKETS_LIST = DEFAULT_BASE_URL + "markets/list/";
         public const string WALLETS_LIST = DEFAULT_BASE_URL + "wallet/all/";
 
@@ -46,12 +47,14 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         private static void AssertSuccessStatus(JObject jsonObj)
         {
-            string status = jsonObj.Value<string>("status");
+            bool? status = jsonObj.Value<bool>("status");
+
             if (null == status)
             {
                 throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
             }
-            if (!status.Equals("True"))
+
+            if (!(bool)status)
             {
                 string message = jsonObj.Value<string>("message");
 
@@ -291,10 +294,18 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override async Task<List<Market<CoinsEMarketId>>> GetMarkets()
         {
-            JArray marketsJson = (await CallPublic(MARKETS_LIST)).Value<JArray>("markets");
+            List<CoinsECurrency> currencies = await this.GetCoins();
+            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
+
+            foreach (CoinsECurrency currency in currencies)
+            {
+                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
+            }
+
+            JObject marketsJson = (await CallPublic(MARKETS_DATA)).Value<JObject>("markets");
             
-            return marketsJson.Select(
-                 market => (Market<CoinsEMarketId>)CoinsEMarket.Parse(market as JObject)
+            return marketsJson.Properties().Select(
+                 market => (Market<CoinsEMarketId>)CoinsEMarket.Parse(currencyShortCodeToLabel, market.Value as JObject)
              ).ToList();
         }
 

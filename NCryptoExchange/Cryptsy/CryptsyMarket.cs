@@ -13,13 +13,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
     {
         public CryptsyMarket(CryptsyMarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,
-            decimal currentVolume, decimal lastTrade, decimal highTrade, decimal lowTrade, DateTime created)
-            : base(setMarketId, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label)
+            MarketStatistics statistics, DateTime created)
+            : base(setMarketId, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label,
+                statistics)
         {
-            this.CurrentVolume = currentVolume;
-            this.LastTrade = lastTrade;
-            this.HighTrade = highTrade;
-            this.LowTrade = lowTrade;
             this.Created = created;
         }
 
@@ -27,21 +24,23 @@ namespace Lostics.NCryptoExchange.Cryptsy
             DateTime created = DateTime.Parse(marketObj.Value<string>("created"));
 
             TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
+            
+            MarketStatistics statistics = new MarketStatistics()
+            {
+                Volume24H = marketObj.Value<decimal>("current_volume"),
+                LastTrade = marketObj.Value<decimal>("last_trade"),
+                HighTrade = marketObj.Value<decimal>("high_trade"),
+                LowTrade = marketObj.Value<decimal>("low_trade")
+            };
 
             return new CryptsyMarket(new CryptsyMarketId(marketObj.Value<string>("marketid")),
                 marketObj.Value<string>("primary_currency_code"), marketObj.Value<string>("primary_currency_name"),
                 marketObj.Value<string>("secondary_currency_code"), marketObj.Value<string>("secondary_currency_name"),
                 marketObj.Value<string>("label"),
-                marketObj.Value<decimal>("current_volume"), marketObj.Value<decimal>("last_trade"),
-                marketObj.Value<decimal>("high_trade"), marketObj.Value<decimal>("low_trade"),
-                created
+                statistics, created
             );
         }
 
-        public decimal CurrentVolume { get; private set; }
-        public decimal LastTrade { get; private set; }
-        public decimal HighTrade { get; private set; }
-        public decimal LowTrade { get; private set; }
         public DateTime Created { get; private set; }
     }
 }
