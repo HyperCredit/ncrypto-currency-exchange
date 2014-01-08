@@ -275,14 +275,56 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
+        /// <summary>
+        /// Attempt to extract trades based on user's orders with a specific exchange. This functionality
+        /// is emulated in client as Coins-E does not provide details of the user's trades as a specific
+        /// API call.
+        /// </summary>
+        /// <param name="marketId"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        public override async Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetMyTrades(CoinsEMarketId marketId, int? limit)
         {
-            throw new NotImplementedException();
+            List<CoinsEMyOrder> allOrders = await GetMyOrders(marketId, CoinsEOrderFilter.All, null, limit);
+            List<MyTrade<CoinsEMarketId, CoinsEOrderId>> trades = new List<MyTrade<CoinsEMarketId, CoinsEOrderId>>();
+
+            foreach (CoinsEMyOrder order in allOrders)
+            {
+                if (order.OriginalQuantity == order.Quantity)
+                {
+                    continue;
+                }
+
+                CoinsETradeId tradeId = new CoinsETradeId(order.OrderId);
+
+                trades.Add(new MyTrade<CoinsEMarketId, CoinsEOrderId>(tradeId, order.OrderType,
+                    order.Created, order.Price, null, order.OriginalQuantity - order.Quantity,
+                    order.MarketId, order.OrderId));
+            }
+
+            return trades;
         }
 
-        public override Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetAllMyTrades(int? limit)
+        public override async Task<List<Model.MyTrade<CoinsEMarketId, CoinsEOrderId>>> GetAllMyTrades(int? limit)
         {
-            throw new NotImplementedException();
+            List<MyTrade<CoinsEMarketId, CoinsEOrderId>> trades = new List<MyTrade<CoinsEMarketId, CoinsEOrderId>>();
+
+            foreach (Market<CoinsEMarketId> market in (await GetMarkets()))
+            {
+                trades.Concat(await GetMyTrades(market.MarketId, limit));
+            }
+
+            trades.Sort();
+
+            if (null != limit
+                && trades.Count > limit)
+            {
+                return trades.GetRange(0, (int)limit);
+            }
+            else
+            {
+                return trades;
+            }
         }
 
         public override async Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetMyActiveOrders(CoinsEMarketId marketId, int? limit)

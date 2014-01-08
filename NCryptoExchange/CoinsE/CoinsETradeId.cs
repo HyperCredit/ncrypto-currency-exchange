@@ -8,6 +8,15 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
         }
 
+        /// <summary>
+        /// Improvise a trade ID based on order ID
+        /// </summary>
+        /// <param name="setValue"></param>
+        public CoinsETradeId(CoinsEOrderId setValue)
+            : base(setValue.ToString())
+        {
+        }
+
         internal static CoinsETradeId Parse(Newtonsoft.Json.Linq.JToken tradeIdToken)
         {
             if (tradeIdToken.Type != Newtonsoft.Json.Linq.JTokenType.String)

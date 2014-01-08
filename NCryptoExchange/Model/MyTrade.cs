@@ -6,7 +6,7 @@ namespace Lostics.NCryptoExchange.Model
         where O : OrderId
     {
         public MyTrade(TradeId tradeId, OrderType tradeType,
-            DateTime dateTime, decimal price, decimal fee,
+            DateTime dateTime, decimal price, decimal? fee,
             decimal quantity,
             M marketId, O orderId)
             : base(tradeId, dateTime, price, quantity, marketId)
@@ -23,7 +23,7 @@ namespace Lostics.NCryptoExchange.Model
                 + this.Price + " each";
         }
 
-        public decimal Fee { get; private set; }
+        public decimal? Fee { get; private set; }
         public OrderId OrderId { get; private set; }
         public OrderType TradeType { get; private set; }
     }
