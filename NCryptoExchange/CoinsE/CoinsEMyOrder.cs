@@ -6,7 +6,7 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public class CoinsEMyOrder : MyOrder<CoinsEMarketId, CoinsEOrderId>
     {
-        public CoinsEMyOrder(CoinsEOrderId orderId, OrderType orderType,
+        private CoinsEMyOrder(CoinsEOrderId orderId, OrderType orderType,
             DateTime created, decimal price, decimal quantity, decimal originalQuantity,
             CoinsEMarketId marketId) : base(orderId, orderType, created, price, quantity, originalQuantity, marketId)
         {
@@ -20,10 +20,14 @@ namespace Lostics.NCryptoExchange.CoinsE
                 CoinsEParsers.ParseOrderType(json.Value<string>("order_type")), dateTime,
                 json.Value<decimal>("rate"), json.Value<decimal>("quantity_remaining"), json.Value<decimal>("quantity"),
                 new CoinsEMarketId(json.Value<string>("pair"))
-            );
+            )
+            {
+                IsOpen = json.Value<bool>("is_open"),
+                Status = json.Value<string>("status")
+            };
         }
 
-        public Boolean IsOpen { get; private set; }
+        public bool IsOpen { get; private set; }
         public string Status { get; private set; }
     }
 }

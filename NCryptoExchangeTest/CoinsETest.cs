@@ -87,17 +87,13 @@ namespace Lostics.NCryptoExchange
         public void TestParseNewOrder()
         {
             JObject jsonObj = LoadTestData("new_order.json");
-            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
-
-            Assert.AreEqual(5, accountInfo.Wallets.Count);
-
-            foreach (Wallet wallet in accountInfo.Wallets)
-            {
-                if (wallet.CurrencyCode.Equals("BTC"))
-                {
-                    Assert.AreEqual((decimal)3.05354081, wallet.Balance);
-                }
-            }
+            CoinsEMyOrder order = CoinsEMyOrder.Parse(jsonObj.Value<JObject>("order"));
+            
+            Assert.AreEqual("B/0.00212300/5517761665040384", order.OrderId.ToString());
+            Assert.AreEqual((decimal)1.00000000, order.Quantity);
+            Assert.AreEqual((decimal)0.00212300, order.Price);
+            Assert.AreEqual(true, order.IsOpen);
+            Assert.AreEqual("queued", order.Status);
         }
 
         [TestMethod]
