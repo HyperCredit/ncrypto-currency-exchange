@@ -101,8 +101,8 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             return new MyTrade<CryptsyMarketId, CryptsyOrderId>(tradeId,
                 tradeType, tradeDateTime,
-                jsonTrade.Value<decimal>("tradeprice"),
-                jsonTrade.Value<decimal>("quantity"), jsonTrade.Value<decimal>("fee"),
+                jsonTrade.Value<decimal>("tradeprice"), jsonTrade.Value<decimal>("fee"),
+                jsonTrade.Value<decimal>("quantity"),
                 marketId, orderId
             );
         }
