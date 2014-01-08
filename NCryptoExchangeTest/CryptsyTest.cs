@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 
-namespace Lostics.NCryptoExchangeTest
+namespace Lostics.NCryptoExchange
 {
     [TestClass]
     public class CryptsyTest

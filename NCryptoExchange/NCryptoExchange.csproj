@@ -52,6 +52,7 @@
     <Compile Include="CoinsE\CoinsEMarket.cs" />
     <Compile Include="CoinsE\CoinsEMarketTrade.cs" />
     <Compile Include="CoinsE\CoinsEMethod.cs" />
+    <Compile Include="CoinsE\CoinsEOrderNumber.cs" />
     <Compile Include="CoinsE\CoinsEParsers.cs" />
     <Compile Include="CoinsE\CoinsEResponseException.cs" />
     <Compile Include="CoinsE\CoinsEMarketId.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="CoinsE\CoinsETradeId.cs" />
     <Compile Include="CoinsE\CoinsEWallet.cs" />
     <Compile Include="CoinsE\CoinsEMarketOrder.cs" />
+    <Compile Include="CoinsE\CoinsEMyOrder.cs" />
     <Compile Include="ConfigurationException.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />

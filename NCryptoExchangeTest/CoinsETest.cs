@@ -2,13 +2,11 @@
 using Lostics.NCryptoExchange.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 
-namespace Lostics.NCryptoExchangeTest
+namespace Lostics.NCryptoExchange
 {
     [TestClass]
     public class CoinsETest
@@ -17,6 +15,32 @@ namespace Lostics.NCryptoExchangeTest
         public void TestParseAccountInfo()
         {
             JObject jsonObj = LoadTestData("get_wallets.json");
+            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
+
+            Assert.AreEqual(5, accountInfo.Wallets.Count);
+
+            foreach (Wallet wallet in accountInfo.Wallets)
+            {
+                if (wallet.CurrencyCode.Equals("BTC"))
+                {
+                    Assert.AreEqual((decimal)3.05354081, wallet.Balance);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestParseCancelOrder()
+        {
+            JObject jsonObj = LoadTestData("cancel_order.json");
+            CoinsEMyOrder order = CoinsEMyOrder.Parse(jsonObj.Value<JObject>("order"));
+
+            Assert.AreEqual("B/0.00212300/5517761665040384", order.OrderId.ToString());
+        }
+
+        [TestMethod]
+        public void TestParseCoins()
+        {
+            JObject jsonObj = LoadTestData("list_coins.json");
             AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
 
             Assert.AreEqual(5, accountInfo.Wallets.Count);
@@ -43,6 +67,23 @@ namespace Lostics.NCryptoExchangeTest
 
             Assert.AreEqual(markets[0].BaseCurrencyCode, "WDC");
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+        }
+
+        [TestMethod]
+        public void TestParseNewOrder()
+        {
+            JObject jsonObj = LoadTestData("new_order.json");
+            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
+
+            Assert.AreEqual(5, accountInfo.Wallets.Count);
+
+            foreach (Wallet wallet in accountInfo.Wallets)
+            {
+                if (wallet.CurrencyCode.Equals("BTC"))
+                {
+                    Assert.AreEqual((decimal)3.05354081, wallet.Balance);
+                }
+            }
         }
 
         [TestMethod]

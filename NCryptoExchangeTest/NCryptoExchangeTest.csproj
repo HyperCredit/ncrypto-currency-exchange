@@ -6,7 +6,7 @@
     <ProjectGuid>{918C59CD-0877-49AA-A3E2-A5EEC598FB29}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lostics.NCryptoExchangeTest</RootNamespace>
+    <RootNamespace>Lostics.NCryptoExchange</RootNamespace>
     <AssemblyName>NCryptoExchangeTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
