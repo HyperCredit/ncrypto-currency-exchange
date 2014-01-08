@@ -64,5 +64,20 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             return (OrderType)Enum.Parse(typeof(OrderType), correctedVal);
         }
+
+        /// <summary>
+        /// Parse an order status as returned from Coins-E. See the order workflow
+        /// documentation for more details (https://www.coins-e.com/exchange/api/order-workflow/).
+        /// Note that whitespace in the order status is replaced with an underscore
+        /// to allow parsing as an enum.
+        /// </summary>
+        /// <param name="val">An order status, for example "queued" or "cancelled"</param>
+        /// <returns></returns>
+        public static CoinsEOrderStatus ParseOrderStatus(string val)
+        {
+            string correctedVal = val.Replace(' ', '_');
+
+            return (CoinsEOrderStatus)Enum.Parse(typeof(CoinsEOrderStatus), correctedVal);
+        }
     }
 }

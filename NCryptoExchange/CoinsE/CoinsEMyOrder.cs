@@ -23,11 +23,11 @@ namespace Lostics.NCryptoExchange.CoinsE
             )
             {
                 IsOpen = json.Value<bool>("is_open"),
-                Status = json.Value<string>("status")
+                Status = CoinsEParsers.ParseOrderStatus(json.Value<string>("status"))
             };
         }
 
         public bool IsOpen { get; private set; }
-        public string Status { get; private set; }
+        public CoinsEOrderStatus Status { get; private set; }
     }
 }

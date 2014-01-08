@@ -35,6 +35,7 @@ namespace Lostics.NCryptoExchange
             CoinsEMyOrder order = CoinsEMyOrder.Parse(jsonObj.Value<JObject>("order"));
 
             Assert.AreEqual("B/0.00212300/5517761665040384", order.OrderId.ToString());
+            Assert.AreEqual(CoinsEOrderStatus.cancel_requested, order.Status);
         }
 
         [TestMethod]
@@ -93,7 +94,7 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual((decimal)1.00000000, order.Quantity);
             Assert.AreEqual((decimal)0.00212300, order.Price);
             Assert.AreEqual(true, order.IsOpen);
-            Assert.AreEqual("queued", order.Status);
+            Assert.AreEqual(CoinsEOrderStatus.queued, order.Status);
         }
 
         [TestMethod]
