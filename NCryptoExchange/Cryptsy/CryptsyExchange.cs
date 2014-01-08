@@ -36,6 +36,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string PARAM_ORDER_TYPE = "ordertype";
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
+
         public const string PROPERTY_PUBLIC_KEY = "public_key";
         public const string PROPERTY_PRIVATE_KEY = "private_key";
 

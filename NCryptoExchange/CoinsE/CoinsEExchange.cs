@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -28,6 +29,9 @@ namespace Lostics.NCryptoExchange.CoinsE
         public const string PARAM_QUANTITY = "quantity";
         public const string PARAM_RATE = "rate";
 
+        public const string PROPERTY_PUBLIC_KEY = "public_key";
+        public const string PROPERTY_PRIVATE_KEY = "private_key";
+
         private readonly string publicKey;
         private readonly byte[] privateKey;
         private HttpClient client = new HttpClient();
@@ -38,6 +42,29 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
+        }
+
+        private static void AssertSuccessStatus(JObject jsonObj)
+        {
+            string status = jsonObj.Value<string>("status");
+            if (null == status)
+            {
+                throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
+            }
+            if (!status.Equals("True"))
+            {
+                string message = jsonObj.Value<string>("message");
+
+                if (null != message)
+                {
+                    throw new CoinsEResponseException(message);
+                }
+                else
+                {
+                    throw new CoinsEResponseException("Success status from Coins-E was \""
+                        + status + "\", expected \"true\".");
+                }
+            }
         }
 
         public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method)
@@ -130,25 +157,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 throw new CoinsEResponseException("Could not parse response from Coins-E.", e);
             }
 
-            string status = jsonObj.Value<string>("status");
-            if (null == status)
-            {
-                throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
-            }
-            if (!status.Equals("true"))
-            {
-                string message = jsonObj.Value<string>("message");
-
-                if (null != message)
-                {
-                    throw new CoinsEResponseException(message);
-                }
-                else
-                {
-                    throw new CoinsEResponseException("Success status from Coins-E was \""
-                        + status + "\", expected \"true\".");
-                }
-            }
+            AssertSuccessStatus(jsonObj);
 
             return jsonObj;
         }
@@ -214,25 +223,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 throw new CoinsEResponseException("Could not parse response from Coins-E.", e);
             }
 
-            string status = jsonObj.Value<string>("status");
-            if (null == status)
-            {
-                throw new CoinsEResponseException("Response from Coins-E did not include a \"success\" property.");
-            }
-            if (!status.Equals("true"))
-            {
-                string message = jsonObj.Value<string>("message");
-
-                if (null != message)
-                {
-                    throw new CoinsEResponseException(message);
-                }
-                else
-                {
-                    throw new CoinsEResponseException("Success status from Coins-E was \""
-                        + status + "\", expected \"true\".");
-                }
-            }
+            AssertSuccessStatus(jsonObj);
 
             return jsonObj;
         }
@@ -254,6 +245,34 @@ namespace Lostics.NCryptoExchange.CoinsE
             JArray coinsJson = (await CallPublic(COINS_LIST)).Value<JArray>("coins");
 
             return coinsJson.Select(coin => CoinsECurrency.Parse(coin as JObject)).ToList();
+        }
+
+        public static CoinsEExchange GetExchange(FileInfo configurationFile)
+        {
+            if (!configurationFile.Exists)
+            {
+                WriteDefaultConfigurationFile(configurationFile);
+                throw new ConfigurationException("No configuration file exists; blank default created. "
+                    + "Please enter public and private key values and try again.");
+            }
+
+            Dictionary<string, string> properties = GetConfiguration(configurationFile);
+            string publicKey = properties[PROPERTY_PUBLIC_KEY];
+            string privateKey = properties[PROPERTY_PRIVATE_KEY];
+
+            if (null == publicKey)
+            {
+                throw new ConfigurationException("No public key specified in configuration file \""
+                    + configurationFile.FullName + "\".");
+            }
+
+            if (null == privateKey)
+            {
+                throw new ConfigurationException("No public key specified in configuration file \""
+                    + configurationFile.FullName + "\".");
+            }
+
+            return new CoinsEExchange(publicKey, privateKey);
         }
 
         public override async Task<List<Market<CoinsEMarketId>>> GetMarkets()
@@ -384,6 +403,16 @@ namespace Lostics.NCryptoExchange.CoinsE
         public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
+        }
+
+        private static void WriteDefaultConfigurationFile(FileInfo file)
+        {
+            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
+            {
+                writer.WriteLine("# Configuration file for specifying API public & private key.");
+                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
+                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
+            }
         }
 
         public string BaseUrl { get; private set; }
