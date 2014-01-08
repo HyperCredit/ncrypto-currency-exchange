@@ -4,8 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Lostics.NCryptoExchangeExamples.Cryptsy
+namespace Lostics.NCryptoExample
 {
+    /// <summary>
+    /// Dumps copies of the JSON returned by Cryptsy, from data request methods, into
+    /// files on disk.
+    /// </summary>
     public class GetData
     {
         public const string CONFIG_FILENAME = "cryptsy.conf";
