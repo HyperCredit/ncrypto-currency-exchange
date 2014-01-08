@@ -55,7 +55,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarkets()
+        public void TestParseListMarkets()
         {
             JObject jsonObj = LoadTestData("list_markets.json");
             JArray marketsJson = jsonObj.Value<JArray>("markets");
@@ -67,6 +67,22 @@ namespace Lostics.NCryptoExchange
 
             Assert.AreEqual(markets[0].BaseCurrencyCode, "WDC");
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+        }
+
+        [TestMethod]
+        public void TestParseListOrders()
+        {
+            JObject jsonObj = LoadTestData("list_orders.json");
+            JArray ordersJson = jsonObj.Value<JArray>("orders");
+            List<CoinsEMyOrder> orders = ordersJson.Select(
+                market => CoinsEMyOrder.Parse(market as JObject)
+            ).ToList();
+
+            Assert.AreEqual(2, orders.Count);
+            
+            Assert.AreEqual(OrderType.Buy, orders[0].OrderType);
+            Assert.AreEqual((decimal)1.00000000, orders[0].OriginalQuantity);
+            Assert.AreEqual((decimal)0.00000000, orders[0].Quantity);
         }
 
         [TestMethod]
