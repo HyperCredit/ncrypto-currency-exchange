@@ -387,5 +387,9 @@ namespace Lostics.NCryptoExchange.CoinsE
         }
 
         public string BaseUrl { get; private set; }
+        public override string Label
+        {
+            get { return "Coins-E"; }
+        }
     }
 }

@@ -470,5 +470,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// Normally left unset (null), in which case responses are not dumped.
         /// </summary>
         public DirectoryInfo DumpResponse { get; set; }
+        public override string Label
+        {
+            get { return "Cryptsy"; }
+        }
     }
 }

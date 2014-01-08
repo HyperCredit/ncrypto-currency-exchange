@@ -70,6 +70,12 @@ namespace Lostics.NCryptoExchange
             return jsonObj;
         }
 
+        public abstract Task CancelOrder(O orderId);
+
+        public abstract Task CancelMarketOrders(M marketId);
+
+        public abstract Task<O> CreateOrder(M marketId, OrderType orderType, decimal quantity, decimal price);
+
         public abstract void Dispose();
 
         public abstract Task<AccountInfo> GetAccountInfo();
@@ -88,12 +94,8 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task<Book> GetMarketDepth(M marketId);
 
-        public abstract Task CancelOrder(O orderId);
-
-        public abstract Task CancelMarketOrders(M marketId);
-
-        public abstract Task<O> CreateOrder(M marketId, OrderType orderType, decimal quantity, decimal price);
-
         public abstract string GetNextNonce();
+
+        public abstract string Label { get; }
     }
 }
