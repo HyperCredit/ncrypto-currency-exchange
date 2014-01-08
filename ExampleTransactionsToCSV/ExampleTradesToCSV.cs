@@ -1,5 +1,7 @@
-﻿using Lostics.NCryptoExchange.Cryptsy;
+﻿using Lostics.NCryptoExchange.CoinsE;
+using Lostics.NCryptoExchange.Cryptsy;
 using Lostics.NCryptoExchange.Model;
+using Lostics.NCryptoExchange;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,29 +12,42 @@ namespace Lostics.NCryptoExample
 {
     public class ExampleTradesToCSV
     {
-        public const string CONFIG_FILENAME = "cryptsy.conf";
+        public const string COINS_E_CONFIG_FILENAME = "coins_e.conf";
+        public const string CRYPTSY_CONFIG_FILENAME = "cryptsy.conf";
 
-        public static FileInfo GetDefaultConfigurationFile()
+        public static FileInfo GetCryptsyConfigurationFile()
         {
             DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent;
-            return new FileInfo(Path.Combine(dir.FullName, CONFIG_FILENAME));
+            return new FileInfo(Path.Combine(dir.FullName, CRYPTSY_CONFIG_FILENAME));
+        }
+
+        public static FileInfo GetCoinsEConfigurationFile()
+        {
+            DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent;
+            return new FileInfo(Path.Combine(dir.FullName, COINS_E_CONFIG_FILENAME));
         }
 
         static void Main()
         {
-            CryptsyExchange cryptsy = CryptsyExchange.GetExchange(GetDefaultConfigurationFile());
             string filename = DateTime.Now.ToFileTime() + ".csv";
             FileInfo file = new FileInfo(
                 Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName,
                 filename)
             );
 
-            using (FileStream stream = new FileStream(file.FullName, FileMode.CreateNew))
+            using (CryptsyExchange cryptsy = CryptsyExchange.GetExchange(GetCryptsyConfigurationFile()))
             {
-                using (TextWriter writer = new StreamWriter(stream))
+                using (CoinsEExchange coinsE = CoinsEExchange.GetExchange(GetCoinsEConfigurationFile()))
                 {
-                    writer.WriteLine("Trade ID, Date, Order, Market, Price, Quantity, Fee");
-                    WriteTradesToCSV(writer, cryptsy, cryptsy.GetAllMyTrades(null).Result);
+                    using (FileStream stream = new FileStream(file.FullName, FileMode.CreateNew))
+                    {
+                        using (TextWriter writer = new StreamWriter(stream))
+                        {
+                            writer.WriteLine("Exchange,Trade ID,Date,Order,Market,Price,Quantity,Fee");
+                            WriteTradesToCSV(writer, cryptsy);
+                            WriteTradesToCSV(writer, coinsE);
+                        }
+                    }
                 }
             }
 
@@ -40,12 +55,14 @@ namespace Lostics.NCryptoExample
             Console.ReadKey();
         }
 
-        private static void WriteTradesToCSV(TextWriter writer, CryptsyExchange exchange,
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades)
+        private static void WriteTradesToCSV<M, O>(TextWriter writer, AbstractExchange<M, O> exchange)
+            where M: MarketId
+            where O: OrderId
         {
-            foreach (MyTrade<CryptsyMarketId, CryptsyOrderId> trade in trades)
+            foreach (MyTrade<M, O> trade in exchange.GetAllMyTrades(null).Result)
             {
-                writer.WriteLine(trade.TradeId.ToString() + ","
+                writer.WriteLine(exchange.Label + ","
+                    + trade.TradeId.ToString() + ","
                     + trade.DateTime + ","
                     + Enum.GetName(typeof(OrderType), trade.TradeType) + ","
                     + trade.MarketId + ","
