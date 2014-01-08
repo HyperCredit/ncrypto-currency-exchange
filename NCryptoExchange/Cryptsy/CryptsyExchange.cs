@@ -90,7 +90,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns></returns>
         private async Task Call(FormUrlEncodedContent request)
         {
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
@@ -104,7 +104,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <returns>The return from Cryptsy as a JSON token</returns>
         private async Task<T> Call<T>(FormUrlEncodedContent request)
         {
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
             request.Headers.Add(HEADER_KEY, this.publicKey);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);

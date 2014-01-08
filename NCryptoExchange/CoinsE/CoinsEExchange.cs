@@ -67,7 +67,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             }
         }
 
-        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method)
+        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
@@ -75,12 +75,12 @@ namespace Lostics.NCryptoExchange.CoinsE
             });
 
             request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
 
             return request;
         }
 
-        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, CoinsEOrderFilter filter,
+        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, CoinsEOrderFilter filter,
             string cursor, int? limit)
         {
             List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>(
@@ -103,12 +103,12 @@ namespace Lostics.NCryptoExchange.CoinsE
             FormUrlEncodedContent request = new FormUrlEncodedContent(kvPairs.ToArray());
 
             request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
 
             return request;
         }
 
-        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, OrderType orderType, 
+        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, OrderType orderType, 
             decimal quantity, decimal price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
@@ -120,12 +120,12 @@ namespace Lostics.NCryptoExchange.CoinsE
             });
 
             request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
 
             return request;
         }
 
-        public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, CoinsEOrderId orderId)
+        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, CoinsEOrderId orderId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
@@ -134,7 +134,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             });
 
             request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));
+            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
 
             return request;
         }
@@ -169,7 +169,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, string url)
         {
-            return await CallPrivate(await BuildPrivateRequest(method), url);
+            return await CallPrivate(BuildPrivateRequest(method), url);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, CoinsEOrderId orderId, string url)
         {
-            return await CallPrivate(await BuildPrivateRequest(method, orderId), url);
+            return await CallPrivate(BuildPrivateRequest(method, orderId), url);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         private async Task<JObject> CallPrivate(CoinsEMethod method, CoinsEOrderFilter filter,
             string cursor, int? limit, string url)
         {
-            return await CallPrivate(await BuildPrivateRequest(method, filter, cursor, limit), url);
+            return await CallPrivate(BuildPrivateRequest(method, filter, cursor, limit), url);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         private async Task<JObject> CallPrivate(CoinsEMethod method, OrderType orderType, decimal quantity, decimal price,
             string url)
         {
-            return await CallPrivate(await BuildPrivateRequest(method, orderType, quantity, price), url);
+            return await CallPrivate(BuildPrivateRequest(method, orderType, quantity, price), url);
         }
 
 

@@ -15,11 +15,11 @@ namespace Lostics.NCryptoExchange
         where M : MarketId
         where O : OrderId
     {
-        public static async Task<string> GenerateSHA512Signature(FormUrlEncodedContent request, byte[] privateKey)
+        public static string GenerateSHA512Signature(FormUrlEncodedContent request, byte[] privateKey)
         {
             HMAC digester = new HMACSHA512(privateKey);
             StringBuilder hex = new StringBuilder();
-            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(await request.ReadAsStringAsync());
+            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request.ReadAsStringAsync().Result);
 
             return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
         }
