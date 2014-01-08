@@ -36,7 +36,7 @@ namespace Lostics.NCryptoExample
                 List<MarketTrade<CryptsyMarketId>> trades = cryptsy.GetMarketTrades(markets[0].MarketId).Result;
             }
 
-            cryptsy.GetAllMyOrders(null).Wait();
+            cryptsy.GetAllMyActiveOrders(null).Wait();
             cryptsy.GetAllMyTrades(null).Wait();
             cryptsy.CancelAllOrders().Wait();
 

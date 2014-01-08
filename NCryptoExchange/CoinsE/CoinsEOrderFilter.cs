@@ -5,11 +5,9 @@ using System.Text;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public enum CoinsEMethod
+    public enum CoinsEOrderFilter
     {
-        cancelorder,
-        getallwallets,
-        getorder,
-        listorders
+        Active,
+        All
     }
 }

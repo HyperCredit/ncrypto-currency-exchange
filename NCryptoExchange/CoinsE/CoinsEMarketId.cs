@@ -1,4 +1,5 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using System;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {

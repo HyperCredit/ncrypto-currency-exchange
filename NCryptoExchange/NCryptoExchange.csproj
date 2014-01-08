@@ -52,6 +52,7 @@
     <Compile Include="CoinsE\CoinsEMarket.cs" />
     <Compile Include="CoinsE\CoinsEMarketTrade.cs" />
     <Compile Include="CoinsE\CoinsEMethod.cs" />
+    <Compile Include="CoinsE\CoinsEOrderFilter.cs" />
     <Compile Include="CoinsE\CoinsEOrderNumber.cs" />
     <Compile Include="CoinsE\CoinsEOrderStatus.cs" />
     <Compile Include="CoinsE\CoinsEParsers.cs" />

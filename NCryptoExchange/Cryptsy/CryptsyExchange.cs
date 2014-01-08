@@ -297,7 +297,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             ).ToList();
         }
 
-        public async override Task<List<Transaction>> GetMyTransactions()
+        public async Task<List<Transaction>> GetMyTransactions()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
@@ -341,7 +341,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 defaultTimeZone)).ToList();
         }
 
-        public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyOrders(CryptsyMarketId marketId, int? limit)
+        public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetMyActiveOrders(CryptsyMarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
@@ -352,7 +352,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return myOrdersJson.Select(myOrderJson => CryptsyParsers.ParseMyOrder(myOrderJson as JObject, marketId, defaultTimeZone)).ToList();
         }
 
-        public async override Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyOrders(int? limit)
+        public async Task<List<MyOrder<CryptsyMarketId, CryptsyOrderId>>> GetAllMyActiveOrders(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));

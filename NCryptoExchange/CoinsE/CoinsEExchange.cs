@@ -10,9 +10,10 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public class CoinsEExchange : AbstractExchange<CoinsEMarketId, CoinsEOrderId>
     {
-        public const string COINS_LIST = "https://www.coins-e.com/api/v2/coins/list/";
-        public const string MARKETS_LIST = "https://www.coins-e.com/api/v2/markets/list/";
-        public const string WALLETS_LIST = "https://www.coins-e.com/api/v2/wallet/all/";
+        public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
+        public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
+        public const string MARKETS_LIST = DEFAULT_BASE_URL + "markets/list/";
+        public const string WALLETS_LIST = DEFAULT_BASE_URL + "wallet/all/";
 
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
@@ -30,6 +31,8 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public CoinsEExchange(string publicKey, string privateKey)
         {
+            this.BaseUrl = DEFAULT_BASE_URL;
+
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
@@ -201,11 +204,6 @@ namespace Lostics.NCryptoExchange.CoinsE
              ).ToList();
         }
 
-        public override Task<List<Model.Transaction>> GetMyTransactions()
-        {
-            throw new NotImplementedException();
-        }
-
         public override Task<Book> GetMarketOrders(CoinsEMarketId marketId)
         {
             throw new NotImplementedException();
@@ -226,14 +224,27 @@ namespace Lostics.NCryptoExchange.CoinsE
             throw new NotImplementedException();
         }
 
-        public override Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetMyOrders(CoinsEMarketId marketId, int? limit)
+        public override async Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetMyActiveOrders(CoinsEMarketId marketId, int? limit)
         {
-            throw new NotImplementedException();
+            List<CoinsEMyOrder> activeOrders = await GetMyOrders(marketId, CoinsEOrderFilter.Active, null, limit);
+
+            return activeOrders.ConvertAll(x => (Model.MyOrder<CoinsEMarketId, CoinsEOrderId>)x);
         }
 
-        public override Task<List<Model.MyOrder<CoinsEMarketId, CoinsEOrderId>>> GetAllMyOrders(int? limit)
+        public async Task<List<CoinsEMyOrder>> GetMyOrders(CoinsEMarketId marketId,
+            CoinsEOrderFilter filter, string cursor, int? limit)
         {
-            throw new NotImplementedException();
+            JObject responseJson = await CallPrivate(CoinsEMethod.listorders, GetMarketUrl(marketId));
+
+            return responseJson.Value<JArray>("orders").Select(
+                 order => CoinsEMyOrder.Parse(order as JObject)
+             ).ToList();
+        }
+
+        private string GetMarketUrl(CoinsEMarketId marketId)
+        {
+            return this.BaseUrl + "market/"
+                + Uri.EscapeUriString(marketId.Value) + "/";
         }
 
         public override Task<Model.Book> GetMarketDepth(CoinsEMarketId marketId)
@@ -265,5 +276,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
             throw new NotImplementedException();
         }
+
+        public string BaseUrl { get; private set; }
     }
 }

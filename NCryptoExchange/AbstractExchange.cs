@@ -76,8 +76,6 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task<List<Market<M>>> GetMarkets();
 
-        public abstract Task<List<Transaction>> GetMyTransactions();
-
         public abstract Task<Book> GetMarketOrders(M marketId);
 
         public abstract Task<List<Model.MarketTrade<M>>> GetMarketTrades(M marketId);
@@ -86,9 +84,7 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task<List<Model.MyTrade<M, O>>> GetAllMyTrades(int? limit);
 
-        public abstract Task<List<Model.MyOrder<M, O>>> GetMyOrders(M marketId, int? limit);
-
-        public abstract Task<List<Model.MyOrder<M, O>>> GetAllMyOrders(int? limit);
+        public abstract Task<List<Model.MyOrder<M, O>>> GetMyActiveOrders(M marketId, int? limit);
 
         public abstract Task<Book> GetMarketDepth(M marketId);
 
