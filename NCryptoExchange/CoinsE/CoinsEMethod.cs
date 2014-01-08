@@ -10,6 +10,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         cancelorder,
         getallwallets,
         getorder,
-        listorders
+        listorders,
+        neworder
     }
 }

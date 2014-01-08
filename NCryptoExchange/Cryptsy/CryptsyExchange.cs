@@ -118,7 +118,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             await Call(request);
         }
 
-        public async override Task CancelAllOrders()
+        public async Task CancelAllOrders()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelallorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));

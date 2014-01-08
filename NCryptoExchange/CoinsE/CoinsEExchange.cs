@@ -82,7 +82,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         }
 
         public async Task<FormUrlEncodedContent> BuildPrivateRequest(CoinsEMethod method, OrderType orderType, 
-            decimal price, decimal quantity)
+            decimal quantity, decimal price)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
@@ -182,6 +182,17 @@ namespace Lostics.NCryptoExchange.CoinsE
             string cursor, int? limit, string url)
         {
             return await CallPrivate(await BuildPrivateRequest(method, filter, cursor, limit), url);
+        }
+
+        /// <summary>
+        /// Make a call to a private (authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Coins-E</returns>
+        private async Task<JObject> CallPrivate(CoinsEMethod method, OrderType orderType, decimal quantity, decimal price,
+            string url)
+        {
+            return await CallPrivate(await BuildPrivateRequest(method, orderType, quantity, price), url);
         }
 
 
@@ -307,11 +318,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(orderId.MarketId));
         }
 
-        public override Task CancelAllOrders()
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Cancel all outstanding orders in the given market. Note that Coins-E does not provide this
         /// functionality natively, so it's emulated client-side, which risks a race condition.
@@ -326,9 +332,11 @@ namespace Lostics.NCryptoExchange.CoinsE
             }
         }
 
-        public override Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        public override async Task<CoinsEOrderId> CreateOrder(CoinsEMarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
-            throw new NotImplementedException();
+            JObject responseJson = await CallPrivate(CoinsEMethod.neworder, orderType, quantity, price, GetMarketUrl(marketId));
+
+            return CoinsEMyOrder.Parse(responseJson.Value<JObject>("order")).OrderId;
         }
 
         public override string GetNextNonce()
