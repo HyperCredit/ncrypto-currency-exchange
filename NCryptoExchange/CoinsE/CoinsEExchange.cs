@@ -19,6 +19,10 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public const string PARAM_METHOD = "method";
         public const string PARAM_NONCE = "nonce";
+        public const string PARAM_ORDER_ID = "order_id";
+        public const string PARAM_ORDER_TYPE = "order_type";
+        public const string PARAM_QUANTITY = "quantity";
+        public const string PARAM_RATE = "rate";
 
         private readonly string publicKey;
         private readonly byte[] privateKey;
@@ -28,6 +32,35 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
+        }
+
+        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method)
+        {
+            return new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+        }
+
+        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method, OrderType orderType, 
+            decimal price, decimal quantity)
+        {
+            return new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType)),
+                new KeyValuePair<string, string>(PARAM_RATE, price.ToString()),
+                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString())
+            });
+        }
+
+        internal FormUrlEncodedContent BuildRequest(CoinsEMethod method, CoinsEOrderId orderId)
+        {
+            return new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
+            });
         }
 
         /// <summary>
@@ -101,10 +134,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, string url)
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new [] {
-                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
+            FormUrlEncodedContent request = BuildRequest(method);
 
             request.Headers.Add(HEADER_KEY, this.publicKey);
             request.Headers.Add(HEADER_SIGN, await GenerateSHA512Signature(request, this.privateKey));

@@ -45,5 +45,24 @@ namespace Lostics.NCryptoExchange.CoinsE
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(secondsSinceEpoch);
         }
+
+        /// <summary>
+        /// Parse an order type as returned from Coins-E.
+        /// </summary>
+        /// <param name="val">An order type, for example "buy" or "sell"</param>
+        /// <returns></returns>
+        public static OrderType ParseOrderType(string val)
+        {
+            if (val.Length == 0)
+            {
+                throw new ArgumentException("Order type cannot be an empty string.");
+            }
+
+            string firstLetter = val.Substring(0, 1);
+            string remainder = val.Substring(1);
+            string correctedVal = firstLetter.ToUpper() + remainder;
+
+            return (OrderType)Enum.Parse(typeof(OrderType), correctedVal);
+        }
     }
 }
