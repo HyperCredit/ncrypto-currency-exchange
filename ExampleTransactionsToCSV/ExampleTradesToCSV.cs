@@ -55,11 +55,9 @@ namespace Lostics.NCryptoExample
             Console.ReadKey();
         }
 
-        private static void WriteTradesToCSV<M, O>(TextWriter writer, AbstractExchange<M, O> exchange)
-            where M: MarketId
-            where O: OrderId
+        private static void WriteTradesToCSV(TextWriter writer, AbstractExchange exchange)
         {
-            foreach (MyTrade<M, O> trade in exchange.GetAllMyTrades(null).Result)
+            foreach (MyTrade trade in exchange.GetAllMyTrades(null).Result)
             {
                 writer.WriteLine(exchange.Label + ","
                     + trade.TradeId.ToString() + ","

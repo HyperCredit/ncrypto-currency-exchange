@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// </summary>
     public class CryptsyParsers
     {
-        public static Book ParseMarketDepthBook(JObject bookJson, CryptsyMarketId marketId)
+        public static Book ParseMarketDepthBook(JObject bookJson, MarketId marketId)
         {
             JToken buyJson = bookJson["buy"];
             JToken sellJson = bookJson["sell"];
@@ -52,7 +52,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return new Book(sellOrders, buyOrders);
         }
 
-        public static MyOrder<CryptsyMarketId, CryptsyOrderId> ParseMyOrder(JObject myOrderJson, CryptsyMarketId marketId, TimeZoneInfo timeZone)
+        public static MyOrder ParseMyOrder(JObject myOrderJson, MarketId marketId, TimeZoneInfo timeZone)
         {
             DateTime created = DateTime.Parse(myOrderJson.Value<string>("created"));
             CryptsyOrderId orderId = CryptsyOrderId.Parse(myOrderJson["orderid"]);
@@ -60,7 +60,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             created = TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
 
-            return new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
+            return new MyOrder(orderId,
                 orderType, created,
                 myOrderJson.Value<decimal>("price"),
                 myOrderJson.Value<decimal>("quantity"), myOrderJson.Value<decimal>("orig_quantity"),
@@ -68,7 +68,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             );
         }
 
-        public static MyOrder<CryptsyMarketId, CryptsyOrderId> ParseMyOrder(JObject myOrderJson, TimeZoneInfo timeZone)
+        public static MyOrder ParseMyOrder(JObject myOrderJson, TimeZoneInfo timeZone)
         {
             DateTime created = DateTime.Parse(myOrderJson.Value<string>("created"));
             CryptsyMarketId marketId = CryptsyMarketId.Parse(myOrderJson["marketid"]);
@@ -77,7 +77,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             created = TimeZoneInfo.ConvertTimeToUtc(created, timeZone);
 
-            return new MyOrder<CryptsyMarketId, CryptsyOrderId>(orderId,
+            return new MyOrder(orderId,
                 orderType, created,
                 myOrderJson.Value<decimal>("price"),
                 myOrderJson.Value<decimal>("quantity"), myOrderJson.Value<decimal>("orig_quantity"),
@@ -85,12 +85,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
             );
         }
 
-        public static MyTrade<CryptsyMarketId, CryptsyOrderId> ParseMyTrade(JObject jsonTrade,
-            CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
+        public static MyTrade ParseMyTrade(JObject jsonTrade,
+            MarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             DateTime tradeDateTime = DateTime.Parse(jsonTrade.Value<string>("datetime"));
             JToken marketIdToken = jsonTrade["marketid"];
-            CryptsyMarketId marketId = null == marketIdToken
+            MarketId marketId = null == marketIdToken
                 ? defaultMarketId
                 : CryptsyMarketId.Parse(marketIdToken);
             CryptsyOrderId orderId = CryptsyOrderId.Parse(jsonTrade["order_id"]);
@@ -99,7 +99,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
             tradeDateTime = TimeZoneInfo.ConvertTimeToUtc(tradeDateTime, timeZone);
 
-            return new MyTrade<CryptsyMarketId, CryptsyOrderId>(tradeId,
+            return new MyTrade(tradeId,
                 tradeType, tradeDateTime,
                 jsonTrade.Value<decimal>("tradeprice"), jsonTrade.Value<decimal>("fee"),
                 jsonTrade.Value<decimal>("quantity"),

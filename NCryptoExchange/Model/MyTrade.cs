@@ -1,14 +1,12 @@
 using System;
 namespace Lostics.NCryptoExchange.Model
 {
-    public class MyTrade<M, O> : Trade<M>
-        where M : MarketId
-        where O : OrderId
+    public class MyTrade : Trade
     {
         public MyTrade(TradeId tradeId, OrderType tradeType,
             DateTime dateTime, decimal price, decimal? fee,
             decimal quantity,
-            M marketId, O orderId)
+            MarketId marketId, OrderId orderId)
             : base(tradeId, dateTime, price, quantity, marketId)
         {
             this.Fee = fee;

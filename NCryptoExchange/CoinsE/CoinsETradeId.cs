@@ -12,7 +12,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// Improvise a trade ID based on order ID
         /// </summary>
         /// <param name="setValue"></param>
-        public CoinsETradeId(CoinsEOrderId setValue)
+        public CoinsETradeId(OrderId setValue)
             : base(setValue.ToString())
         {
         }

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEMarket : Market<CoinsEMarketId>
+    public class CoinsEMarket : Market
     {
         public CoinsEMarket(CoinsEMarketId id, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,

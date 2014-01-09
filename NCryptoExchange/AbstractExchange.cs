@@ -11,9 +11,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
-    public abstract class AbstractExchange<M, O> : IDisposable
-        where M : MarketId
-        where O : OrderId
+    public abstract class AbstractExchange : IDisposable, IMarketDataSource
     {
         public static string GenerateSHA512Signature(FormUrlEncodedContent request, byte[] privateKey)
         {
@@ -55,29 +53,29 @@ namespace Lostics.NCryptoExchange
             return properties;
         }
 
-        public abstract Task CancelOrder(O orderId);
+        public abstract Task CancelOrder(OrderId orderId);
 
-        public abstract Task CancelMarketOrders(M marketId);
+        public abstract Task CancelMarketOrders(MarketId marketId);
 
-        public abstract Task<O> CreateOrder(M marketId, OrderType orderType, decimal quantity, decimal price);
+        public abstract Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price);
 
         public abstract void Dispose();
 
         public abstract Task<AccountInfo> GetAccountInfo();
 
-        public abstract Task<List<Market<M>>> GetMarkets();
+        public abstract Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit);
 
-        public abstract Task<Book> GetMarketOrders(M marketId);
+        public abstract Task<List<MyTrade>> GetAllMyTrades(int? limit);
 
-        public abstract Task<List<Model.MarketTrade<M>>> GetMarketTrades(M marketId);
+        public abstract Task<List<Market>> GetMarkets();
 
-        public abstract Task<List<Model.MyTrade<M, O>>> GetMyTrades(M marketId, int? limit);
+        public abstract Task<Book> GetMarketOrders(MarketId marketId);
 
-        public abstract Task<List<Model.MyTrade<M, O>>> GetAllMyTrades(int? limit);
+        public abstract Task<List<MarketTrade>> GetMarketTrades(MarketId marketId);
 
-        public abstract Task<List<Model.MyOrder<M, O>>> GetMyActiveOrders(M marketId, int? limit);
+        public abstract Task<Book> GetMarketDepth(MarketId marketId);
 
-        public abstract Task<Book> GetMarketDepth(M marketId);
+        public abstract Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit);
 
         public abstract string GetNextNonce();
 

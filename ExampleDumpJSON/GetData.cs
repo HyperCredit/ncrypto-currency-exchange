@@ -27,13 +27,13 @@ namespace Lostics.NCryptoExample
             cryptsy.DumpResponse = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent;
 
             cryptsy.GetAccountInfo().Wait();
-            List<Market<CryptsyMarketId>> markets = cryptsy.GetMarkets().Result;
+            List<Market> markets = cryptsy.GetMarkets().Result;
 
             if (markets.Count > 0)
             {
                 Book marketDepth = cryptsy.GetMarketDepth(markets[0].MarketId).Result;
                 Book orders = cryptsy.GetMarketOrders(markets[0].MarketId).Result;
-                List<MarketTrade<CryptsyMarketId>> trades = cryptsy.GetMarketTrades(markets[0].MarketId).Result;
+                List<MarketTrade> trades = cryptsy.GetMarketTrades(markets[0].MarketId).Result;
             }
 
             cryptsy.GetAllMyActiveOrders(null).Wait();

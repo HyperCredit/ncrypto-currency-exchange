@@ -43,7 +43,7 @@ namespace Lostics.NCryptoExchange
 
             Assert.AreEqual(114, markets.Count);
 
-            foreach (Market<CryptsyMarketId> market in markets)
+            foreach (Market market in markets)
             {
                 // DOGE/BTC
                 if (market.MarketId.ToString().Equals("132"))
@@ -90,7 +90,7 @@ namespace Lostics.NCryptoExchange
             JObject jsonObj = LoadTestData("getmytrades.json");
             CryptsyMarketId marketId = new CryptsyMarketId("132");
             TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-            List<MyTrade<CryptsyMarketId, CryptsyOrderId>> trades = jsonObj.Value<JArray>("return").Select(
+            List<MyTrade> trades = jsonObj.Value<JArray>("return").Select(
                 marketTrade => CryptsyParsers.ParseMyTrade(marketTrade as JObject, marketId, defaultTimeZone)
             ).ToList();
 

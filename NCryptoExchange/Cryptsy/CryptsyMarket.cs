@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyMarket : Market<CryptsyMarketId>
+    public class CryptsyMarket : Market
     {
         public CryptsyMarket(CryptsyMarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,

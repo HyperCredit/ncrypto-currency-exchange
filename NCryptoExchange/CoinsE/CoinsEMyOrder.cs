@@ -4,7 +4,7 @@ using System;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEMyOrder : MyOrder<CoinsEMarketId, CoinsEOrderId>
+    public class CoinsEMyOrder : MyOrder
     {
         private CoinsEMyOrder(CoinsEOrderId orderId, OrderType orderType,
             DateTime created, decimal price, decimal quantity, decimal originalQuantity,

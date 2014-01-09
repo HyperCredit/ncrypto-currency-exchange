@@ -4,7 +4,7 @@ using System;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
-    public class CoinsEMarketTrade : MarketTrade<CoinsEMarketId>
+    public class CoinsEMarketTrade : MarketTrade
     {
         public CoinsEMarketTrade(TradeId tradeId,
             DateTime dateTime, decimal price,

@@ -8,23 +8,23 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyMarketTrade : MarketTrade<CryptsyMarketId>
+    public class CryptsyMarketTrade : MarketTrade
     {
         public CryptsyMarketTrade(TradeId tradeId, OrderType tradeType,
             DateTime dateTime, decimal price,
             decimal quantity, decimal fee,
-            CryptsyMarketId marketId)
+            MarketId marketId)
             : base(tradeId, dateTime, price, quantity, marketId)
         {
             this.TradeType = tradeType;
             this.Fee = fee;
         }
 
-        public static CryptsyMarketTrade Parse(JObject jsonTrade, CryptsyMarketId defaultMarketId, TimeZoneInfo timeZone)
+        public static CryptsyMarketTrade Parse(JObject jsonTrade, MarketId defaultMarketId, TimeZoneInfo timeZone)
         {
             DateTime tradeDateTime = DateTime.Parse(jsonTrade.Value<string>("datetime"));
             JToken marketIdToken = jsonTrade["marketid"];
-            CryptsyMarketId marketId = null == marketIdToken
+            MarketId marketId = null == marketIdToken
                 ? defaultMarketId
                 : CryptsyMarketId.Parse(marketIdToken);
             CryptsyTradeId tradeId = CryptsyTradeId.Parse(jsonTrade["tradeid"]);
