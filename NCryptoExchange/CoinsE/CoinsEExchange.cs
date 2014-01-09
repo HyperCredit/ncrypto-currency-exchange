@@ -305,7 +305,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             JObject marketsJson = (await CallPublic(MARKETS_DATA)).Value<JObject>("markets");
             
             return marketsJson.Properties().Select(
-                 market => (Market)CoinsEMarket.Parse(currencyShortCodeToLabel, market.Value as JObject)
+                 market => (Market)CoinsEMarket.Parse(currencyShortCodeToLabel, market.Name, market.Value as JObject)
              ).ToList();
         }
 

@@ -24,14 +24,15 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <param name="coinShortCodeToLabel">A mapping from coin short codes to human readable labels</param>
         /// <param name="marketObj">The JSON object representing a market</param>
         /// <returns></returns>
-        public static CoinsEMarket Parse(Dictionary<string, string> coinShortCodeToLabel, JObject marketObj)
+        public static CoinsEMarket Parse(Dictionary<string, string> coinShortCodeToLabel, string pair,
+            JObject marketObj)
         {
             MarketStatistics marketStats = ParseMarketStatistics(marketObj.Value<JObject>("marketstat"));
 
-            return new CoinsEMarket(new CoinsEMarketId(marketObj.Value<string>("pair")),
+            return new CoinsEMarket(new CoinsEMarketId(pair),
                 marketObj.Value<string>("c1"), coinShortCodeToLabel[marketObj.Value<string>("c1")],
                 marketObj.Value<string>("c2"), coinShortCodeToLabel[marketObj.Value<string>("c2")],
-                marketObj.Value<string>("pair"), marketStats,
+                pair, marketStats,
                 marketObj.Value<string>("status"), marketObj.Value<decimal>("trade_fee")
             );
         }
