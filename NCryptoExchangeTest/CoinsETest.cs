@@ -74,7 +74,7 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(markets[0].Label, "RED_BTC");
             Assert.AreEqual(markets[0].BaseCurrencyCode, "RED");
             Assert.AreEqual(markets[0].BaseCurrencyName, "redcoin");
-            Assert.AreEqual(markets[0].Statistics.Volume24H, (decimal)6396.70000000);
+            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)6396.70000000);
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
         }
 

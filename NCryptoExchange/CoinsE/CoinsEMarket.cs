@@ -46,7 +46,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 LastTrade = statisticsJson.Value<decimal>("ltp"),
                 HighTrade = twentyFourHours.Value<decimal>("h"),
                 LowTrade = twentyFourHours.Value<decimal>("l"),
-                Volume24H = twentyFourHours.Value<decimal>("volume")
+                Volume24HBase = twentyFourHours.Value<decimal>("volume")
             };
         }
 

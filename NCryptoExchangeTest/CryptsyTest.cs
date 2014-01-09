@@ -50,6 +50,7 @@ namespace Lostics.NCryptoExchange
                 {
                     Assert.AreEqual(market.BaseCurrencyCode, "DOGE");
                     Assert.AreEqual(market.QuoteCurrencyCode, "BTC");
+                    Assert.AreEqual(market.Statistics.Volume24HBase, (decimal)716008746.70171800);
                 }
             }
         }

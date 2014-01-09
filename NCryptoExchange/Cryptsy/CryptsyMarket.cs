@@ -27,7 +27,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             
             MarketStatistics statistics = new MarketStatistics()
             {
-                Volume24H = marketObj.Value<decimal>("current_volume"),
+                Volume24HBase = marketObj.Value<decimal>("current_volume"),
                 LastTrade = marketObj.Value<decimal>("last_trade"),
                 HighTrade = marketObj.Value<decimal>("high_trade"),
                 LowTrade = marketObj.Value<decimal>("low_trade")
