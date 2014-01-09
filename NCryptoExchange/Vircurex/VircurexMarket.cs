@@ -25,7 +25,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         public static VircurexMarket Parse(Dictionary<string, string> currencyShortCodeToLabel,
             string baseCurrencyCode, JProperty marketProperty)
         {
-            JObject marketJson = marketProperty.Value<JObject>();
+            JObject marketJson = marketProperty.Value as JObject;
             MarketStatistics marketStats = new MarketStatistics()
             {
                 LastTrade = marketJson.Value<decimal>("ltp"),
