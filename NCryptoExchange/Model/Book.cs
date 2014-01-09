@@ -8,13 +8,13 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Book
     {
-        public Book(List<MarketOrder> sell, List<MarketOrder> buy)
+        public Book(List<MarketOrder> asks, List<MarketOrder> bids)
         {
-            this.Sell = sell;
-            this.Buy = buy;
+            this.Asks = asks;
+            this.Bids = bids;
         }
 
-        public List<MarketOrder> Buy { get; private set; }
-        public List<MarketOrder> Sell { get; private set; }
+        public List<MarketOrder> Bids { get; private set; }
+        public List<MarketOrder> Asks { get; private set; }
     }
 }

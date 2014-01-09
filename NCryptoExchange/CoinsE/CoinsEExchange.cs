@@ -14,6 +14,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
         public const string MARKETS_DATA = DEFAULT_BASE_URL + "markets/data/";
+        public const string MARKET_DEPTH_PATH = "depth/";
         public const string MARKETS_LIST = DEFAULT_BASE_URL + "markets/list/";
         public const string WALLETS_LIST = DEFAULT_BASE_URL + "wallet/all/";
 
@@ -309,9 +310,11 @@ namespace Lostics.NCryptoExchange.CoinsE
              ).ToList();
         }
 
-        public override Task<Book> GetMarketOrders(MarketId marketId)
+        public override async Task<Book> GetMarketOrders(MarketId marketId)
         {
-            throw new NotImplementedException();
+            JObject marketsJson = (await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH)).Value<JObject>("marketdepth");
+
+            return CoinsEParsers.ParseMarketOrders(marketsJson.Value<JObject>("marketdepth"));
         }
 
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)

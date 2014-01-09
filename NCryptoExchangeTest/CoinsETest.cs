@@ -113,16 +113,16 @@ namespace Lostics.NCryptoExchange
             JObject jsonObj = LoadTestData("depth.json");
             Book marketOrders = CoinsEParsers.ParseMarketOrders(jsonObj.Value<JObject>("marketdepth"));
 
-            Assert.AreEqual(3, marketOrders.Buy.Count);
-            Assert.AreEqual(1, marketOrders.Sell.Count);
+            Assert.AreEqual(3, marketOrders.Bids.Count);
+            Assert.AreEqual(1, marketOrders.Asks.Count);
 
-            CoinsEMarketOrder lowestSellOrder = (CoinsEMarketOrder)marketOrders.Sell[0];
+            CoinsEMarketOrder lowestSellOrder = (CoinsEMarketOrder)marketOrders.Asks[0];
 
             Assert.AreEqual((decimal)2.92858000, lowestSellOrder.Price);
             Assert.AreEqual((decimal)8.98400000, lowestSellOrder.Quantity);
             Assert.AreEqual((decimal)8.98400000, lowestSellOrder.CummulativeQuantity);
 
-            CoinsEMarketOrder highestBuyOrder = (CoinsEMarketOrder)marketOrders.Buy[2];
+            CoinsEMarketOrder highestBuyOrder = (CoinsEMarketOrder)marketOrders.Bids[2];
 
             Assert.AreEqual((decimal)0.12230000, highestBuyOrder.Price);
             Assert.AreEqual((decimal)11.00000000, highestBuyOrder.Quantity);
