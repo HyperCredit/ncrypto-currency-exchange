@@ -312,9 +312,9 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)
         {
-            JObject marketsJson = (await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH)).Value<JObject>("marketdepth");
+            JObject responseJson = await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH);
 
-            return CoinsEParsers.ParseMarketOrders(marketsJson.Value<JObject>("marketdepth"));
+            return CoinsEParsers.ParseMarketOrders(responseJson.Value<JObject>("marketdepth"));
         }
 
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
