@@ -87,15 +87,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task<List<VircurexCurrency>> GetCoins()
         {
-            JObject coinsJson = await CallPublic(Method.get_currency_info, Format.Json);
-            List<VircurexCurrency> coins = new List<VircurexCurrency>();
-
-            foreach (JProperty property in coinsJson.Properties()) {
-                string currencyCode = property.Name;
-                coins.Add(VircurexCurrency.Parse(currencyCode, property.Value<JObject>()));
-            }
-
-            return coins;
+            return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info, Format.Json));
         }
 
         public static VircurexExchange GetExchange(FileInfo configurationFile)
