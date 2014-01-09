@@ -34,7 +34,8 @@ namespace Lostics.NCryptoExchange
             List<VircurexCurrency> currencies = VircurexCurrency.Parse(currenciesJson);
             Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
 
-            foreach (VircurexCurrency currency in currencies) {
+            foreach (VircurexCurrency currency in currencies)
+            {
                 currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
             }
 
@@ -58,6 +59,19 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(markets[0].BaseCurrencyName, "Anoncoin");
             Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)2089.56097032);
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+        }
+
+        [TestMethod]
+        public void TestParseOrderBook()
+        {
+            JObject marketsJson = LoadTestData("orderbook.json");
+            Book orderBook = VircurexParsers.ParseMarketOrders(marketsJson);
+            List<MarketOrder> asks = orderBook.Asks;
+            List<MarketOrder> bids = orderBook.Bids;
+
+            Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
+            Assert.AreEqual(asks[0].Quantity, (decimal)3742.0);
+            Assert.AreEqual(asks[0].OrderType, OrderType.Sell);
         }
 
         private JObject LoadTestData(string filename)
