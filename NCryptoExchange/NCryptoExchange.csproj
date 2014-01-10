@@ -82,6 +82,7 @@
     <Compile Include="Cryptsy\TimezoneResolver.cs" />
     <Compile Include="ExchangeException.cs" />
     <Compile Include="IMarketDataSource.cs" />
+    <Compile Include="Model\AbstractIntBasedId.cs" />
     <Compile Include="Model\AbstractLongBasedId.cs" />
     <Compile Include="Model\AbstractStringBasedId.cs" />
     <Compile Include="Model\AccountInfo.cs" />

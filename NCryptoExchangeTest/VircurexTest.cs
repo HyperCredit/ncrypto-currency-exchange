@@ -5,16 +5,30 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 
 namespace Lostics.NCryptoExchange
 {
     [TestClass]
     public class VircurexTest
     {
+        private Dictionary<string, string> GetCurrencyShortCodesToLabelMapping()
+        {
+            JObject currenciesJson = LoadTestDataObject("get_currency_info.json");
+            List<VircurexCurrency> currencies = VircurexCurrency.Parse(currenciesJson);
+            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
+
+            foreach (VircurexCurrency currency in currencies)
+            {
+                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
+            }
+            return currencyShortCodeToLabel;
+        }
+
         [TestMethod]
         public void TestParseCoins()
         {
-            JObject jsonObj = LoadTestData("get_currency_info.json");
+            JObject jsonObj = LoadTestDataObject("get_currency_info.json");
             List<VircurexCurrency> currencies = VircurexCurrency.Parse(jsonObj);
             
             Assert.AreEqual(19, currencies.Count);
@@ -30,16 +44,9 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketData()
         {
-            JObject currenciesJson = LoadTestData("get_currency_info.json");
-            List<VircurexCurrency> currencies = VircurexCurrency.Parse(currenciesJson);
-            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
+            Dictionary<string, string> currencyShortCodeToLabel = GetCurrencyShortCodesToLabelMapping();
 
-            foreach (VircurexCurrency currency in currencies)
-            {
-                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
-            }
-
-            JObject marketsJson = LoadTestData("get_info_for_currency.json");
+            JObject marketsJson = LoadTestDataObject("get_info_for_currency.json");
             List<Market> markets = new List<Market>();
 
             foreach (JProperty baseProperty in marketsJson.Properties())
@@ -62,9 +69,25 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestParseMarketTrades()
+        {
+            JArray tradesJson = LoadTestDataArray("trades.json");
+            VircurexMarketId marketId = new VircurexMarketId("DOGE", "BTC");
+            List<MarketTrade> trades = VircurexParsers.ParseMarketTrades(marketId, tradesJson);
+
+            Assert.AreEqual(1000, trades.Count);
+            Assert.AreEqual("1110350", trades[0].TradeId.ToString());
+            Assert.AreEqual(new DateTime(2014, 1, 3, 11, 14, 42), trades[0].DateTime);
+            Assert.AreEqual((decimal)1208.12173, trades[0].Quantity);
+            Assert.AreEqual((decimal)0.00000043, trades[0].Price);
+
+            Assert.AreEqual("1110352", trades[1].TradeId.ToString());
+        }
+
+        [TestMethod]
         public void TestParseOrderBook()
         {
-            JObject orderBookJson = LoadTestData("orderbook.json");
+            JObject orderBookJson = LoadTestDataObject("orderbook.json");
             Book orderBook = VircurexParsers.ParseMarketOrders(orderBookJson);
             List<MarketOrder> asks = orderBook.Asks;
             List<MarketOrder> bids = orderBook.Bids;
@@ -77,7 +100,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseOrderBookAlt()
         {
-            JObject orderBookJson = LoadTestData("orderbook_alt.json");
+            JObject orderBookJson = LoadTestDataObject("orderbook_alt.json");
             Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",
                 orderBookJson);
             Book orderBook = orderBooks[new VircurexMarketId("DOGE", "BTC")];
@@ -88,7 +111,17 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(asks[0].Quantity, (decimal)120793.0143665);
         }
 
-        private JObject LoadTestData(string filename)
+        private JArray LoadTestDataArray(string filename)
+        {
+            return JArray.Parse(LoadTestDataRaw(filename));
+        }
+
+        private JObject LoadTestDataObject(string filename)
+        {
+            return JObject.Parse(LoadTestDataRaw(filename));
+        }
+
+        private string LoadTestDataRaw(string filename)
         {
             string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Vircurex");
@@ -96,7 +129,7 @@ namespace Lostics.NCryptoExchange
 
             using (StreamReader reader = new StreamReader(new FileStream(fileName.FullName, FileMode.Open)))
             {
-                return JObject.Parse(reader.ReadToEndAsync().Result);
+                return reader.ReadToEndAsync().Result;
             }
         }
     }

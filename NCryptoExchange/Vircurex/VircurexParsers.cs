@@ -53,5 +53,26 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             return marketOrders;
         }
+
+        public static List<MarketTrade> ParseMarketTrades(MarketId marketId, JArray tradesJson)
+        {
+            return tradesJson.Select(
+                trade => ParseMarketTrade(marketId, (JObject)trade)
+            ).ToList();
+        }
+
+        public static MarketTrade ParseMarketTrade(MarketId marketId, JObject trade)
+        {
+            return new MarketTrade(new VircurexTradeId(trade.Value<int>("tid")),
+                ParseDateTime(trade.Value<int>("date")), trade.Value<decimal>("price"),
+                trade.Value<decimal>("amount"), marketId);
+        }
+
+        private static DateTime ParseDateTime(int secondsSinceEpoch)
+        {
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+
+            return dateTime.AddSeconds(secondsSinceEpoch);
+        }
     }
 }

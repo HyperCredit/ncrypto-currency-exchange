@@ -19,6 +19,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public const string PARAM_BASE = "base";
         public const string PARAM_ALT = "alt";
+        public const string PARAM_SINCE = "since";
 
         public const string PROPERTY_PUBLIC_KEY = "public_key";
         public const string PROPERTY_PRIVATE_KEY = "private_key";
@@ -47,43 +48,72 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <returns>The raw JSON returned from Vircurex</returns>
         private async Task<JObject> CallPublic(Method method)
         {
-            return await CallPublic(BuildPublicUrl(method, Format.Json));
+            return JObject.Parse(await CallPublic(BuildPublicUrl(method, Format.Json)));
         }
 
         /// <summary>
         /// Make a call to a public (non-authenticated) API
         /// </summary>
         /// <param name="method">The method to call on the Vircurex API</param>
-        /// <param name="baseCurrencyCode">An optional base currency code to append to the URL</param>
-        /// <param name="quoteCurrencyCode">An optional quote currency code to append to the URL</param>
+        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<JObject> CallPublic(Method method, string quoteCurrencyCode)
+        {
+            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+            url.Append("?");
+            url.Append(PARAM_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
+
+            return JObject.Parse(await CallPublic(url.ToString()));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <param name="baseCurrencyCode">A base currency code to append to the URL</param>
+        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
         private async Task<JObject> CallPublic(Method method, string baseCurrencyCode, string quoteCurrencyCode)
         {
-
             StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
 
-            if (null != baseCurrencyCode
-                || null != quoteCurrencyCode)
+            url.Append("?");
+
+            url.Append(PARAM_BASE).Append("=")
+                .Append(Uri.EscapeUriString(baseCurrencyCode));
+            url.Append("&").Append(PARAM_ALT)
+                .Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
+
+            return JObject.Parse(await CallPublic(url.ToString()));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API. This currently only works
+        /// with the trades API, which returns arrays instead of an object.
+        /// </summary>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <param name="baseCurrencyCode">A base currency code to append to the URL</param>
+        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <param name="since">An optional order ID to return trades since.</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<JArray> CallPublic(Method method, string baseCurrencyCode, string quoteCurrencyCode,
+            VircurexOrderId since)
+        {
+            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+
+            url.Append("?");
+            url.Append(PARAM_BASE).Append("=")
+                .Append(Uri.EscapeUriString(baseCurrencyCode));
+
+            url.Append("&").Append(PARAM_ALT)
+                .Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
+            if (null != since)
             {
-                url.Append("?");
-
-                if (null != baseCurrencyCode)
-                {
-                    url.Append(PARAM_BASE).Append("=")
-                        .Append(Uri.EscapeUriString(baseCurrencyCode));
-                    if (null != quoteCurrencyCode)
-                    {
-                        url.Append("&");
-                    }
-                }
-
-                if (null != quoteCurrencyCode)
-                {
-                    url.Append(PARAM_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
-                }
+                url.Append("&").Append(PARAM_SINCE)
+                    .Append("=").Append(Uri.EscapeUriString(since.ToString()));
             }
 
-            return await CallPublic(url.ToString());
+            return JArray.Parse(await CallPublic(url.ToString()));
         }
 
         /// <summary>
@@ -91,10 +121,8 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JObject> CallPublic(string url)
+        private async Task<string> CallPublic(string url)
         {
-            JObject jsonObj;
-
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
@@ -102,7 +130,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        jsonObj = JObject.Parse(await jsonStreamReader.ReadToEndAsync());
+                        return await jsonStreamReader.ReadToEndAsync();
                     }
                 }
             }
@@ -110,13 +138,21 @@ namespace Lostics.NCryptoExchange.Vircurex
             {
                 throw new VircurexResponseException("Could not parse response from Vircurex.", e);
             }
-
-            return jsonObj;
         }
 
         public override void Dispose()
         {
             client.Dispose();
+        }
+
+        /// <summary>
+        /// Formats a date and time in a manner suitable for use with Vircurex.
+        /// </summary>
+        /// <param name="dateTimeUtc">A date and time, must be in the UTC timezone.</param>
+        /// <returns>A formatted string</returns>
+        public string FormatDateTime(DateTime dateTimeUtc)
+        {
+            return dateTimeUtc.ToString("s");
         }
 
         public override async Task<Model.AccountInfo> GetAccountInfo()
@@ -193,12 +229,23 @@ namespace Lostics.NCryptoExchange.Vircurex
         public async Task<Dictionary<MarketId, Book>> GetMarketOrdersAlt(string quoteCurrencyCode)
         {
             return VircurexParsers.ParseMarketOrdersAlt(quoteCurrencyCode,
-                await CallPublic(Method.orderbook_alt, null, quoteCurrencyCode));
+                await CallPublic(Method.orderbook_alt, quoteCurrencyCode));
         }
 
-        public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
+        public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
-            throw new NotImplementedException();
+            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
+
+            return VircurexParsers.ParseMarketTrades(marketId,
+                await CallPublic(Method.trades,
+                    vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, null));
+        }
+
+        public async Task<List<MarketTrade>> GetMarketTrades(VircurexMarketId vircurexMarketId, VircurexOrderId since)
+        {
+            return VircurexParsers.ParseMarketTrades(vircurexMarketId,
+                await CallPublic(Method.trades,
+                    vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, since));
         }
 
         public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)
@@ -268,7 +315,8 @@ namespace Lostics.NCryptoExchange.Vircurex
             get_currency_info,
             get_info_for_currency,
             orderbook_alt,
-            orderbook
+            orderbook,
+            trades
         }
     }
 }
