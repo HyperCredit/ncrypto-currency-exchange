@@ -21,17 +21,12 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string PARAM_ALT = "alt";
         public const string PARAM_SINCE = "since";
 
-        public const string PROPERTY_PUBLIC_KEY = "public_key";
-        public const string PROPERTY_PRIVATE_KEY = "private_key";
+        private Dictionary<Method, string> privateKeys = new Dictionary<Method, string>();
 
-        private readonly string publicKey;
-        private readonly byte[] privateKey;
         private HttpClient client = new HttpClient();
 
-        public VircurexExchange(string publicKey, string privateKey)
+        public VircurexExchange()
         {
-            this.publicKey = publicKey;
-            this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
         public static string BuildPublicUrl(Method method,Format format)
@@ -164,7 +159,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info));
         }
 
-        public static VircurexExchange GetExchange(FileInfo configurationFile)
+        /* public static VircurexExchange GetExchange(FileInfo configurationFile)
         {
             if (!configurationFile.Exists)
             {
@@ -190,7 +185,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
 
             return new VircurexExchange(publicKey, privateKey);
-        }
+        } */
 
         public override async Task<List<Market>> GetMarkets()
         {
@@ -287,14 +282,9 @@ namespace Lostics.NCryptoExchange.Vircurex
             return DateTime.Now.Ticks.ToString();
         }
 
-        private static void WriteDefaultConfigurationFile(FileInfo file)
+        public void SetApiKey(Method method, string key)
         {
-            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
-            {
-                writer.WriteLine("# Configuration file for specifying API public & private key.");
-                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
-                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
-            }
+            this.privateKeys[method] = key;
         }
 
         public override string Label
