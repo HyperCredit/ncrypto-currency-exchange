@@ -61,8 +61,9 @@ namespace Lostics.NCryptoExchange
             foreach (JProperty baseProperty in marketsJson.Properties())
             {
                 string baseCurrency = baseProperty.Name;
+                JObject properties = (JObject)baseProperty.Value;
 
-                foreach (JProperty quoteProperty in (baseProperty.Value as JObject).Properties())
+                foreach (JProperty quoteProperty in properties.Properties())
                 {
                     markets.Add(VircurexMarket.Parse(currencyShortCodeToLabel, baseCurrency, quoteProperty));
                 }

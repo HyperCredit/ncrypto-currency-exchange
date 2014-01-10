@@ -26,15 +26,16 @@ namespace Lostics.NCryptoExchange.Vircurex
         public static VircurexMarket Parse(Dictionary<string, string> currencyShortCodeToLabel,
             string baseCurrencyCode, JProperty marketProperty)
         {
-            JObject marketJson = marketProperty.Value as JObject;
+            JObject marketJson = (JObject)marketProperty.Value;
             MarketStatistics marketStats = new MarketStatistics()
             {
                 LastTrade = marketJson.Value<decimal>("ltp"),
                 Volume24HBase = marketJson.Value<decimal>("volume")
             };
             string quoteCurrencyCode = marketProperty.Name;
+            VircurexMarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
 
-            return new VircurexMarket(new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode),
+            return new VircurexMarket(marketId,
                 baseCurrencyCode, currencyShortCodeToLabel[baseCurrencyCode],
                 quoteCurrencyCode, currencyShortCodeToLabel[quoteCurrencyCode],
                 marketStats

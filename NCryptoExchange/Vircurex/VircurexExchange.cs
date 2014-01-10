@@ -196,14 +196,15 @@ namespace Lostics.NCryptoExchange.Vircurex
                 currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
             }
 
-            JObject marketsJson = await CallPublic(Method.get_currency_info);
+            JObject marketsJson = await CallPublic(Method.get_info_for_currency);
             List<Market> markets = new List<Market>();
 
             foreach (JProperty baseProperty in marketsJson.Properties())
             {
                 string baseCurrency = baseProperty.Name;
+                JObject properties = (JObject)baseProperty.Value;
 
-                foreach (JProperty quoteProperty in (baseProperty.Value as JObject).Properties())
+                foreach (JProperty quoteProperty in properties.Properties())
                 {
                     markets.Add(VircurexMarket.Parse(currencyShortCodeToLabel, baseCurrency, quoteProperty));
                 }
