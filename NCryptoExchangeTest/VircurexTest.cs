@@ -64,8 +64,8 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseOrderBook()
         {
-            JObject marketsJson = LoadTestData("orderbook.json");
-            Book orderBook = VircurexParsers.ParseMarketOrders(marketsJson);
+            JObject orderBookJson = LoadTestData("orderbook.json");
+            Book orderBook = VircurexParsers.ParseMarketOrders(orderBookJson);
             List<MarketOrder> asks = orderBook.Asks;
             List<MarketOrder> bids = orderBook.Bids;
 

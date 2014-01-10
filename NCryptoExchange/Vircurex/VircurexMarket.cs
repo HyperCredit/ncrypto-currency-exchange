@@ -10,9 +10,10 @@ namespace Lostics.NCryptoExchange.Vircurex
     public class VircurexMarket : Market
     {
         public VircurexMarket(VircurexMarketId id, string baseCurrencyCode, string baseCurrencyName,
-            string quoteCurrencyCode, string quoteCurrencyName, string label,
+            string quoteCurrencyCode, string quoteCurrencyName,
             MarketStatistics statistics)
-            : base(id, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label, statistics)
+            : base(id, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName,
+                id.ToString(), statistics)
         {
         }
 
@@ -32,13 +33,11 @@ namespace Lostics.NCryptoExchange.Vircurex
                 Volume24HBase = marketJson.Value<decimal>("volume")
             };
             string quoteCurrencyCode = marketProperty.Name;
-            string pair = baseCurrencyCode + "/"
-                + quoteCurrencyCode;
 
-            return new VircurexMarket(new VircurexMarketId(pair),
+            return new VircurexMarket(new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode),
                 baseCurrencyCode, currencyShortCodeToLabel[baseCurrencyCode],
                 quoteCurrencyCode, currencyShortCodeToLabel[quoteCurrencyCode],
-                pair, marketStats
+                marketStats
             );
         }
     }

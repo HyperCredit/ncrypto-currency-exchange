@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
@@ -16,15 +17,8 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
 
-        public const string PARAM_CURSOR = "cursor";
-        public const string PARAM_FILTER = "filter";
-        public const string PARAM_LIMIT = "limit";
-        public const string PARAM_METHOD = "method";
-        public const string PARAM_NONCE = "nonce";
-        public const string PARAM_ORDER_ID = "order_id";
-        public const string PARAM_ORDER_TYPE = "order_type";
-        public const string PARAM_QUANTITY = "quantity";
-        public const string PARAM_RATE = "rate";
+        public const string PARAM_BASE = "base";
+        public const string PARAM_ALT = "alt";
 
         public const string PROPERTY_PUBLIC_KEY = "public_key";
         public const string PROPERTY_PRIVATE_KEY = "private_key";
@@ -49,12 +43,57 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <summary>
         /// Make a call to a public (non-authenticated) API
         /// </summary>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<JObject> CallPublic(Method method)
+        {
+            return await CallPublic(BuildPublicUrl(method, Format.Json));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <param name="baseCurrencyCode">An optional base currency code to append to the URL</param>
+        /// <param name="quoteCurrencyCode">An optional quote currency code to append to the URL</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<JObject> CallPublic(Method method, string baseCurrencyCode, string quoteCurrencyCode)
+        {
+
+            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+
+            if (null != baseCurrencyCode
+                || null != quoteCurrencyCode)
+            {
+                url.Append("?");
+
+                if (null != baseCurrencyCode)
+                {
+                    url.Append(PARAM_BASE).Append("=")
+                        .Append(Uri.EscapeUriString(baseCurrencyCode));
+                    if (null != quoteCurrencyCode)
+                    {
+                        url.Append("&");
+                    }
+                }
+
+                if (null != quoteCurrencyCode)
+                {
+                    url.Append(PARAM_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
+                }
+            }
+
+            return await CallPublic(url.ToString());
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JObject> CallPublic(Method method, Format format)
+        private async Task<JObject> CallPublic(string url)
         {
             JObject jsonObj;
-            string url = BuildPublicUrl(method, format);
 
             try
             {
@@ -87,7 +126,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task<List<VircurexCurrency>> GetCoins()
         {
-            return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info, Format.Json));
+            return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info));
         }
 
         public static VircurexExchange GetExchange(FileInfo configurationFile)
@@ -127,7 +166,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
             }
 
-            JObject marketsJson = await CallPublic(Method.get_currency_info, Format.Json);
+            JObject marketsJson = await CallPublic(Method.get_currency_info);
             List<Market> markets = new List<Market>();
 
             foreach (JProperty baseProperty in marketsJson.Properties())
@@ -145,7 +184,16 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)
         {
-            throw new NotImplementedException();
+            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
+
+            return VircurexParsers.ParseMarketOrders(await CallPublic(Method.orderbook,
+                vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
+        }
+
+        public async Task<Dictionary<MarketId, Book>> GetMarketOrdersAlt(string quoteCurrencyCode)
+        {
+            return VircurexParsers.ParseMarketOrdersAlt(await CallPublic(Method.orderbook_alt,
+                null, quoteCurrencyCode));
         }
 
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
@@ -218,7 +266,9 @@ namespace Lostics.NCryptoExchange.Vircurex
         public enum Method
         {
             get_currency_info,
-            get_info_for_currency
+            get_info_for_currency,
+            orderbook_alt,
+            orderbook
         }
     }
 }

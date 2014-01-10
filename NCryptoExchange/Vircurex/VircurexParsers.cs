@@ -31,10 +31,15 @@ namespace Lostics.NCryptoExchange.Vircurex
             return new Book(asks, bids);
         }
 
-        private static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
+        internal static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
         {
             return new MarketOrder(orderType,
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
+        }
+
+        public static Dictionary<MarketId, Book> ParseMarketOrdersAlt(JObject jObject)
+        {
+            throw new NotImplementedException();
         }
     }
 }
