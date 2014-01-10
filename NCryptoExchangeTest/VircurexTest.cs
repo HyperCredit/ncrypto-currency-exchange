@@ -26,6 +26,15 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestBuildPublicUrl()
+        {
+            string url = VircurexExchange.BuildPublicUrl(VircurexExchange.Method.orderbook,
+                VircurexExchange.Format.Json);
+
+            Assert.AreEqual("https://vircurex.com/api/orderbook.json", url);
+        }
+
+        [TestMethod]
         public void TestParseCoins()
         {
             JObject jsonObj = LoadTestDataObject("get_currency_info.json");

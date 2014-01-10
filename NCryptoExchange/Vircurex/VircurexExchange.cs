@@ -30,15 +30,14 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public VircurexExchange(string publicKey, string privateKey)
         {
-            this.BaseUrl = DEFAULT_BASE_URL;
-
             this.publicKey = publicKey;
             this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
-        private string BuildPublicUrl(Method method,Format format)
+        public static string BuildPublicUrl(Method method,Format format)
         {
- 	        throw new NotImplementedException();
+            return DEFAULT_BASE_URL + Enum.GetName(typeof(Method), method)
+                + "." + Enum.GetName(typeof(Format), format).ToLower();
         }
 
         /// <summary>
@@ -298,7 +297,6 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
         }
 
-        public string BaseUrl { get; private set; }
         public override string Label
         {
             get { return "Vircurex"; }
