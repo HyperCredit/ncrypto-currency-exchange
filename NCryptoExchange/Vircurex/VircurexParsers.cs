@@ -16,30 +16,42 @@ namespace Lostics.NCryptoExchange.Vircurex
             return epoch.AddSeconds(secondsSinceEpoch);
         }
 
-        public static Book ParseMarketOrders(JObject bookJson)
-        {
-            JArray asksArray = bookJson.Value<JArray>("asks");
-            JArray bidsArray = bookJson.Value<JArray>("bids");
-
-            List<MarketOrder> asks = asksArray.Select(
-                depth => (MarketOrder)ParseMarketDepth(depth as JArray, OrderType.Sell)
-            ).ToList();
-            List<MarketOrder> bids = bidsArray.Select(
-                depth => (MarketOrder)ParseMarketDepth(depth as JArray, OrderType.Buy)
-            ).ToList();
-
-            return new Book(asks, bids);
-        }
-
         internal static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
         {
             return new MarketOrder(orderType,
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
         }
 
-        public static Dictionary<MarketId, Book> ParseMarketOrdersAlt(JObject jObject)
+        public static Book ParseMarketOrders(JObject bookJson)
         {
-            throw new NotImplementedException();
+            JArray asksArray = bookJson.Value<JArray>("asks");
+            JArray bidsArray = bookJson.Value<JArray>("bids");
+
+            List<MarketOrder> asks = asksArray.Select(
+                depth => (MarketOrder)ParseMarketDepth((JArray)depth, OrderType.Sell)
+            ).ToList();
+            List<MarketOrder> bids = bidsArray.Select(
+                depth => (MarketOrder)ParseMarketDepth((JArray)depth, OrderType.Buy)
+            ).ToList();
+
+            return new Book(asks, bids);
+        }
+
+        public static Dictionary<MarketId, Book> ParseMarketOrdersAlt(string quoteCurrencyCode,
+            JObject altDepthJson)
+        {
+            Dictionary<MarketId, Book> marketOrders = new Dictionary<MarketId, Book>();
+
+            // altDepthJson is structured as an object containing base currency
+            // codes as keys, and book data as value.
+            foreach (JProperty property in altDepthJson.Properties())
+            {
+                string baseCurrencyCode = property.Name;
+                MarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
+                marketOrders[marketId] = ParseMarketOrders((JObject)property.Value);
+            }
+
+            return marketOrders;
         }
     }
 }

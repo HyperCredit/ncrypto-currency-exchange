@@ -192,8 +192,8 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task<Dictionary<MarketId, Book>> GetMarketOrdersAlt(string quoteCurrencyCode)
         {
-            return VircurexParsers.ParseMarketOrdersAlt(await CallPublic(Method.orderbook_alt,
-                null, quoteCurrencyCode));
+            return VircurexParsers.ParseMarketOrdersAlt(quoteCurrencyCode,
+                await CallPublic(Method.orderbook_alt, null, quoteCurrencyCode));
         }
 
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)

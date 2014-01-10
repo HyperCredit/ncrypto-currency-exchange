@@ -74,6 +74,20 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(asks[0].OrderType, OrderType.Sell);
         }
 
+        [TestMethod]
+        public void TestParseOrderBookAlt()
+        {
+            JObject orderBookJson = LoadTestData("orderbook_alt.json");
+            Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",
+                orderBookJson);
+            Book orderBook = orderBooks[new VircurexMarketId("DOGE", "BTC")];
+            List<MarketOrder> asks = orderBook.Asks;
+            List<MarketOrder> bids = orderBook.Bids;
+
+            Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
+            Assert.AreEqual(asks[0].Quantity, (decimal)120793.0143665);
+        }
+
         private JObject LoadTestData(string filename)
         {
             string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
