@@ -108,10 +108,10 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketOrders()
+        public void TestParseMarketDepth()
         {
             JObject jsonObj = LoadTestData("depth.json");
-            Book marketOrders = CoinsEParsers.ParseMarketOrders(jsonObj.Value<JObject>("marketdepth"));
+            Book marketOrders = CoinsEParsers.ParseMarketDepth(jsonObj.Value<JObject>("marketdepth"));
 
             Assert.AreEqual(3, marketOrders.Bids.Count);
             Assert.AreEqual(1, marketOrders.Asks.Count);

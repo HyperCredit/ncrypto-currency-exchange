@@ -20,7 +20,7 @@ namespace Lostics.NCryptoExchange.CoinsE
             return new AccountInfo(wallets, systemTime);
         }
 
-        public static Book ParseMarketOrders(JObject bookJson)
+        public static Book ParseMarketDepth(JObject bookJson)
         {
             JArray bidsArray = bookJson.Value<JArray>("bids");
             JArray asksArray = bookJson.Value<JArray>("asks");

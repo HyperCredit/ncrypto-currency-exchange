@@ -31,9 +31,6 @@ namespace Lostics.NCryptoExchange.CoinsE
         public const string PARAM_QUANTITY = "quantity";
         public const string PARAM_RATE = "rate";
 
-        public const string PROPERTY_PUBLIC_KEY = "public_key";
-        public const string PROPERTY_PRIVATE_KEY = "private_key";
-
         private readonly string publicKey;
         private readonly byte[] privateKey;
         private HttpClient client = new HttpClient();
@@ -246,6 +243,34 @@ namespace Lostics.NCryptoExchange.CoinsE
             return jsonObj;
         }
 
+        public override async Task CancelOrder(OrderId orderId)
+        {
+            CoinsEOrderId coinsEOrderId = (CoinsEOrderId)orderId;
+
+            JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(coinsEOrderId.MarketId));
+        }
+
+        /// <summary>
+        /// Cancel all outstanding orders in the given market. Note that Coins-E does not provide this
+        /// functionality natively, so it's emulated client-side, which risks a race condition.
+        /// </summary>
+        /// <param name="marketId"></param>
+        /// <returns></returns>
+        public override async Task CancelMarketOrders(MarketId marketId)
+        {
+            foreach (CoinsEMyOrder order in (await GetMyActiveOrders(marketId, null)))
+            {
+                await CallPrivate(CoinsEMethod.cancelorder, order.OrderId, GetMarketUrl(order.MarketId));
+            }
+        }
+
+        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        {
+            JObject responseJson = await CallPrivate(CoinsEMethod.neworder, orderType, quantity, price, GetMarketUrl(marketId));
+
+            return CoinsEMyOrder.Parse(responseJson.Value<JObject>("order")).OrderId;
+        }
+
         public override void Dispose()
         {
             client.Dispose();
@@ -263,34 +288,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             JArray coinsJson = (await CallPublic(COINS_LIST)).Value<JArray>("coins");
 
             return coinsJson.Select(coin => CoinsECurrency.Parse(coin as JObject)).ToList();
-        }
-
-        public static CoinsEExchange GetExchange(FileInfo configurationFile)
-        {
-            if (!configurationFile.Exists)
-            {
-                WriteDefaultConfigurationFile(configurationFile);
-                throw new ConfigurationException("No configuration file exists; blank default created. "
-                    + "Please enter public and private key values and try again.");
-            }
-
-            Dictionary<string, string> properties = GetConfiguration(configurationFile);
-            string publicKey = properties[PROPERTY_PUBLIC_KEY];
-            string privateKey = properties[PROPERTY_PRIVATE_KEY];
-
-            if (null == publicKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            if (null == privateKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            return new CoinsEExchange(publicKey, privateKey);
         }
 
         public override async Task<List<Market>> GetMarkets()
@@ -312,14 +309,29 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)
         {
+            // Coins-E doesn't have an option to return detailed market orders, so we have to use
+            // market depth instead.
             JObject responseJson = await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH);
 
-            return CoinsEParsers.ParseMarketOrders(responseJson.Value<JObject>("marketdepth"));
+            return CoinsEParsers.ParseMarketDepth(responseJson.Value<JObject>("marketdepth"));
         }
 
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             throw new NotImplementedException();
+        }
+
+        private string GetMarketUrl(MarketId marketId)
+        {
+            return this.BaseUrl + "market/"
+                + Uri.EscapeUriString(marketId.ToString()) + "/";
+        }
+
+        public override async Task<Book> GetMarketDepth(MarketId marketId)
+        {
+            JObject responseJson = await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH);
+
+            return CoinsEParsers.ParseMarketDepth(responseJson.Value<JObject>("marketdepth"));
         }
 
         /// <summary>
@@ -391,58 +403,9 @@ namespace Lostics.NCryptoExchange.CoinsE
              ).ToList();
         }
 
-        private string GetMarketUrl(MarketId marketId)
-        {
-            return this.BaseUrl + "market/"
-                + Uri.EscapeUriString(marketId.ToString()) + "/";
-        }
-
-        public override Task<Model.Book> GetMarketDepth(MarketId marketId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task CancelOrder(OrderId orderId)
-        {
-            CoinsEOrderId coinsEOrderId = (CoinsEOrderId)orderId;
-
-            JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(coinsEOrderId.MarketId));
-        }
-
-        /// <summary>
-        /// Cancel all outstanding orders in the given market. Note that Coins-E does not provide this
-        /// functionality natively, so it's emulated client-side, which risks a race condition.
-        /// </summary>
-        /// <param name="marketId"></param>
-        /// <returns></returns>
-        public override async Task CancelMarketOrders(MarketId marketId)
-        {
-            foreach (CoinsEMyOrder order in (await GetMyActiveOrders(marketId, null)))
-            {
-                await CallPrivate(CoinsEMethod.cancelorder, order.OrderId, GetMarketUrl(order.MarketId));
-            }
-        }
-
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
-        {
-            JObject responseJson = await CallPrivate(CoinsEMethod.neworder, orderType, quantity, price, GetMarketUrl(marketId));
-
-            return CoinsEMyOrder.Parse(responseJson.Value<JObject>("order")).OrderId;
-        }
-
         public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
-        }
-
-        private static void WriteDefaultConfigurationFile(FileInfo file)
-        {
-            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
-            {
-                writer.WriteLine("# Configuration file for specifying API public & private key.");
-                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
-                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
-            }
         }
 
         public string BaseUrl { get; private set; }

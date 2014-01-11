@@ -37,9 +37,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public const string PARAM_PRICE = "price";
         public const string PARAM_QUANTITY = "quantity";
 
-        public const string PROPERTY_PUBLIC_KEY = "public_key";
-        public const string PROPERTY_PRIVATE_KEY = "private_key";
-
         private readonly TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 
         private HttpClient client = new HttpClient();
@@ -245,34 +242,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyAccountInfo.Parse(await Call<JObject>(request));
         }
 
-        public static CryptsyExchange GetExchange(FileInfo configurationFile)
-        {
-            if (!configurationFile.Exists)
-            {
-                WriteDefaultConfigurationFile(configurationFile);
-                throw new ConfigurationException("No configuration file exists; blank default created. "
-                    + "Please enter public and private key values and try again.");
-            }
-
-            Dictionary<string, string> properties = GetConfiguration(configurationFile);
-            string publicKey = properties[PROPERTY_PUBLIC_KEY];
-            string privateKey = properties[PROPERTY_PRIVATE_KEY];
-
-            if (null == publicKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            if (null == privateKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            return new CryptsyExchange(publicKey, privateKey);
-        }
-
         public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
@@ -465,16 +434,6 @@ namespace Lostics.NCryptoExchange.Cryptsy
             using (StreamWriter dumpTo = new StreamWriter(new FileStream(logFile.FullName, FileMode.CreateNew)))
             {
                 dumpTo.Write(jsonObj.ToString());
-            }
-        }
-
-        private static void WriteDefaultConfigurationFile(FileInfo file)
-        {
-            using (StreamWriter writer = new StreamWriter(new FileStream(file.FullName, FileMode.CreateNew)))
-            {
-                writer.WriteLine("# Configuration file for specifying API public & private key.");
-                writer.WriteLine(PROPERTY_PUBLIC_KEY + "=");
-                writer.WriteLine(PROPERTY_PRIVATE_KEY + "=");
             }
         }
 
