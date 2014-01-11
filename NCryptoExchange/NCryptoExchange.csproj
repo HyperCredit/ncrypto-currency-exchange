@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
+    <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="IExchange.cs" />
     <Compile Include="AbstractExchange.cs" />
     <Compile Include="CoinsE\CoinsECurrency.cs" />
@@ -62,7 +64,6 @@
     <Compile Include="CoinsE\CoinsEOrderId.cs" />
     <Compile Include="CoinsE\CoinsETradeId.cs" />
     <Compile Include="CoinsE\CoinsEWallet.cs" />
-    <Compile Include="CoinsE\CoinsEMarketOrder.cs" />
     <Compile Include="CoinsE\CoinsEMyOrder.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Cryptsy\CryptsyAccountInfo.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="Cryptsy\CryptsyMarket.cs" />
     <Compile Include="Cryptsy\CryptsyMarketId.cs" />
     <Compile Include="Cryptsy\CryptsyMarketTrade.cs" />
-    <Compile Include="Cryptsy\CryptsyMarketOrder.cs" />
     <Compile Include="Cryptsy\CryptsyMethod.cs" />
     <Compile Include="Cryptsy\CryptsyOrderId.cs" />
     <Compile Include="Cryptsy\CryptsyParsers.cs" />
