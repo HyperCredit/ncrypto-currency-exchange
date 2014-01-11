@@ -91,6 +91,7 @@
     <Compile Include="Model\Currency.cs" />
     <Compile Include="Model\Book.cs" />
     <Compile Include="Model\Market.cs" />
+    <Compile Include="Model\MarketDepth.cs" />
     <Compile Include="Model\MarketId.cs" />
     <Compile Include="Model\MarketOrder.cs" />
     <Compile Include="Model\MarketStatistics.cs" />

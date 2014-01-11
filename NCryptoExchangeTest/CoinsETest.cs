@@ -116,13 +116,13 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(3, marketOrders.Bids.Count);
             Assert.AreEqual(1, marketOrders.Asks.Count);
 
-            CoinsEMarketOrder lowestSellOrder = (CoinsEMarketOrder)marketOrders.Asks[0];
+            CoinsEMarketDepth lowestSellOrder = (CoinsEMarketDepth)marketOrders.Asks[0];
 
             Assert.AreEqual((decimal)2.92858000, lowestSellOrder.Price);
             Assert.AreEqual((decimal)8.98400000, lowestSellOrder.Quantity);
             Assert.AreEqual((decimal)8.98400000, lowestSellOrder.CummulativeQuantity);
 
-            CoinsEMarketOrder highestBuyOrder = (CoinsEMarketOrder)marketOrders.Bids[2];
+            CoinsEMarketDepth highestBuyOrder = (CoinsEMarketDepth)marketOrders.Bids[2];
 
             Assert.AreEqual((decimal)0.12230000, highestBuyOrder.Price);
             Assert.AreEqual((decimal)11.00000000, highestBuyOrder.Quantity);

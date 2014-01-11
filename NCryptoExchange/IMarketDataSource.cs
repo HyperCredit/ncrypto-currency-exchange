@@ -11,8 +11,6 @@ namespace Lostics.NCryptoExchange
     {
         Task<List<Market>> GetMarkets();
 
-        Task<Book> GetMarketOrders(MarketId marketId);
-
         Task<List<MarketTrade>> GetMarketTrades(MarketId marketId);
 
         Task<Book> GetMarketDepth(MarketId marketId);

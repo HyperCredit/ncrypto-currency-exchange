@@ -27,11 +27,11 @@ namespace Lostics.NCryptoExchange.Vircurex
             JArray asksArray = bookJson.Value<JArray>("asks");
             JArray bidsArray = bookJson.Value<JArray>("bids");
 
-            List<MarketOrder> asks = asksArray.Select(
-                depth => (MarketOrder)ParseMarketDepth((JArray)depth, OrderType.Sell)
+            List<MarketDepth> asks = asksArray.Select(
+                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Sell)
             ).ToList();
-            List<MarketOrder> bids = bidsArray.Select(
-                depth => (MarketOrder)ParseMarketDepth((JArray)depth, OrderType.Buy)
+            List<MarketDepth> bids = bidsArray.Select(
+                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Buy)
             ).ToList();
 
             return new Book(asks, bids);

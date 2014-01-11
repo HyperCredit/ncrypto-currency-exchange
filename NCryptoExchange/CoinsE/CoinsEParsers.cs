@@ -25,11 +25,11 @@ namespace Lostics.NCryptoExchange.CoinsE
             JArray bidsArray = bookJson.Value<JArray>("bids");
             JArray asksArray = bookJson.Value<JArray>("asks");
 
-            List<MarketOrder> bids = bidsArray.Select(
-                depth => (MarketOrder)CoinsEMarketOrder.ParseMarketDepth(depth as JObject, OrderType.Buy)
+            List<MarketDepth> bids = bidsArray.Select(
+                depth => (MarketDepth)CoinsEMarketDepth.ParseMarketDepth(depth as JObject)
             ).ToList();
-            List<MarketOrder> asks = asksArray.Select(
-                depth => (MarketOrder)CoinsEMarketOrder.ParseMarketDepth(depth as JObject, OrderType.Sell)
+            List<MarketDepth> asks = asksArray.Select(
+                depth => (MarketDepth)CoinsEMarketDepth.ParseMarketDepth(depth as JObject)
             ).ToList();
 
             return new Book(asks, bids);

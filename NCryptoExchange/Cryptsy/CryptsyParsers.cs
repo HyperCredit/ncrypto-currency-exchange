@@ -34,11 +34,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
             JArray buyArray = (JArray)buyJson;
             JArray sellArray = (JArray)sellJson;
 
-            List<MarketOrder> buy = buyArray.Select(
-                depth => (MarketOrder)CryptsyMarketOrder.ParseMarketDepth(depth as JArray, OrderType.Buy)
+            List<MarketDepth> buy = buyArray.Select(
+                depth => (MarketDepth)CryptsyMarketDepth.ParseMarketDepth(depth as JArray)
             ).ToList();
-            List<MarketOrder> sell = sellArray.Select(
-                depth => (MarketOrder)CryptsyMarketOrder.ParseMarketDepth(depth as JArray, OrderType.Sell)
+            List<MarketDepth> sell = sellArray.Select(
+                depth => (MarketDepth)CryptsyMarketDepth.ParseMarketDepth(depth as JArray)
             ).ToList();
 
             return new Book(sell, buy);
@@ -46,8 +46,10 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public static Book ParseMarketOrders(JObject marketOrdersJson)
         {
-            List<MarketOrder> buyOrders = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => (MarketOrder)CryptsyMarketOrder.ParseBuy(marketOrder as JObject)).ToList();
-            List<MarketOrder> sellOrders = marketOrdersJson.Value<JArray>("sellorders").Select(marketOrder => (MarketOrder)CryptsyMarketOrder.ParseSell(marketOrder as JObject)).ToList();
+            List<MarketDepth> buyOrders
+                = marketOrdersJson.Value<JArray>("buyorders").Select(marketOrder => (MarketDepth)CryptsyMarketDepth.ParseBuy(marketOrder as JObject)).ToList();
+            List<MarketDepth> sellOrders
+                = marketOrdersJson.Value<JArray>("sellorders").Select(marketOrder => (MarketDepth)CryptsyMarketDepth.ParseSell(marketOrder as JObject)).ToList();
 
             return new Book(sellOrders, buyOrders);
         }

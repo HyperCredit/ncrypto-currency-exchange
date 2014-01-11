@@ -61,7 +61,7 @@ namespace Lostics.NCryptoExchange
             JObject jsonObj = LoadTestData("getmarketorders.json");
             Book marketOrders = CryptsyParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
 
-            MarketOrder lowestSellOrder = marketOrders.Asks[0];
+            MarketDepth lowestSellOrder = marketOrders.Asks[0];
 
             Assert.AreEqual((decimal)0.00001118, lowestSellOrder.Price);
             Assert.AreEqual((decimal)119.40714285, lowestSellOrder.Quantity);

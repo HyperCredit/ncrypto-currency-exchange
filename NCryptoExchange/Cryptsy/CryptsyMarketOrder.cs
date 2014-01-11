@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Cryptsy
 {
-    public class CryptsyMarketOrder : MarketOrder
+    public class CryptsyMarketDepth : MarketDepth
     {
-        public CryptsyMarketOrder(OrderType orderType, decimal price, decimal quantity) : base(orderType, price, quantity)
+        public CryptsyMarketDepth(decimal price, decimal quantity) : base(price, quantity)
         {
         }
 
@@ -19,10 +19,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// </summary>
         /// <param name="jsonOrder"></param>
         /// <returns></returns>
-        public static CryptsyMarketOrder ParseBuy(JObject jsonOrder)
+        public static CryptsyMarketDepth ParseBuy(JObject jsonOrder)
         {
-            return new CryptsyMarketOrder(OrderType.Buy,
-                jsonOrder.Value<decimal>("buyprice"), jsonOrder.Value<decimal>("quantity"));
+            return new CryptsyMarketDepth(jsonOrder.Value<decimal>("buyprice"), jsonOrder.Value<decimal>("quantity"));
         }
 
         /// <summary>
@@ -31,19 +30,18 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// <param name="orderType"></param>
         /// <param name="depthJson"></param>
         /// <returns></returns>
-        public static MarketOrder ParseMarketDepth(JArray depthJson, OrderType orderType)
+        public static CryptsyMarketDepth ParseMarketDepth(JArray depthJson)
         {
-            return new CryptsyMarketOrder(orderType, depthJson[0].Value<decimal>(),
+            return new CryptsyMarketDepth(depthJson[0].Value<decimal>(),
                     depthJson[1].Value<decimal>());
         }
 
         /// <summary>
         /// Parse a market order from the Cryptsy sell order list
         /// </summary>
-        public static CryptsyMarketOrder ParseSell(JObject jsonOrder)
+        public static CryptsyMarketDepth ParseSell(JObject jsonOrder)
         {
-            return new CryptsyMarketOrder(OrderType.Sell,
-                jsonOrder.Value<decimal>("sellprice"), jsonOrder.Value<decimal>("quantity"));
+            return new CryptsyMarketDepth(jsonOrder.Value<decimal>("sellprice"), jsonOrder.Value<decimal>("quantity"));
         }
     }
 }

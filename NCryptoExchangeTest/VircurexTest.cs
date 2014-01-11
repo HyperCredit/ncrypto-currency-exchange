@@ -99,12 +99,11 @@ namespace Lostics.NCryptoExchange
         {
             JObject orderBookJson = LoadTestDataObject("orderbook.json");
             Book orderBook = VircurexParsers.ParseMarketOrders(orderBookJson);
-            List<MarketOrder> asks = orderBook.Asks;
-            List<MarketOrder> bids = orderBook.Bids;
+            List<MarketDepth> asks = orderBook.Asks;
+            List<MarketDepth> bids = orderBook.Bids;
 
             Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
             Assert.AreEqual(asks[0].Quantity, (decimal)3742.0);
-            Assert.AreEqual(asks[0].OrderType, OrderType.Sell);
         }
 
         [TestMethod]
@@ -114,8 +113,8 @@ namespace Lostics.NCryptoExchange
             Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",
                 orderBookJson);
             Book orderBook = orderBooks[new VircurexMarketId("DOGE", "BTC")];
-            List<MarketOrder> asks = orderBook.Asks;
-            List<MarketOrder> bids = orderBook.Bids;
+            List<MarketDepth> asks = orderBook.Asks;
+            List<MarketDepth> bids = orderBook.Bids;
 
             Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
             Assert.AreEqual(asks[0].Quantity, (decimal)120793.0143665);
