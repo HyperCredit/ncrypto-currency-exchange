@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinsE
 {
+    /// <summary>
+    /// Wrapper around the Cryptsy (https://www.coins-e.com/) API.
+    /// 
+    /// To use, requires a public and private key.
+    /// </summary>
     public class CoinsEExchange : AbstractExchange
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";

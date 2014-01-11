@@ -17,10 +17,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// Wrapper around the Cryptsy (https://www.cryptsy.com/) API.
     /// 
     /// To use, requires a public and private key (these can be generated from the
-    /// "Settings" page within Cryptsy, once logged in). It's suggested these are
-    /// stored in a configuration file, and the method GetExchange()
-    /// will load the keys from that file for you (provided with a path to
-    /// a file that does not exist, it will create a blank file as a template).
+    /// "Settings" page within Cryptsy, once logged in).
     /// </summary>
     public class CryptsyExchange : AbstractExchange
     {
