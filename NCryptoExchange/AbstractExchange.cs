@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange
 {
-    public abstract class AbstractExchange : IDisposable, IMarketDataSource
+    public abstract class AbstractExchange : IExchange
     {
         public static string GenerateSHA512Signature(FormUrlEncodedContent request, byte[] privateKey)
         {
@@ -20,37 +20,6 @@ namespace Lostics.NCryptoExchange
             byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request.ReadAsStringAsync().Result);
 
             return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
-        }
-
-        public static Dictionary<string, string> GetConfiguration(FileInfo configurationFile)
-        {
-            Dictionary<string, string> properties = new Dictionary<string,string>();
-
-            using (StreamReader reader = new StreamReader(new FileStream(configurationFile.FullName, FileMode.Open)))
-            {
-                string line = reader.ReadLine();
-
-                while (null != line)
-                {
-                    line = line.Trim();
-
-                    // Ignore comment lines
-                    if (!line.StartsWith("#"))
-                    {
-                        string[] parts = line.Split(new[] { '=' });
-                        if (parts.Length >= 2)
-                        {
-                            string name = parts[0].Trim().ToLower();
-
-                            properties.Add(name, parts[1].Trim());
-                        }
-                    }
-
-                    line = reader.ReadLine();
-                }
-            }
-
-            return properties;
         }
 
         public abstract Task CancelOrder(OrderId orderId);
