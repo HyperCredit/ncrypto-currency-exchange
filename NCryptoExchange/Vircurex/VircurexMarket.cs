@@ -17,6 +17,28 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
         }
 
+        public static List<Market> ParseMarkets(Dictionary<string, string> currencyShortCodeToLabel,
+            JObject marketsJson)
+        {
+            List<Market> markets = new List<Market>();
+
+            foreach (JProperty baseProperty in marketsJson.Properties())
+            {
+                string baseCurrency = baseProperty.Name;
+                JObject quoteCurrencies = baseProperty.Value as JObject;
+
+                if (null != quoteCurrencies)
+                {
+                    foreach (JProperty quoteProperty in quoteCurrencies.Properties())
+                    {
+                        markets.Add(VircurexMarket.Parse(currencyShortCodeToLabel, baseCurrency, quoteProperty));
+                    }
+                }
+            }
+
+            return markets;
+        }
+
         /// <summary>
         /// Parse market information from the market data API (as in https://vircurex.com/api/get_info_for_currency.json).
         /// </summary>

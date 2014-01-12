@@ -197,20 +197,8 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
 
             JObject marketsJson = await CallPublic(Method.get_info_for_currency);
-            List<Market> markets = new List<Market>();
 
-            foreach (JProperty baseProperty in marketsJson.Properties())
-            {
-                string baseCurrency = baseProperty.Name;
-                JObject properties = (JObject)baseProperty.Value;
-
-                foreach (JProperty quoteProperty in properties.Properties())
-                {
-                    markets.Add(VircurexMarket.Parse(currencyShortCodeToLabel, baseCurrency, quoteProperty));
-                }
-            }
-
-            return markets;
+            return VircurexMarket.ParseMarkets(currencyShortCodeToLabel, marketsJson);
         }
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)

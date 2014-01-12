@@ -20,7 +20,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             foreach (JProperty property in currenciesJson.Properties())
             {
-                currencies.Add(VircurexCurrency.Parse(property.Name, property.Value as JObject));
+                currencies.Add(VircurexCurrency.Parse(property.Name, (JObject)property.Value));
             }
 
             return currencies;
