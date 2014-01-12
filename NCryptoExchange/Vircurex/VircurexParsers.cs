@@ -47,8 +47,13 @@ namespace Lostics.NCryptoExchange.Vircurex
             foreach (JProperty property in altDepthJson.Properties())
             {
                 string baseCurrencyCode = property.Name;
-                MarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
-                marketOrders[marketId] = ParseMarketOrders((JObject)property.Value);
+                JObject bookJson = property.Value as JObject;
+
+                if (null != bookJson)
+                {
+                    MarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
+                    marketOrders[marketId] = ParseMarketOrders(bookJson);
+                }
             }
 
             return marketOrders;

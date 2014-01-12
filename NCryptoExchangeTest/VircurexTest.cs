@@ -90,8 +90,11 @@ namespace Lostics.NCryptoExchange
             List<MarketDepth> asks = orderBook.Asks;
             List<MarketDepth> bids = orderBook.Bids;
 
-            Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
-            Assert.AreEqual(asks[0].Quantity, (decimal)3742.0);
+            Assert.AreEqual(asks[0].Price, (decimal)0.00000038);
+            Assert.AreEqual(asks[0].Quantity, (decimal)156510.61595001);
+
+            Assert.AreEqual(bids[0].Price, (decimal)0.00000037);
+            Assert.AreEqual(bids[0].Quantity, (decimal)2295316.39314516);
         }
 
         [TestMethod]
@@ -100,12 +103,14 @@ namespace Lostics.NCryptoExchange
             JObject orderBookJson = LoadTestDataObject("orderbook_alt.json");
             Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",
                 orderBookJson);
-            Book orderBook = orderBooks[new VircurexMarketId("DOGE", "BTC")];
+            Book orderBook = orderBooks[new VircurexMarketId("DGC", "BTC")];
             List<MarketDepth> asks = orderBook.Asks;
             List<MarketDepth> bids = orderBook.Bids;
 
-            Assert.AreEqual(asks[0].Price, (decimal)0.0000003);
-            Assert.AreEqual(asks[0].Quantity, (decimal)120793.0143665);
+            Assert.AreEqual(asks[0].Price, (decimal)0.00043586);
+            Assert.AreEqual(asks[0].Quantity, (decimal)1.38879063);
+            Assert.AreEqual(bids[0].Price, (decimal)0.00041001);
+            Assert.AreEqual(bids[0].Quantity, (decimal)3.63826735);
         }
 
         private JArray LoadTestDataArray(string filename)
