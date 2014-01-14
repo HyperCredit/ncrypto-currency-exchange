@@ -20,6 +20,18 @@ namespace Lostics.NCryptoExchange.Model
             this.Statistics = statistics;
         }
 
+        public Market(MarketId setMarketId, string baseCurrencyCode, string quoteCurrencyCode,
+            string label, MarketStatistics statistics)
+        {
+            this.MarketId = setMarketId;
+            this.BaseCurrencyCode = baseCurrencyCode;
+            this.BaseCurrencyName = null;
+            this.QuoteCurrencyCode = quoteCurrencyCode;
+            this.QuoteCurrencyName = null;
+            this.Label = label;
+            this.Statistics = statistics;
+        }
+
         public override bool Equals(Object obj)
         {
             if (!(obj is Market))
