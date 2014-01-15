@@ -45,6 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bter\BterException.cs" />
+    <Compile Include="Bter\BterExchange.cs" />
+    <Compile Include="Bter\BterMarket.cs" />
+    <Compile Include="Bter\BterMarketId.cs" />
+    <Compile Include="Bter\BterOrderId.cs" />
+    <Compile Include="Bter\BterParsers.cs" />
+    <Compile Include="Bter\BterResponseException.cs" />
+    <Compile Include="Bter\BterTradeId.cs" />
     <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="IExchange.cs" />
