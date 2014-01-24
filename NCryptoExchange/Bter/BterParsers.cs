@@ -22,21 +22,6 @@ namespace Lostics.NCryptoExchange.Bter
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
         }
 
-        public static Book ParseMarketOrders(JObject bookJson)
-        {
-            JArray asksArray = bookJson.Value<JArray>("asks");
-            JArray bidsArray = bookJson.Value<JArray>("bids");
-
-            List<MarketDepth> asks = asksArray.Select(
-                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Sell)
-            ).ToList();
-            List<MarketDepth> bids = bidsArray.Select(
-                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Buy)
-            ).ToList();
-
-            return new Book(asks, bids);
-        }
-
         public static List<MarketTrade> ParseMarketTrades(MarketId marketId, JObject tradesJson)
         {
             return tradesJson.Value<JArray>("data").Select(

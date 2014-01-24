@@ -14,8 +14,6 @@ namespace Lostics.NCryptoExchange.Bter
     {
         public const string DEFAULT_BASE_URL = "http://bter.com/api/1/";
 
-        public const string PATH_PAIRS = "pairs";
-
         private HttpClient client = new HttpClient();
 
         public BterExchange()
@@ -32,9 +30,10 @@ namespace Lostics.NCryptoExchange.Bter
         /// </summary>
         /// <param name="method">The method to call on the Bter API</param>
         /// <returns>The raw JSON returned from Bter</returns>
-        private async Task<JObject> CallPublic(Method method)
+        private async Task<T> CallPublic<T>(Method method)
+            where T : JToken
         {
-            return JObject.Parse(await CallPublic(BuildPublicUrl(method)));
+            return (T)JToken.Parse(await CallPublic(BuildPublicUrl(method)));
         }
 
         /// <summary>
@@ -43,14 +42,15 @@ namespace Lostics.NCryptoExchange.Bter
         /// <param name="method">The method to call on the Bter API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>The raw JSON returned from Bter</returns>
-        private async Task<JObject> CallPublic(Method method, BterMarketId marketId)
+        private async Task<T> CallPublic<T>(Method method, BterMarketId marketId)
+            where T : JToken
         {
             StringBuilder url = new StringBuilder(BuildPublicUrl(method));
 
             url.Append("/")
                 .Append(Uri.EscapeUriString(marketId.Value));
 
-            return JObject.Parse(await CallPublic(url.ToString()));
+            return (T)JToken.Parse(await CallPublic(url.ToString()));
         }
 
         /// <summary>
@@ -92,23 +92,22 @@ namespace Lostics.NCryptoExchange.Bter
             return dateTimeUtc.ToString("s");
         }
 
-        public override async Task<Model.AccountInfo> GetAccountInfo()
+        public override async Task<AccountInfo> GetAccountInfo()
         {
             throw new NotImplementedException();
         }
 
         public override async Task<List<Market>> GetMarkets()
         {
-            JObject marketsJson = await CallPublic(Method.tickers);
+            JObject marketsJson = await CallPublic<JObject>(Method.tickers);
 
             return BterMarket.ParseMarkets(marketsJson);
         }
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)
         {
-            BterMarketId bterMarketId = (BterMarketId)marketId;
-
-            return BterParsers.ParseMarketOrders(await CallPublic(Method.depth, bterMarketId));
+            // TODO: Pull from default API
+            throw new NotImplementedException();
         }
 
         public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
@@ -116,7 +115,14 @@ namespace Lostics.NCryptoExchange.Bter
             BterMarketId bterMarketId = (BterMarketId)marketId;
 
             return BterParsers.ParseMarketTrades(marketId,
-                await CallPublic(Method.trade, bterMarketId));
+                await CallPublic<JObject>(Method.trade, bterMarketId));
+        }
+
+        public override async Task<List<BterMarketId>> GetPairs()
+        {
+            JArray pairsJson = await CallPublic<JArray>(Method.tickers);
+
+            return BterMarketId.ParsePairs(pairsJson);
         }
 
         public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)
