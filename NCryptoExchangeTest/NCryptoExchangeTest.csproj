@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BterTest.cs" />
     <Compile Include="VircurexTest.cs" />
     <Compile Include="CoinsETest.cs" />
     <Compile Include="CryptsyTest.cs" />

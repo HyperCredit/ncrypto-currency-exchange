@@ -1,5 +1,7 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace Lostics.NCryptoExchange.Bter
 {
@@ -17,6 +19,23 @@ namespace Lostics.NCryptoExchange.Bter
 
             this.BaseCurrencyCode = parts[0].ToUpper();
             this.QuoteCurrencyCode = parts[1].ToUpper();
+        }
+
+        public static List<BterMarketId> ParsePairs(JArray pairsJson)
+        {
+            List<BterMarketId> pairs = new List<BterMarketId>();
+
+            foreach (JToken pairJson in pairsJson)
+            {
+                if (!(pairJson is JValue))
+                {
+                    continue;
+                }
+
+                pairs.Add(new BterMarketId(pairJson.ToString()));
+            }
+
+            return pairs;
         }
 
         public string BaseCurrencyCode { get; private set; }

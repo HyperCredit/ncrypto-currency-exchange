@@ -45,6 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Btce\BtceException.cs" />
+    <Compile Include="Btce\BtceExchange.cs" />
+    <Compile Include="Btce\BtceMarket.cs" />
+    <Compile Include="Btce\BtceMarketId.cs" />
+    <Compile Include="Btce\BtceOrderId.cs" />
+    <Compile Include="Btce\BtceParsers.cs" />
+    <Compile Include="Btce\BtceResponseException.cs" />
+    <Compile Include="Btce\BtceTradeId.cs" />
     <Compile Include="Bter\BterException.cs" />
     <Compile Include="Bter\BterExchange.cs" />
     <Compile Include="Bter\BterMarket.cs" />

@@ -21,18 +21,30 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestParseMarketPairs()
+        {
+            JArray pairsJson = LoadTestDataArray("pairs.json");
+            List<BterMarketId> pairs = BterMarketId.ParsePairs(pairsJson);
+
+            Assert.AreEqual(76, pairs.Count);
+            
+            Assert.AreEqual(pairs[0].ToString(), "btc_cny");
+            Assert.AreEqual(pairs[1].ToString(), "ltc_cny");
+            Assert.AreEqual(pairs[2].ToString(), "bqc_cny");
+        }
+
+        [TestMethod]
         public void TestParseMarketData()
         {
-            JObject marketsJson = LoadTestDataObject("pairs.json");
+            JObject marketsJson = LoadTestDataObject("tickers.json");
             List<Market> markets = BterMarket.ParseMarkets(marketsJson);
 
-            Assert.AreEqual(342, markets.Count);
+            Assert.AreEqual(76, markets.Count);
 
-            Assert.AreEqual(markets[0].Label, "ANC/BTC");
-            Assert.AreEqual(markets[0].BaseCurrencyCode, "ANC");
-            Assert.AreEqual(markets[0].BaseCurrencyName, "Anoncoin");
-            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)301.90826656);
-            Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+            Assert.AreEqual(markets[0].Label, "btc_cny");
+            Assert.AreEqual(markets[0].BaseCurrencyCode, "BTC");
+            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)1098.2957);
+            Assert.AreEqual(markets[0].QuoteCurrencyCode, "CNY");
         }
 
         /* [TestMethod]
