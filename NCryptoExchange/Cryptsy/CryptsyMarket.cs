@@ -14,10 +14,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public CryptsyMarket(CryptsyMarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
             string quoteCurrencyCode, string quoteCurrencyName, string label,
             MarketStatistics statistics, DateTime created)
-            : base(setMarketId, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName, label,
-                statistics)
+            : base(setMarketId, baseCurrencyCode, quoteCurrencyCode, label, statistics)
         {
             this.Created = created;
+            this.BaseCurrencyName = baseCurrencyName;
+            this.QuoteCurrencyName = quoteCurrencyName;
         }
 
         public static CryptsyMarket Parse(JObject marketObj, TimeZoneInfo timeZone) {
@@ -42,5 +43,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         }
 
         public DateTime Created { get; private set; }
+        public string BaseCurrencyName { get; private set; }
+        public string QuoteCurrencyName { get; private set; }
     }
 }

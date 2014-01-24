@@ -56,24 +56,16 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketData()
         {
-            Dictionary<string, string> currencyCodesToLabel = new Dictionary<string, string>()
-            {
-                {"BTC", "bitcoin"},
-                {"RED", "redcoin"}
-            };
-
             JObject jsonObj = LoadTestData("market_data.json");
             JObject marketsJson = jsonObj.Value<JObject>("markets");
             List<CoinsEMarket> markets = marketsJson.Properties().Select(
-                market => CoinsEMarket.Parse(currencyCodesToLabel, "RED_BTC",
-                    market.Value as JObject)
+                market => CoinsEMarket.Parse("RED_BTC", market.Value as JObject)
             ).ToList();
 
             Assert.AreEqual(1, markets.Count);
 
             Assert.AreEqual(markets[0].Label, "RED_BTC");
             Assert.AreEqual(markets[0].BaseCurrencyCode, "RED");
-            Assert.AreEqual(markets[0].BaseCurrencyName, "redcoin");
             Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)6396.70000000);
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
         }

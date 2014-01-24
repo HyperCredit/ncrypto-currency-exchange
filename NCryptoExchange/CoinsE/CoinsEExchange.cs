@@ -297,18 +297,10 @@ namespace Lostics.NCryptoExchange.CoinsE
 
         public override async Task<List<Market>> GetMarkets()
         {
-            List<CoinsECurrency> currencies = await this.GetCoins();
-            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
-
-            foreach (CoinsECurrency currency in currencies)
-            {
-                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
-            }
-
             JObject marketsJson = (await CallPublic(MARKETS_DATA)).Value<JObject>("markets");
             
             return marketsJson.Properties().Select(
-                 market => (Market)CoinsEMarket.Parse(currencyShortCodeToLabel, market.Name, market.Value as JObject)
+                 market => (Market)CoinsEMarket.Parse(market.Name, market.Value as JObject)
              ).ToList();
         }
 

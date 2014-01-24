@@ -189,16 +189,9 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public override async Task<List<Market>> GetMarkets()
         {
-            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
-
-            foreach (VircurexCurrency currency in await this.GetCoins())
-            {
-                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
-            }
-
             JObject marketsJson = await CallPublic(Method.get_info_for_currency);
 
-            return VircurexMarket.ParseMarkets(currencyShortCodeToLabel, marketsJson);
+            return VircurexMarket.ParseMarkets(marketsJson);
         }
 
         public override async Task<Book> GetMarketOrders(MarketId marketId)

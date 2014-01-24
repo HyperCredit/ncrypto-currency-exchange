@@ -12,19 +12,6 @@ namespace Lostics.NCryptoExchange
     [TestClass]
     public class VircurexTest
     {
-        private Dictionary<string, string> GetCurrencyShortCodesToLabelMapping()
-        {
-            JObject currenciesJson = LoadTestDataObject("get_currency_info.json");
-            List<VircurexCurrency> currencies = VircurexCurrency.Parse(currenciesJson);
-            Dictionary<string, string> currencyShortCodeToLabel = new Dictionary<string, string>();
-
-            foreach (VircurexCurrency currency in currencies)
-            {
-                currencyShortCodeToLabel.Add(currency.CurrencyCode, currency.Label);
-            }
-            return currencyShortCodeToLabel;
-        }
-
         [TestMethod]
         public void TestBuildPublicUrl()
         {
@@ -53,15 +40,13 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketData()
         {
-            Dictionary<string, string> currencyShortCodeToLabel = GetCurrencyShortCodesToLabelMapping();
             JObject marketsJson = LoadTestDataObject("get_info_for_currency.json");
-            List<Market> markets = VircurexMarket.ParseMarkets(currencyShortCodeToLabel, marketsJson);
+            List<Market> markets = VircurexMarket.ParseMarkets(marketsJson);
 
             Assert.AreEqual(342, markets.Count);
 
             Assert.AreEqual(markets[0].Label, "ANC/BTC");
             Assert.AreEqual(markets[0].BaseCurrencyCode, "ANC");
-            Assert.AreEqual(markets[0].BaseCurrencyName, "Anoncoin");
             Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)301.90826656);
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
         }

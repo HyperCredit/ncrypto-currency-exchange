@@ -7,27 +7,12 @@ namespace Lostics.NCryptoExchange.Model
     /// </summary>
     public abstract class Market
     {
-        public Market(MarketId setMarketId, string baseCurrencyCode, string baseCurrencyName,
-            string quoteCurrencyCode, string quoteCurrencyName, string label,
+        public Market(MarketId setMarketId, string baseCurrencyCode, string quoteCurrencyCode, string label,
             MarketStatistics statistics)
         {
             this.MarketId = setMarketId;
             this.BaseCurrencyCode = baseCurrencyCode;
-            this.BaseCurrencyName = baseCurrencyName;
             this.QuoteCurrencyCode = quoteCurrencyCode;
-            this.QuoteCurrencyName = quoteCurrencyName;
-            this.Label = label;
-            this.Statistics = statistics;
-        }
-
-        public Market(MarketId setMarketId, string baseCurrencyCode, string quoteCurrencyCode,
-            string label, MarketStatistics statistics)
-        {
-            this.MarketId = setMarketId;
-            this.BaseCurrencyCode = baseCurrencyCode;
-            this.BaseCurrencyName = null;
-            this.QuoteCurrencyCode = quoteCurrencyCode;
-            this.QuoteCurrencyName = null;
             this.Label = label;
             this.Statistics = statistics;
         }
@@ -60,9 +45,7 @@ namespace Lostics.NCryptoExchange.Model
 
         public MarketId MarketId { get; private set; }
         public string BaseCurrencyCode { get; private set; }
-        public string BaseCurrencyName { get; private set; }
         public string QuoteCurrencyCode { get; private set; }
-        public string QuoteCurrencyName { get; private set; }
         public string Label { get; private set; }
         public MarketStatistics Statistics { get; private set; }
     }

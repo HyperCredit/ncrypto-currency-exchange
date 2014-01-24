@@ -17,7 +17,7 @@ namespace Lostics.NCryptoExchange
         {
             string url = BterExchange.BuildPublicUrl(BterExchange.Method.pairs);
 
-            Assert.AreEqual("http://data.bter.com/api/1/pairs", url);
+            Assert.AreEqual("http://bter.com/api/1/pairs", url);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace Lostics.NCryptoExchange
             JObject marketsJson = LoadTestDataObject("tickers.json");
             List<Market> markets = BterMarket.ParseMarkets(marketsJson);
 
-            Assert.AreEqual(76, markets.Count);
+            Assert.AreEqual(75, markets.Count);
 
             Assert.AreEqual(markets[0].Label, "btc_cny");
             Assert.AreEqual(markets[0].BaseCurrencyCode, "BTC");

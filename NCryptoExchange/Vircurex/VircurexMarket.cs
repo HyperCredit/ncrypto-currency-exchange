@@ -9,16 +9,13 @@ namespace Lostics.NCryptoExchange.Vircurex
 {
     public class VircurexMarket : Market
     {
-        public VircurexMarket(VircurexMarketId id, string baseCurrencyCode, string baseCurrencyName,
-            string quoteCurrencyCode, string quoteCurrencyName,
+        public VircurexMarket(VircurexMarketId id, string baseCurrencyCode, string quoteCurrencyCode,
             MarketStatistics statistics)
-            : base(id, baseCurrencyCode, baseCurrencyName, quoteCurrencyCode, quoteCurrencyName,
-                id.ToString(), statistics)
+            : base(id, baseCurrencyCode, quoteCurrencyCode, id.ToString(), statistics)
         {
         }
 
-        public static List<Market> ParseMarkets(Dictionary<string, string> currencyShortCodeToLabel,
-            JObject marketsJson)
+        public static List<Market> ParseMarkets(JObject marketsJson)
         {
             List<Market> markets = new List<Market>();
 
@@ -31,7 +28,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 {
                     foreach (JProperty quoteProperty in quoteCurrencies.Properties())
                     {
-                        markets.Add(VircurexMarket.Parse(currencyShortCodeToLabel, baseCurrency, quoteProperty));
+                        markets.Add(VircurexMarket.Parse(baseCurrency, quoteProperty));
                     }
                 }
             }
@@ -45,8 +42,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="currencyShortCodeToLabel">A mapping from coin short codes to human readable labels</param>
         /// <param name="marketObj">The JSON object representing a market</param>
         /// <returns></returns>
-        public static VircurexMarket Parse(Dictionary<string, string> currencyShortCodeToLabel,
-            string baseCurrencyCode, JProperty marketProperty)
+        public static VircurexMarket Parse(string baseCurrencyCode, JProperty marketProperty)
         {
             JObject marketJson = (JObject)marketProperty.Value;
             MarketStatistics marketStats = new MarketStatistics()
@@ -57,11 +53,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             string quoteCurrencyCode = marketProperty.Name;
             VircurexMarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
 
-            return new VircurexMarket(marketId,
-                baseCurrencyCode, currencyShortCodeToLabel[baseCurrencyCode],
-                quoteCurrencyCode, currencyShortCodeToLabel[quoteCurrencyCode],
-                marketStats
-            );
+            return new VircurexMarket(marketId, baseCurrencyCode, quoteCurrencyCode, marketStats);
         }
     }
 }
