@@ -104,12 +104,6 @@ namespace Lostics.NCryptoExchange.Bter
             return BterMarket.ParseMarkets(marketsJson);
         }
 
-        public override async Task<Book> GetMarketOrders(MarketId marketId)
-        {
-            // TODO: Pull from default API
-            throw new NotImplementedException();
-        }
-
         public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             BterMarketId bterMarketId = (BterMarketId)marketId;
@@ -118,7 +112,7 @@ namespace Lostics.NCryptoExchange.Bter
                 await CallPublic<JObject>(Method.trade, bterMarketId));
         }
 
-        public override async Task<List<BterMarketId>> GetPairs()
+        public async Task<List<BterMarketId>> GetPairs()
         {
             JArray pairsJson = await CallPublic<JArray>(Method.tickers);
 

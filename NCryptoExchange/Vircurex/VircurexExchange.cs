@@ -194,14 +194,6 @@ namespace Lostics.NCryptoExchange.Vircurex
             return VircurexMarket.ParseMarkets(marketsJson);
         }
 
-        public override async Task<Book> GetMarketOrders(MarketId marketId)
-        {
-            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
-
-            return VircurexParsers.ParseMarketOrders(await CallPublic(Method.orderbook,
-                vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
-        }
-
         public async Task<Dictionary<MarketId, Book>> GetMarketOrdersAlt(string quoteCurrencyCode)
         {
             return VircurexParsers.ParseMarketOrdersAlt(quoteCurrencyCode,
@@ -239,9 +231,12 @@ namespace Lostics.NCryptoExchange.Vircurex
             throw new NotImplementedException();
         }
 
-        public override Task<Model.Book> GetMarketDepth(MarketId marketId)
+        public override async Task<Model.Book> GetMarketDepth(MarketId marketId)
         {
-            throw new NotImplementedException();
+            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
+
+            return VircurexParsers.ParseMarketOrders(await CallPublic(Method.orderbook,
+                vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
         }
 
         public override async Task CancelOrder(OrderId orderId)

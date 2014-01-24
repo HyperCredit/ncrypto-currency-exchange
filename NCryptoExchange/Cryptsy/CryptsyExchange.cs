@@ -244,7 +244,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return DateTime.Now.Ticks.ToString();
         }
 
-        public override async Task<Book> GetMarketOrders(MarketId marketId)
+        public async Task<Book> GetMarketOrders(MarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));

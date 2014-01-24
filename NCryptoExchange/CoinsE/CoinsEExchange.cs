@@ -304,15 +304,6 @@ namespace Lostics.NCryptoExchange.CoinsE
              ).ToList();
         }
 
-        public override async Task<Book> GetMarketOrders(MarketId marketId)
-        {
-            // Coins-E doesn't have an option to return detailed market orders, so we have to use
-            // market depth instead.
-            JObject responseJson = await CallPublic(this.GetMarketUrl(marketId) + MARKET_DEPTH_PATH);
-
-            return CoinsEParsers.ParseMarketDepth(responseJson.Value<JObject>("marketdepth"));
-        }
-
         public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             throw new NotImplementedException();
