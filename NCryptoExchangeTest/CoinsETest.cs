@@ -139,17 +139,7 @@ namespace Lostics.NCryptoExchange
 
         private JObject LoadTestData(string filename)
         {
-            string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Coins-E");
-            FileInfo fileName = new FileInfo(Path.Combine(testDataDir, filename));
-            JObject jsonObj;
-
-            using (StreamReader reader = new StreamReader(new FileStream(fileName.FullName, FileMode.Open)))
-            {
-                jsonObj = JObject.Parse(reader.ReadToEndAsync().Result);
-            }
-
-            return jsonObj;
+            return TestUtils.LoadTestData<JObject>("Coins-E", filename);
         }
     }
 }

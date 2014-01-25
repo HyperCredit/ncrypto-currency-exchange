@@ -23,7 +23,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketPairs()
         {
-            JArray pairsJson = LoadTestDataArray("pairs.json");
+            JArray pairsJson = LoadTestData<JArray>("pairs.json");
             List<BterMarketId> pairs = BterMarketId.ParsePairs(pairsJson);
 
             Assert.AreEqual(76, pairs.Count);
@@ -36,7 +36,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketData()
         {
-            JObject marketsJson = LoadTestDataObject("tickers.json");
+            JObject marketsJson = LoadTestData<JObject>("tickers.json");
             List<Market> markets = BterMarket.ParseMarkets(marketsJson);
 
             Assert.AreEqual(75, markets.Count);
@@ -78,26 +78,10 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(bids[0].Quantity, (decimal)2295316.39314516);
         } */
 
-        private JArray LoadTestDataArray(string filename)
+        private T LoadTestData<T>(string filename)
+            where T : JToken
         {
-            return JArray.Parse(LoadTestDataRaw(filename));
-        }
-
-        private JObject LoadTestDataObject(string filename)
-        {
-            return JObject.Parse(LoadTestDataRaw(filename));
-        }
-
-        private string LoadTestDataRaw(string filename)
-        {
-            string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Bter");
-            FileInfo fileName = new FileInfo(Path.Combine(testDataDir, filename));
-
-            using (StreamReader reader = new StreamReader(new FileStream(fileName.FullName, FileMode.Open)))
-            {
-                return reader.ReadToEndAsync().Result;
-            }
+            return TestUtils.LoadTestData<T>("Bter", filename);
         }
     }
 }

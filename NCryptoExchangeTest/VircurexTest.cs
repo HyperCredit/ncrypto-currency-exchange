@@ -24,7 +24,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseCoins()
         {
-            JObject jsonObj = LoadTestDataObject("get_currency_info.json");
+            JObject jsonObj = LoadTestData<JObject>("get_currency_info.json");
             List<VircurexCurrency> currencies = VircurexCurrency.Parse(jsonObj);
             
             Assert.AreEqual(19, currencies.Count);
@@ -40,7 +40,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketData()
         {
-            JObject marketsJson = LoadTestDataObject("get_info_for_currency.json");
+            JObject marketsJson = LoadTestData<JObject>("get_info_for_currency.json");
             List<Market> markets = VircurexMarket.ParseMarkets(marketsJson);
 
             Assert.AreEqual(342, markets.Count);
@@ -54,7 +54,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseMarketTrades()
         {
-            JArray tradesJson = LoadTestDataArray("trades.json");
+            JArray tradesJson = LoadTestData<JArray>("trades.json");
             VircurexMarketId marketId = new VircurexMarketId("DOGE", "BTC");
             List<MarketTrade> trades = VircurexParsers.ParseMarketTrades(marketId, tradesJson);
 
@@ -70,7 +70,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseOrderBook()
         {
-            JObject orderBookJson = LoadTestDataObject("orderbook.json");
+            JObject orderBookJson = LoadTestData<JObject>("orderbook.json");
             Book orderBook = VircurexParsers.ParseMarketOrders(orderBookJson);
             List<MarketDepth> asks = orderBook.Asks;
             List<MarketDepth> bids = orderBook.Bids;
@@ -85,7 +85,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseOrderBookAlt()
         {
-            JObject orderBookJson = LoadTestDataObject("orderbook_alt.json");
+            JObject orderBookJson = LoadTestData<JObject>("orderbook_alt.json");
             Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",
                 orderBookJson);
             Book orderBook = orderBooks[new VircurexMarketId("DGC", "BTC")];
@@ -98,26 +98,10 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(bids[0].Quantity, (decimal)3.63826735);
         }
 
-        private JArray LoadTestDataArray(string filename)
+        private T LoadTestData<T>(string filename)
+            where T : JToken
         {
-            return JArray.Parse(LoadTestDataRaw(filename));
-        }
-
-        private JObject LoadTestDataObject(string filename)
-        {
-            return JObject.Parse(LoadTestDataRaw(filename));
-        }
-
-        private string LoadTestDataRaw(string filename)
-        {
-            string testDir = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
-            string testDataDir = Path.Combine(Path.Combine(testDir, "Sample_Data"), "Vircurex");
-            FileInfo fileName = new FileInfo(Path.Combine(testDataDir, filename));
-
-            using (StreamReader reader = new StreamReader(new FileStream(fileName.FullName, FileMode.Open)))
-            {
-                return reader.ReadToEndAsync().Result;
-            }
+            return TestUtils.LoadTestData<T>("Vircurex", filename);
         }
     }
 }
