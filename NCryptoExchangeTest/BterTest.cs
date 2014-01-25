@@ -47,23 +47,26 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "CNY");
         }
 
-        /* [TestMethod]
+        [TestMethod]
         public void TestParseMarketTrades()
         {
-            JArray tradesJson = LoadTestDataArray("trades.json");
-            BterMarketId marketId = new BterMarketId("DOGE", "BTC");
-            List<MarketTrade> trades = BterParsers.ParseMarketTrades(marketId, tradesJson);
+            JObject tradesJson = LoadTestData<JObject>("history_doge_btc.json");
+            BterMarketId marketId = new BterMarketId("doge_btc");
+            List<MarketTrade> trades = BterMarketTrade.Parse(marketId, tradesJson);
 
-            Assert.AreEqual(1000, trades.Count);
-            Assert.AreEqual("1110350", trades[0].TradeId.ToString());
-            Assert.AreEqual(new DateTime(2014, 1, 3, 11, 14, 42), trades[0].DateTime);
-            Assert.AreEqual((decimal)1208.12173, trades[0].Quantity);
-            Assert.AreEqual((decimal)0.00000043, trades[0].Price);
+            Assert.AreEqual(40, trades.Count);
+            Assert.AreEqual("3797993", trades[0].TradeId.ToString());
+            Assert.AreEqual(new DateTime(2014, 1, 24, 22, 43, 46), trades[0].DateTime);
+            Assert.AreEqual((decimal)5000, trades[0].Quantity);
+            Assert.AreEqual((decimal)0.00000229, trades[0].Price);
 
-            Assert.AreEqual("1110352", trades[1].TradeId.ToString());
+            Assert.AreEqual("3797995", trades[1].TradeId.ToString());
+            Assert.AreEqual(new DateTime(2014, 1, 24, 22, 43, 56), trades[1].DateTime);
+            Assert.AreEqual((decimal)8215.336, trades[1].Quantity);
+            Assert.AreEqual((decimal)0.00000229, trades[1].Price);
         }
 
-        [TestMethod]
+        /* [TestMethod]
         public void TestParseOrderBook()
         {
             JObject orderBookJson = LoadTestDataObject("orderbook.json");

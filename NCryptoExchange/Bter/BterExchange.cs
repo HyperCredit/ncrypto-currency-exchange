@@ -108,7 +108,7 @@ namespace Lostics.NCryptoExchange.Bter
         {
             BterMarketId bterMarketId = (BterMarketId)marketId;
 
-            return BterParsers.ParseMarketTrades(marketId,
+            return BterMarketTrade.Parse(marketId,
                 await CallPublic<JObject>(Method.trade, bterMarketId));
         }
 
