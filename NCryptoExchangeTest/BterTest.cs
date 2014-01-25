@@ -66,20 +66,24 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual((decimal)0.00000229, trades[1].Price);
         }
 
-        /* [TestMethod]
+        [TestMethod]
         public void TestParseOrderBook()
         {
-            JObject orderBookJson = LoadTestDataObject("orderbook.json");
-            Book orderBook = BterParsers.ParseMarketOrders(orderBookJson);
+            JObject orderBookJson = LoadTestData<JObject>("depth_doge_btc.json");
+            Book orderBook = BterParsers.ParseOrderBook(orderBookJson);
             List<MarketDepth> asks = orderBook.Asks;
             List<MarketDepth> bids = orderBook.Bids;
 
-            Assert.AreEqual(asks[0].Price, (decimal)0.00000038);
-            Assert.AreEqual(asks[0].Quantity, (decimal)156510.61595001);
+            Assert.AreEqual(asks[0].Price, (decimal)0.00000238);
+            Assert.AreEqual(asks[0].Quantity, (decimal)220397.66873897);
+            Assert.AreEqual(asks[1].Price, (decimal)0.00000237);
+            Assert.AreEqual(asks[1].Quantity, (decimal)2833885.131);
 
-            Assert.AreEqual(bids[0].Price, (decimal)0.00000037);
-            Assert.AreEqual(bids[0].Quantity, (decimal)2295316.39314516);
-        } */
+            Assert.AreEqual(bids[0].Price, (decimal)0.00000228);
+            Assert.AreEqual(bids[0].Quantity, (decimal)69517.54691671);
+            Assert.AreEqual(bids[1].Price, (decimal)0.00000227);
+            Assert.AreEqual(bids[1].Quantity, (decimal)540711.166);
+        }
 
         private T LoadTestData<T>(string filename)
             where T : JToken

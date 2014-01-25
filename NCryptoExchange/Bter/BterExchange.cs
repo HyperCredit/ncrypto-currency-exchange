@@ -134,9 +134,11 @@ namespace Lostics.NCryptoExchange.Bter
             throw new NotImplementedException();
         }
 
-        public override Task<Model.Book> GetMarketDepth(MarketId marketId)
+        public override async Task<Model.Book> GetMarketDepth(MarketId marketId)
         {
-            throw new NotImplementedException();
+            BterMarketId bterMarketId = (BterMarketId)marketId;
+
+            return BterParsers.ParseOrderBook(await CallPublic<JObject>(Method.depth, bterMarketId));
         }
 
         public override async Task CancelOrder(OrderId orderId)

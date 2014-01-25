@@ -71,7 +71,7 @@ namespace Lostics.NCryptoExchange
         public void TestParseOrderBook()
         {
             JObject orderBookJson = LoadTestData<JObject>("orderbook.json");
-            Book orderBook = VircurexParsers.ParseMarketOrders(orderBookJson);
+            Book orderBook = VircurexParsers.ParseOrderBook(orderBookJson);
             List<MarketDepth> asks = orderBook.Asks;
             List<MarketDepth> bids = orderBook.Bids;
 

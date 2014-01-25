@@ -235,7 +235,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
 
-            return VircurexParsers.ParseMarketOrders(await CallPublic(Method.orderbook,
+            return VircurexParsers.ParseOrderBook(await CallPublic(Method.orderbook,
                 vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
         }
 

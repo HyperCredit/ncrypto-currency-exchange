@@ -22,7 +22,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
         }
 
-        public static Book ParseMarketOrders(JObject bookJson)
+        public static Book ParseOrderBook(JObject bookJson)
         {
             JArray asksArray = bookJson.Value<JArray>("asks");
             JArray bidsArray = bookJson.Value<JArray>("bids");
@@ -52,7 +52,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 if (null != bookJson)
                 {
                     MarketId marketId = new VircurexMarketId(baseCurrencyCode, quoteCurrencyCode);
-                    marketOrders[marketId] = ParseMarketOrders(bookJson);
+                    marketOrders[marketId] = ParseOrderBook(bookJson);
                 }
             }
 
