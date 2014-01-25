@@ -48,6 +48,5 @@ namespace Lostics.NCryptoExchange.Bter
         }
 
         public OrderType TradeType { get; private set; }
-        public decimal Fee { get; private set; }
     }
 }

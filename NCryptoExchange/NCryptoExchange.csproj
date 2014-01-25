@@ -54,6 +54,16 @@
     <Compile Include="Bter\BterResponseException.cs" />
     <Compile Include="Bter\BterTradeId.cs" />
     <Compile Include="Bter\BterMarketTrade.cs" />
+    <Compile Include="CoinEx\CoinExException.cs" />
+    <Compile Include="CoinEx\CoinExExchange.cs" />
+    <Compile Include="CoinEx\CoinExMarket.cs" />
+    <Compile Include="CoinEx\CoinExMarketId.cs" />
+    <Compile Include="CoinEx\CoinExMarketTrade.cs" />
+    <Compile Include="CoinEx\CoinExOrderId.cs" />
+    <Compile Include="CoinEx\CoinExParsers.cs" />
+    <Compile Include="CoinEx\CoinExResponseException.cs" />
+    <Compile Include="CoinEx\CoinExTradeId.cs" />
+    <Compile Include="CoinEx\CoinExCurrency.cs" />
     <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="ICoinDataSource.cs" />
