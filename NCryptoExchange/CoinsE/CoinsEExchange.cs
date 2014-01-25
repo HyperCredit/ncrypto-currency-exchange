@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange.CoinsE
     /// 
     /// To use, requires a public and private key.
     /// </summary>
-    public class CoinsEExchange : AbstractExchange
+    public class CoinsEExchange : AbstractExchange, ICoinDataSource<CoinsECurrency>
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";

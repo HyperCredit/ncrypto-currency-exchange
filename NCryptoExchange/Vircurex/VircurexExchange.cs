@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : AbstractExchange
+    public class VircurexExchange : AbstractExchange, ICoinDataSource<VircurexCurrency>
     {
         public const string DEFAULT_BASE_URL = "https://vircurex.com/api/";
 
