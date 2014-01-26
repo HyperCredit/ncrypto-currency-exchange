@@ -7,6 +7,7 @@ namespace Lostics.NCryptoExchange.Model
         public MarketOrder(OrderType orderType, decimal price, decimal quantity)
             : base (price, quantity)
         {
+            this.OrderType = orderType;
         }
 
         public int CompareTo(Order other)

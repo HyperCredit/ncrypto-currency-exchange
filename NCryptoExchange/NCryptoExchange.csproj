@@ -64,6 +64,7 @@
     <Compile Include="CoinEx\CoinExResponseException.cs" />
     <Compile Include="CoinEx\CoinExTradeId.cs" />
     <Compile Include="CoinEx\CoinExCurrency.cs" />
+    <Compile Include="CoinEx\CoinExMarketOrder.cs" />
     <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="ICoinDataSource.cs" />
