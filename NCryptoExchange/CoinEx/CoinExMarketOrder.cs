@@ -26,7 +26,7 @@ namespace Lostics.NCryptoExchange.CoinEx
                 : OrderType.Sell;
 
             return new CoinExMarketOrder(orderId, orderType,
-                (orderJson.Value<int>("rate") * CoinExExchange.PRICE_UNIT), orderJson.Value<decimal>("amount"),
+                (orderJson.Value<long>("rate") * CoinExExchange.PRICE_UNIT), orderJson.Value<decimal>("amount"),
                 orderJson.Value<decimal>("filled"), orderJson.Value<DateTime>("created_at"),
                 orderJson.Value<DateTime>("updated_at"));
         }

@@ -32,7 +32,7 @@ namespace Lostics.NCryptoExchange.CoinEx
             }
 
             return new CoinExMarketTrade(new CoinExTradeId(trade.Value<int>("id")), orderType,
-                trade.Value<DateTime>("created_at"), trade.Value<decimal>("rate"),
+                trade.Value<DateTime>("created_at"), trade.Value<long>("rate") * CoinExExchange.PRICE_UNIT,
                 trade.Value<decimal>("amount"), marketId);
         }
 
