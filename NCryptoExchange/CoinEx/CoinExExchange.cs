@@ -112,8 +112,15 @@ namespace Lostics.NCryptoExchange.CoinEx
                 }
             }
 
-            return new Book(MarketDepth.DictionaryToList(askSide),
-                MarketDepth.DictionaryToList(bidSide));
+            List<MarketDepth> bids = MarketDepth.DictionaryToList(bidSide);
+            List<MarketDepth> asks = MarketDepth.DictionaryToList(askSide);
+            
+            // Flip the asks to put lowest first
+            asks.Reverse();
+
+
+            return new Book(asks,
+                bids);
         }
 
         public override void Dispose()

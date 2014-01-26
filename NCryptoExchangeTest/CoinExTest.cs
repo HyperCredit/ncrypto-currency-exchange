@@ -135,7 +135,15 @@ namespace Lostics.NCryptoExchange
                 .Select(order => CoinExMarketOrder.Parse((JObject)order)).ToList();
             Book depth = CoinExExchange.ConsolidateOpenOrders(orders);
 
-            // TODO: test the result
+            Assert.AreEqual(151, depth.Bids[0].Price);
+            Assert.AreEqual(2000000000000, depth.Bids[0].Quantity);
+            Assert.AreEqual(142, depth.Bids[1].Price);
+            Assert.AreEqual(2158124408387, depth.Bids[1].Quantity);
+
+            Assert.AreEqual(238, depth.Asks[0].Price);
+            Assert.AreEqual(411158132000, depth.Asks[0].Quantity);
+            Assert.AreEqual(250, depth.Asks[1].Price);
+            Assert.AreEqual(299600000000, depth.Asks[1].Quantity);
         }
 
         [TestMethod]

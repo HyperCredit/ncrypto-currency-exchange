@@ -31,10 +31,8 @@ namespace Lostics.NCryptoExchange.Model
             else
             {
                 return priceDifference < 0
-                    ? -1
-                    : priceDifference > 0
-                        ? 1
-                        : 0;
+                    ? 1
+                    : -1;
             }
         }
 
