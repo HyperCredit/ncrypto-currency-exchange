@@ -106,17 +106,22 @@ namespace Lostics.NCryptoExchange.CoinEx
 
         public override async Task<List<Market>> GetMarkets()
         {
-            JObject pairsJson = await CallPublic<JObject>(Method.trade_pairs);
+            JObject jsonObj = await CallPublic<JObject>(Method.trade_pairs);
 
-            return CoinExMarket.Parse(pairsJson.Value<JArray>("trade_pairs"));
+            JArray marketsJson = jsonObj.Value<JArray>("trade_pairs");
+            return marketsJson.Select(
+                market => (Market)CoinExMarket.Parse((JObject)market)
+            ).ToList();
         }
 
         public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             CoinExMarketId CoinExMarketId = (CoinExMarketId)marketId;
+            JObject jsonObj = await CallPublic<JObject>(Method.trades, CoinExMarketId);
 
-            return CoinExMarketTrade.Parse(marketId,
-                await CallPublic<JObject>(Method.trades, CoinExMarketId));
+            return jsonObj.Value<JArray>("trades").Select(
+                marketTrade => (MarketTrade)CoinExMarketTrade.Parse(marketId, (JObject)marketTrade)
+            ).ToList();
         }
 
         public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)

@@ -18,14 +18,7 @@ namespace Lostics.NCryptoExchange.CoinEx
             this.TradeType = tradeType;
         }
 
-        public static List<MarketTrade> Parse(MarketId marketId, JObject tradesJson)
-        {
-            return tradesJson.Value<JArray>("data").Select(
-                trade => (MarketTrade)ParseSingle(marketId, (JObject)trade)
-            ).ToList();
-        }
-
-        internal static CoinExMarketTrade ParseSingle(MarketId marketId, JObject trade)
+        public static CoinExMarketTrade Parse(MarketId marketId, JObject trade)
         {
             OrderType orderType;
 

@@ -15,35 +15,26 @@ namespace Lostics.NCryptoExchange.CoinEx
         {
         }
 
-        public static List<Market> Parse(JArray marketsJson)
+        public static CoinExMarket Parse(JObject marketJson)
         {
-            List<Market> markets = new List<Market>(marketsJson.Count);
+            CoinExMarketId marketId = new CoinExMarketId(marketJson.Value<int>("id"), marketJson.Value<string>("url_slug"));
 
-            foreach (JObject marketJson in marketsJson)
+            MarketStatistics marketStats = new MarketStatistics()
             {
-                CoinExMarketId marketId = new CoinExMarketId(marketJson.Value<int>("id"), marketJson.Value<string>("url_slug"));
+                HighTrade = marketJson.Value<decimal>("rate_max"),
+                LastTrade = marketJson.Value<decimal>("last_price"),
+                LowTrade = marketJson.Value<decimal>("rate_min"),
+                Volume24HBase = marketJson.Value<decimal>("market_volume")
+            };
 
-                MarketStatistics marketStats = new MarketStatistics()
-                {
-                    HighTrade = marketJson.Value<decimal>("rate_max"),
-                    LastTrade = marketJson.Value<decimal>("last_price"),
-                    LowTrade = marketJson.Value<decimal>("rate_min"),
-                    Volume24HBase = marketJson.Value<decimal>("market_volume")
-                };
-
-                markets.Add(
-                    new CoinExMarket(marketId, marketId.UrlSlug, marketStats)
-                    {
-                        BaseId = marketJson.Value<int>("market_id"),
-                        QuoteId = marketJson.Value<int>("currency_id"),
-                        BuyFee = marketJson.Value<decimal>("buy_fee"),
-                        SellFee = marketJson.Value<decimal>("sell_fee"),
-                        UpdatedAt = marketJson.Value<DateTime>("updated_at")
-                    }
-                );
-            }
-
-            return markets;
+            return new CoinExMarket(marketId, marketId.UrlSlug, marketStats)
+            {
+                BaseId = marketJson.Value<int>("market_id"),
+                QuoteId = marketJson.Value<int>("currency_id"),
+                BuyFee = marketJson.Value<decimal>("buy_fee"),
+                SellFee = marketJson.Value<decimal>("sell_fee"),
+                UpdatedAt = marketJson.Value<DateTime>("updated_at")
+            };
         }
 
         public int BaseId { get; set; }

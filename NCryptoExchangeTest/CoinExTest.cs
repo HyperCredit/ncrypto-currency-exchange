@@ -39,9 +39,9 @@ namespace Lostics.NCryptoExchange
         } */
 
         [TestMethod]
-        public void TestParseCoins()
+        public void TestParseCoinExCurrencies()
         {
-            JObject jsonObj = LoadTestData("coins.json");
+            JObject jsonObj = LoadTestData("currencies.json");
             List<CoinExCurrency> coins = jsonObj.Value<JArray>("currencies").Select(
                 coin => CoinExCurrency.Parse(coin as JObject)
             ).ToList();
@@ -53,24 +53,29 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual("LuckyCoin", coins[1].Label);
         }
 
-        /* [TestMethod]
-        public void TestParseMarketData()
+        [TestMethod]
+        public void TestParseCoinExMarketData()
         {
-            JObject jsonObj = LoadTestData("market_data.json");
-            JObject marketsJson = jsonObj.Value<JObject>("markets");
-            List<CoinExMarket> markets = marketsJson.Properties().Select(
-                market => CoinExMarket.Parse("RED_BTC", market.Value as JObject)
+            JObject jsonObj = LoadTestData("trade_pairs.json");
+            JArray marketsJson = jsonObj.Value<JArray>("trade_pairs");
+            List<CoinExMarket> markets = marketsJson.Select(
+                market => CoinExMarket.Parse((JObject)market)
             ).ToList();
 
-            Assert.AreEqual(1, markets.Count);
+            Assert.AreEqual(70, markets.Count);
 
-            Assert.AreEqual(markets[0].Label, "RED_BTC");
-            Assert.AreEqual(markets[0].BaseCurrencyCode, "RED");
-            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)6396.70000000);
+            Assert.AreEqual(markets[0].Label, "phs_btc");
+            Assert.AreEqual(markets[0].BaseCurrencyCode, "PHS");
+            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)56747538);
             Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+
+            Assert.AreEqual(markets[1].Label, "mnc_btc");
+            Assert.AreEqual(markets[1].BaseCurrencyCode, "MNC");
+            Assert.AreEqual(markets[1].Statistics.Volume24HBase, (decimal)3028885);
+            Assert.AreEqual(markets[1].QuoteCurrencyCode, "BTC");
         }
 
-        [TestMethod]
+        /* [TestMethod]
         public void TestParseListOrders()
         {
             JObject jsonObj = LoadTestData("list_orders.json");
@@ -119,23 +124,25 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual((decimal)0.12230000, highestBuyOrder.Price);
             Assert.AreEqual((decimal)11.00000000, highestBuyOrder.Quantity);
             Assert.AreEqual((decimal)16.40500000, highestBuyOrder.CummulativeQuantity);
-        }
+        } */
 
         [TestMethod]
-        public void TestParseRecentTrades()
+        public void TestParseCoinExRecentTrades()
         {
-            JObject jsonObj = LoadTestData("recent_trades.json");
+            CoinExMarketId marketId = new CoinExMarketId(46, "doge_btc");
+            JObject jsonObj = LoadTestData("market_trades.json");
             List<CoinExMarketTrade> trades = jsonObj.Value<JArray>("trades").Select(
-                marketTrade => CoinExMarketTrade.Parse(marketTrade as JObject)
+                marketTrade => CoinExMarketTrade.Parse(marketId, marketTrade as JObject)
             ).ToList();
 
-            Assert.AreEqual(2, trades.Count);
-            Assert.AreEqual("0.76124500/5909462682435584-1.52249000/6402043891679232", trades[0].TradeId.ToString());
-            Assert.AreEqual("WDC_BTC", trades[0].MarketId.ToString());
-            Assert.AreEqual((decimal)2.45600000, trades[0].Quantity);
-            Assert.AreEqual((decimal)1.52249000, trades[0].Price);
-            Assert.AreEqual("2.19643500/5205775240658944-2.28373500/4994669008125952", trades[1].TradeId.ToString());
-        } */
+            Assert.AreEqual(50, trades.Count);
+            Assert.AreEqual("384409", trades[0].TradeId.ToString());
+            Assert.AreEqual((decimal)250000000000, trades[0].Quantity);
+            Assert.AreEqual((decimal)220, trades[0].Price);
+
+            Assert.AreEqual((decimal)1303931062, trades[1].Quantity);
+            Assert.AreEqual((decimal)219, trades[1].Price);
+        }
 
         private JObject LoadTestData(string filename)
         {

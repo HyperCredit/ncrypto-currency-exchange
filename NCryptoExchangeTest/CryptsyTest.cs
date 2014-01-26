@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange
     public class CryptsyTest
     {
         [TestMethod]
-        public void TestParseAccountInfo()
+        public void TestParseCryptsyAccountInfo()
         {
             JObject jsonObj = LoadTestData("accountinfo.json");
             CryptsyAccountInfo accountInfo = CryptsyAccountInfo.Parse(jsonObj.Value<JObject>("return"));
@@ -32,7 +32,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarkets()
+        public void TestParseCryptsyMarkets()
         {
             JObject jsonObj = LoadTestData("getmarkets.json");
             TimeZoneInfo defaultTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
@@ -56,7 +56,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketOrders()
+        public void TestParseCryptsyMarketOrders()
         {
             JObject jsonObj = LoadTestData("getmarketorders.json");
             Book marketOrders = CryptsyParsers.ParseMarketOrders(jsonObj.Value<JObject>("return"));
@@ -68,7 +68,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketTrades()
+        public void TestParseCryptsyMarketTrades()
         {
             JObject jsonObj = LoadTestData("getmarkettrades.json");
             CryptsyMarketId marketId = new CryptsyMarketId("1");
@@ -86,7 +86,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMyTrades()
+        public void TestParseCryptsyMyTrades()
         {
             JObject jsonObj = LoadTestData("getmytrades.json");
             CryptsyMarketId marketId = new CryptsyMarketId("132");

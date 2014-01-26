@@ -13,7 +13,7 @@ namespace Lostics.NCryptoExchange
     public class BterTest
     {
         [TestMethod]
-        public void TestBuildPublicUrl()
+        public void TestBuildBterPublicUrl()
         {
             string url = BterExchange.BuildPublicUrl(BterExchange.Method.pairs);
 
@@ -21,7 +21,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketPairs()
+        public void TestParseBterMarketPairs()
         {
             JArray pairsJson = LoadTestData<JArray>("pairs.json");
             List<BterMarketId> pairs = BterMarketId.ParsePairs(pairsJson);
@@ -34,7 +34,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketData()
+        public void TestParseBterMarketData()
         {
             JObject marketsJson = LoadTestData<JObject>("tickers.json");
             List<Market> markets = BterMarket.ParseMarkets(marketsJson);
@@ -48,7 +48,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketTrades()
+        public void TestParseBterMarketTrades()
         {
             JObject tradesJson = LoadTestData<JObject>("history_doge_btc.json");
             BterMarketId marketId = new BterMarketId("doge_btc");
@@ -67,7 +67,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseOrderBook()
+        public void TestParseBterOrderBook()
         {
             JObject orderBookJson = LoadTestData<JObject>("depth_doge_btc.json");
             Book orderBook = BterParsers.ParseOrderBook(orderBookJson);

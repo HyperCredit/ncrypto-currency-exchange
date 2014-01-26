@@ -13,7 +13,7 @@ namespace Lostics.NCryptoExchange
     public class VircurexTest
     {
         [TestMethod]
-        public void TestBuildPublicUrl()
+        public void TestBuildVircurexPublicUrl()
         {
             string url = VircurexExchange.BuildPublicUrl(VircurexExchange.Method.orderbook,
                 VircurexExchange.Format.Json);
@@ -22,7 +22,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseCoins()
+        public void TestParseVircurexCoins()
         {
             JObject jsonObj = LoadTestData<JObject>("get_currency_info.json");
             List<VircurexCurrency> currencies = VircurexCurrency.Parse(jsonObj);
@@ -38,7 +38,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketData()
+        public void TestParseVircurexMarketData()
         {
             JObject marketsJson = LoadTestData<JObject>("get_info_for_currency.json");
             List<Market> markets = VircurexMarket.ParseMarkets(marketsJson);
@@ -52,7 +52,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketTrades()
+        public void TestParseVircurexMarketTrades()
         {
             JArray tradesJson = LoadTestData<JArray>("trades.json");
             VircurexMarketId marketId = new VircurexMarketId("DOGE", "BTC");
@@ -68,7 +68,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseOrderBook()
+        public void TestParseVircurexOrderBook()
         {
             JObject orderBookJson = LoadTestData<JObject>("orderbook.json");
             Book orderBook = VircurexParsers.ParseOrderBook(orderBookJson);
@@ -83,7 +83,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseOrderBookAlt()
+        public void TestParseVircurexOrderBookAlt()
         {
             JObject orderBookJson = LoadTestData<JObject>("orderbook_alt.json");
             Dictionary<MarketId, Book> orderBooks = VircurexParsers.ParseMarketOrdersAlt("BTC",

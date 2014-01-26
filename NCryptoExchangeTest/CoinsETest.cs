@@ -12,7 +12,7 @@ namespace Lostics.NCryptoExchange
     public class CoinsETest
     {
         [TestMethod]
-        public void TestParseAccountInfo()
+        public void TestParseCoinsEAccountInfo()
         {
             JObject jsonObj = LoadTestData("get_wallets.json");
             AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
@@ -29,7 +29,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseCancelOrder()
+        public void TestParseCoinsECancelOrder()
         {
             JObject jsonObj = LoadTestData("cancel_order.json");
             CoinsEMyOrder order = CoinsEMyOrder.Parse(jsonObj.Value<JObject>("order"));
@@ -39,7 +39,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseCoins()
+        public void TestParseCoinsECoins()
         {
             JObject jsonObj = LoadTestData("list_coins.json");
             List<CoinsECurrency> coins = jsonObj.Value<JArray>("coins").Select(
@@ -54,7 +54,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketData()
+        public void TestParseCoinsEMarketData()
         {
             JObject jsonObj = LoadTestData("market_data.json");
             JObject marketsJson = jsonObj.Value<JObject>("markets");
@@ -71,7 +71,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseListOrders()
+        public void TestParseCoinsEMyOrders()
         {
             JObject jsonObj = LoadTestData("list_orders.json");
             JArray ordersJson = jsonObj.Value<JArray>("orders");
@@ -87,7 +87,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseNewOrder()
+        public void TestParseCoinsENewOrder()
         {
             JObject jsonObj = LoadTestData("new_order.json");
             CoinsEMyOrder order = CoinsEMyOrder.Parse(jsonObj.Value<JObject>("order"));
@@ -100,7 +100,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseMarketDepth()
+        public void TestParseCoinsEMarketDepth()
         {
             JObject jsonObj = LoadTestData("depth.json");
             Book marketOrders = CoinsEParsers.ParseMarketDepth(jsonObj.Value<JObject>("marketdepth"));
@@ -122,7 +122,7 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
-        public void TestParseRecentTrades()
+        public void TestParseCoinsERecentTrades()
         {
             JObject jsonObj = LoadTestData("recent_trades.json");
             List<CoinsEMarketTrade> trades = jsonObj.Value<JArray>("trades").Select(
