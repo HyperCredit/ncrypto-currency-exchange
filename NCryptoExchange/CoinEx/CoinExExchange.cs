@@ -12,6 +12,7 @@ namespace Lostics.NCryptoExchange.CoinEx
 {
     public class CoinExExchange : AbstractExchange, ICoinDataSource<CoinExCurrency>
     {
+        public const decimal PRICE_UNIT = 0.00000001m;
         public const string DEFAULT_BASE_URL = "https://coinex.pw/api/v2/";
 
         private HttpClient client = new HttpClient();

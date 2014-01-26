@@ -21,9 +21,9 @@ namespace Lostics.NCryptoExchange.CoinEx
 
             MarketStatistics marketStats = new MarketStatistics()
             {
-                HighTrade = marketJson.Value<decimal>("rate_max"),
-                LastTrade = marketJson.Value<decimal>("last_price"),
-                LowTrade = marketJson.Value<decimal>("rate_min"),
+                HighTrade = marketJson.Value<long>("rate_max") * CoinExExchange.PRICE_UNIT,
+                LastTrade = marketJson.Value<long>("last_price") * CoinExExchange.PRICE_UNIT,
+                LowTrade = marketJson.Value<long>("rate_min") * CoinExExchange.PRICE_UNIT,
                 Volume24HBase = marketJson.Value<decimal>("market_volume")
             };
 

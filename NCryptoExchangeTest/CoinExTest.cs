@@ -64,15 +64,16 @@ namespace Lostics.NCryptoExchange
 
             Assert.AreEqual(70, markets.Count);
 
-            Assert.AreEqual(markets[0].Label, "phs_btc");
-            Assert.AreEqual(markets[0].BaseCurrencyCode, "PHS");
-            Assert.AreEqual(markets[0].Statistics.Volume24HBase, (decimal)56747538);
-            Assert.AreEqual(markets[0].QuoteCurrencyCode, "BTC");
+            Assert.AreEqual("phs_btc", markets[0].Label);
+            Assert.AreEqual("PHS", markets[0].BaseCurrencyCode);
+            Assert.AreEqual(0.00019901m, markets[0].Statistics.LowTrade);
+            Assert.AreEqual(56747538m, markets[0].Statistics.Volume24HBase);
+            Assert.AreEqual("BTC", markets[0].QuoteCurrencyCode);
 
-            Assert.AreEqual(markets[1].Label, "mnc_btc");
-            Assert.AreEqual(markets[1].BaseCurrencyCode, "MNC");
-            Assert.AreEqual(markets[1].Statistics.Volume24HBase, (decimal)3028885);
-            Assert.AreEqual(markets[1].QuoteCurrencyCode, "BTC");
+            Assert.AreEqual("mnc_btc", markets[1].Label);
+            Assert.AreEqual("MNC", markets[1].BaseCurrencyCode);
+            Assert.AreEqual(3028885m, markets[1].Statistics.Volume24HBase);
+            Assert.AreEqual("BTC", markets[1].QuoteCurrencyCode);
         }
 
         /* [TestMethod]
@@ -117,14 +118,14 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(202011, orders[0].OrderId.Value);
             Assert.AreEqual(OrderType.Sell, orders[0].OrderType);
             Assert.AreEqual(1300000000, orders[0].Quantity);
-            Assert.AreEqual(0, orders[0].Filled);
-            Assert.AreEqual(1000000, orders[0].Price);
+            Assert.AreEqual(0m, orders[0].Filled);
+            Assert.AreEqual(0.01000000m, orders[0].Price);
 
             Assert.AreEqual(202016, orders[1].OrderId.Value);
             Assert.AreEqual(OrderType.Sell, orders[1].OrderType);
             Assert.AreEqual(1500000000, orders[1].Quantity);
             Assert.AreEqual(0, orders[1].Filled);
-            Assert.AreEqual(10000000, orders[1].Price);
+            Assert.AreEqual(0.10000000m, orders[1].Price);
         }
 
         [TestMethod]
@@ -143,16 +144,16 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(2, depth.Bids.Count);
             Assert.AreEqual(3, depth.Asks.Count);
 
-            Assert.AreEqual(201, depth.Bids[0].Price);
+            Assert.AreEqual(0.00000201m, depth.Bids[0].Price);
             Assert.AreEqual(100, depth.Bids[0].Quantity);
-            Assert.AreEqual(200, depth.Bids[1].Price);
+            Assert.AreEqual(0.00000200m, depth.Bids[1].Price);
             Assert.AreEqual(100, depth.Bids[1].Quantity);
 
-            Assert.AreEqual(199, depth.Asks[0].Price); // Putting in a delibrately broken price here
+            Assert.AreEqual(0.00000199m, depth.Asks[0].Price); // Putting in a delibrately broken price here
             Assert.AreEqual(50, depth.Asks[0].Quantity);
-            Assert.AreEqual(202, depth.Asks[1].Price);
+            Assert.AreEqual(0.00000202m, depth.Asks[1].Price);
             Assert.AreEqual(200, depth.Asks[1].Quantity);
-            Assert.AreEqual(203, depth.Asks[2].Price);
+            Assert.AreEqual(0.00000203m, depth.Asks[2].Price);
             Assert.AreEqual(100, depth.Asks[2].Quantity);
         }
 
