@@ -130,27 +130,37 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestParseCoinExMarketDepth()
         {
-            JObject jsonObj = LoadTestData("orders.json");
+            JObject jsonObj = LoadTestData("orders_depth.json");
             List<CoinExMarketOrder> orders = jsonObj.Value<JArray>("orders")
                 .Select(order => CoinExMarketOrder.Parse((JObject)order)).ToList();
+
+            Assert.AreEqual(6, orders.Count);
+
             Book depth = CoinExExchange.ConsolidateOpenOrders(orders);
 
-            Assert.AreEqual(151, depth.Bids[0].Price);
-            Assert.AreEqual(2000000000000, depth.Bids[0].Quantity);
-            Assert.AreEqual(142, depth.Bids[1].Price);
-            Assert.AreEqual(2158124408387, depth.Bids[1].Quantity);
+            // Two trades on the ask side are the same, so the total depth
+            // is less than the total number of orders
+            Assert.AreEqual(2, depth.Bids.Count);
+            Assert.AreEqual(3, depth.Asks.Count);
 
-            Assert.AreEqual(238, depth.Asks[0].Price);
-            Assert.AreEqual(411158132000, depth.Asks[0].Quantity);
-            Assert.AreEqual(250, depth.Asks[1].Price);
-            Assert.AreEqual(299600000000, depth.Asks[1].Quantity);
+            Assert.AreEqual(201, depth.Bids[0].Price);
+            Assert.AreEqual(100, depth.Bids[0].Quantity);
+            Assert.AreEqual(200, depth.Bids[1].Price);
+            Assert.AreEqual(100, depth.Bids[1].Quantity);
+
+            Assert.AreEqual(199, depth.Asks[0].Price); // Putting in a delibrately broken price here
+            Assert.AreEqual(50, depth.Asks[0].Quantity);
+            Assert.AreEqual(202, depth.Asks[1].Price);
+            Assert.AreEqual(200, depth.Asks[1].Quantity);
+            Assert.AreEqual(203, depth.Asks[2].Price);
+            Assert.AreEqual(100, depth.Asks[2].Quantity);
         }
 
         [TestMethod]
         public void TestParseCoinExRecentTrades()
         {
             CoinExMarketId marketId = new CoinExMarketId(46, "doge_btc");
-            JObject jsonObj = LoadTestData("orders.json");
+            JObject jsonObj = LoadTestData("market_trades.json");
             List<CoinExMarketTrade> trades = jsonObj.Value<JArray>("trades").Select(
                 marketTrade => CoinExMarketTrade.Parse(marketId, marketTrade as JObject)
             ).ToList();
