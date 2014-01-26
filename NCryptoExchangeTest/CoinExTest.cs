@@ -127,27 +127,16 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(10000000, orders[1].Price);
         }
 
-        /* [TestMethod]
+        [TestMethod]
         public void TestParseCoinExMarketDepth()
         {
             JObject jsonObj = LoadTestData("orders.json");
-            Book marketOrders = CoinExParsers.ParseMarketDepth(jsonObj.Value<JObject>("marketdepth"));
+            List<CoinExMarketOrder> orders = jsonObj.Value<JArray>("orders")
+                .Select(order => CoinExMarketOrder.Parse((JObject)order)).ToList();
+            Book depth = CoinExExchange.ConsolidateOpenOrders(orders);
 
-            Assert.AreEqual(3, marketOrders.Bids.Count);
-            Assert.AreEqual(1, marketOrders.Asks.Count);
-
-            CoinExMarketDepth lowestSellOrder = (CoinExMarketDepth)marketOrders.Asks[0];
-
-            Assert.AreEqual((decimal)2.92858000, lowestSellOrder.Price);
-            Assert.AreEqual((decimal)8.98400000, lowestSellOrder.Quantity);
-            Assert.AreEqual((decimal)8.98400000, lowestSellOrder.CummulativeQuantity);
-
-            CoinExMarketDepth highestBuyOrder = (CoinExMarketDepth)marketOrders.Bids[2];
-
-            Assert.AreEqual((decimal)0.12230000, highestBuyOrder.Price);
-            Assert.AreEqual((decimal)11.00000000, highestBuyOrder.Quantity);
-            Assert.AreEqual((decimal)16.40500000, highestBuyOrder.CummulativeQuantity);
-        } */
+            // TODO: test the result
+        }
 
         [TestMethod]
         public void TestParseCoinExRecentTrades()

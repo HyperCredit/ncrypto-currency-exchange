@@ -8,6 +8,8 @@ namespace Lostics.NCryptoExchange.Model
 {
     public class Book
     {
+        // Considered storing this data as a pair of dictionaries, but for now
+        // am sticking how how the markets provide the raw data...
         public Book(List<MarketDepth> asks, List<MarketDepth> bids)
         {
             this.Asks = asks;

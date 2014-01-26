@@ -77,6 +77,45 @@ namespace Lostics.NCryptoExchange.CoinEx
             }
         }
 
+        /// <summary>
+        /// Convert the open order list into a more conventional order book.
+        /// </summary>
+        /// <param name="orders"></param>
+        /// <returns></returns>
+        public static Book ConsolidateOpenOrders(IEnumerable<CoinExMarketOrder> orders)
+        {
+            Dictionary<decimal, decimal> bidSide = new Dictionary<decimal,decimal>();
+            Dictionary<decimal, decimal> askSide = new Dictionary<decimal,decimal>();
+
+            foreach (CoinExMarketOrder order in orders) {
+                decimal price = order.Price;
+                decimal quantity = 0;
+
+                switch (order.OrderType)
+                {
+                    case OrderType.Buy:
+                        if (!bidSide.TryGetValue(price, out quantity))
+                        {
+                            quantity = 0;
+                        }
+                        quantity += order.Quantity;
+                        bidSide[price] = quantity;
+                        break;
+                    case OrderType.Sell:
+                        if (!askSide.TryGetValue(price, out quantity))
+                        {
+                            quantity = 0;
+                        }
+                        quantity += order.Quantity;
+                        askSide[price] = quantity;
+                        break;
+                }
+            }
+
+            return new Book(MarketDepth.DictionaryToList(askSide),
+                MarketDepth.DictionaryToList(bidSide));
+        }
+
         public override void Dispose()
         {
             client.Dispose();
@@ -124,26 +163,34 @@ namespace Lostics.NCryptoExchange.CoinEx
             ).ToList();
         }
 
-        public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)
+        public override async Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<List<Model.MyTrade>> GetAllMyTrades(int? limit)
+        public override async Task<List<MyTrade>> GetAllMyTrades(int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
+        public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<Model.Book> GetMarketDepth(MarketId marketId)
+        public override async Task<Book> GetMarketDepth(MarketId marketId)
+        {
+            List<CoinExMarketOrder> openOrders = await GetMarketOpenOrders(marketId);
+            return ConsolidateOpenOrders(openOrders.ToArray());
+        }
+
+        public async Task<List<CoinExMarketOrder>> GetMarketOpenOrders(MarketId marketId)
         {
             CoinExMarketId CoinExMarketId = (CoinExMarketId)marketId;
+            JObject jsonObj = await CallPublic<JObject>(Method.orders, CoinExMarketId);
 
-            return CoinExParsers.ParseOrderBook(await CallPublic<JObject>(Method.orders, CoinExMarketId));
+            return jsonObj.Value<JArray>("orders")
+                .Select(order => CoinExMarketOrder.Parse((JObject)order)).ToList();
         }
 
         public override async Task CancelOrder(OrderId orderId)
