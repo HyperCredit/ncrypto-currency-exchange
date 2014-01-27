@@ -1,0 +1,46 @@
+{
+    "status": "success",
+    "data": {
+        "date": 1390852468,
+        "opening_price": {
+            "precision": 5,
+            "value": "803.90000",
+            "value_int": 80390000
+        },
+        "closing_price": {
+            "precision": 5,
+            "value": "789.55550",
+            "value_int": 78955550
+        },
+        "units_traded": {
+            "precision": 8,
+            "value": "14.07009853",
+            "value_int": 1407009853
+        },
+        "max_price": {
+            "precision": 5,
+            "value": "804.75999",
+            "value_int": 80475999
+        },
+        "min_price": {
+            "precision": 5,
+            "value": "781.00000",
+            "value_int": 78100000
+        },
+        "average_price": {
+            "precision": 5,
+            "value": "797.12487",
+            "value_int": 79712487
+        },
+        "volume_1day": {
+            "precision": 8,
+            "value": "14.07009853",
+            "value_int": 1407009853
+        },
+        "volume_7day": {
+            "precision": 8,
+            "value": "491.55116930",
+            "value_int": 49155116930
+        }
+    }
+}

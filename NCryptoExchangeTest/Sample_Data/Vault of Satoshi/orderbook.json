@@ -1,0 +1,2412 @@
+{
+    "status": "success",
+    "data": {
+        "timestamp": 1390855909333326,
+        "order_currency": "BTC",
+        "payment_currency": "USD",
+        "bids": [
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "9.45894400",
+                    "value_int": 945894400
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "776.00",
+                    "value_int": 77600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "775.00",
+                    "value_int": 77500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.00000000",
+                    "value_int": 300000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "761.99",
+                    "value_int": 76199000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.30000000",
+                    "value_int": 130000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "760.00",
+                    "value_int": 76000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "11.19000000",
+                    "value_int": 1119000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "750.00",
+                    "value_int": 75000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "4.00000000",
+                    "value_int": 400000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "705.99",
+                    "value_int": 70599000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.35000000",
+                    "value_int": 35000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "705.00",
+                    "value_int": 70500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "20.25000000",
+                    "value_int": 2025000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "704.00",
+                    "value_int": 70400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "702.50",
+                    "value_int": 70250000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "4.00000000",
+                    "value_int": 400000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "702.00",
+                    "value_int": 70200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "701.00",
+                    "value_int": 70100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "13.21000000",
+                    "value_int": 1321000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "700.00",
+                    "value_int": 70000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "685.00",
+                    "value_int": 68500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "680.00",
+                    "value_int": 68000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "671.00",
+                    "value_int": 67100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "670.00",
+                    "value_int": 67000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "665.00",
+                    "value_int": 66500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "660.00",
+                    "value_int": 66000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "655.00",
+                    "value_int": 65500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "651.75",
+                    "value_int": 65175000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "651.00",
+                    "value_int": 65100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.40000000",
+                    "value_int": 40000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "650.00",
+                    "value_int": 65000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "645.60",
+                    "value_int": 64560000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "645.00",
+                    "value_int": 64500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "640.00",
+                    "value_int": 64000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "622.00",
+                    "value_int": 62200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "621.00",
+                    "value_int": 62100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.34000000",
+                    "value_int": 34000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "620.00",
+                    "value_int": 62000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.20927000",
+                    "value_int": 20927000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "615.00",
+                    "value_int": 61500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.60000000",
+                    "value_int": 60000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "604.00",
+                    "value_int": 60400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "602.75",
+                    "value_int": 60275000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "602.00",
+                    "value_int": 60200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "601.00",
+                    "value_int": 60100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "40.07000000",
+                    "value_int": 4007000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "600.00",
+                    "value_int": 60000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "593.00",
+                    "value_int": 59300000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "592.00",
+                    "value_int": 59200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "590.00",
+                    "value_int": 59000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "586.00",
+                    "value_int": 58600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.20000000",
+                    "value_int": 20000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "583.00",
+                    "value_int": 58300000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.22250000",
+                    "value_int": 22250000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "578.00",
+                    "value_int": 57800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "577.00",
+                    "value_int": 57700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.02000000",
+                    "value_int": 2000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "575.00",
+                    "value_int": 57500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "567.00",
+                    "value_int": 56700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.62000000",
+                    "value_int": 362000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "566.00",
+                    "value_int": 56600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "565.00",
+                    "value_int": 56500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "561.00",
+                    "value_int": 56100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "555.00",
+                    "value_int": 55500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "552.00",
+                    "value_int": 55200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "550.50",
+                    "value_int": 55050000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.40000000",
+                    "value_int": 40000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "550.48",
+                    "value_int": 55048000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "550.22",
+                    "value_int": 55022000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.42300000",
+                    "value_int": 42300000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "550.00",
+                    "value_int": 55000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "547.00",
+                    "value_int": 54700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "540.00",
+                    "value_int": 54000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "530.00",
+                    "value_int": 53000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.84000000",
+                    "value_int": 284000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "525.00",
+                    "value_int": 52500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "522.00",
+                    "value_int": 52200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "520.00",
+                    "value_int": 52000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.90000000",
+                    "value_int": 90000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "513.13",
+                    "value_int": 51313000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "510.00",
+                    "value_int": 51000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.06000000",
+                    "value_int": 6000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "507.00",
+                    "value_int": 50700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.15000000",
+                    "value_int": 15000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "504.00",
+                    "value_int": 50400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "6.75000000",
+                    "value_int": 675000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "500.00",
+                    "value_int": 50000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.44000000",
+                    "value_int": 144000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "490.00",
+                    "value_int": 49000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "480.00",
+                    "value_int": 48000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "470.00",
+                    "value_int": 47000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "460.30",
+                    "value_int": 46030000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "6.35000000",
+                    "value_int": 635000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "452.00",
+                    "value_int": 45200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.73000000",
+                    "value_int": 173000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "450.00",
+                    "value_int": 45000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.40000000",
+                    "value_int": 40000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "447.58",
+                    "value_int": 44758000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.60000000",
+                    "value_int": 60000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "444.44",
+                    "value_int": 44444000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "440.00",
+                    "value_int": 44000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.60000000",
+                    "value_int": 60000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "433.33",
+                    "value_int": 43333000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "430.00",
+                    "value_int": 43000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "423.12",
+                    "value_int": 42312000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "422.50",
+                    "value_int": 42250000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.20000000",
+                    "value_int": 20000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "420.10",
+                    "value_int": 42010000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "420.00",
+                    "value_int": 42000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "410.00",
+                    "value_int": 41000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.50000000",
+                    "value_int": 350000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "403.25",
+                    "value_int": 40325000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.45000000",
+                    "value_int": 245000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "400.00",
+                    "value_int": 40000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "390.00",
+                    "value_int": 39000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "384.90",
+                    "value_int": 38490000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.20000000",
+                    "value_int": 20000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "381.70",
+                    "value_int": 38170000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.37530435",
+                    "value_int": 237530435
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "380.00",
+                    "value_int": 38000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "370.00",
+                    "value_int": 37000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.75000000",
+                    "value_int": 75000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "360.00",
+                    "value_int": 36000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.87597331",
+                    "value_int": 187597331
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "355.00",
+                    "value_int": 35500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "350.00",
+                    "value_int": 35000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "346.02",
+                    "value_int": 34602000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.46328000",
+                    "value_int": 146328000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "340.00",
+                    "value_int": 34000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.03082000",
+                    "value_int": 203082000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "325.00",
+                    "value_int": 32500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "320.00",
+                    "value_int": 32000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "313.00",
+                    "value_int": 31300000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.60490000",
+                    "value_int": 160490000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "310.00",
+                    "value_int": 31000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "300.00",
+                    "value_int": 30000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.68650000",
+                    "value_int": 168650000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "295.00",
+                    "value_int": 29500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "5.00000000",
+                    "value_int": 500000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "286.00",
+                    "value_int": 28600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.77600000",
+                    "value_int": 277600000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "280.00",
+                    "value_int": 28000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.87740000",
+                    "value_int": 187740000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "265.00",
+                    "value_int": 26500000
+                }
+            }
+        ],
+        "asks": [
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "9.65879994",
+                    "value_int": 965879994
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "781.00",
+                    "value_int": 78100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.56728454",
+                    "value_int": 156728454
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "789.56",
+                    "value_int": 78956000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.38600000",
+                    "value_int": 1038600000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "790.00",
+                    "value_int": 79000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "19.93355000",
+                    "value_int": 1993355000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "794.00",
+                    "value_int": 79400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "794.56",
+                    "value_int": 79456000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "5.00000000",
+                    "value_int": 500000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "794.89",
+                    "value_int": 79489000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "794.99",
+                    "value_int": 79499000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "798.00",
+                    "value_int": 79800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "9.08345000",
+                    "value_int": 908345000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "801.00",
+                    "value_int": 80100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "802.00",
+                    "value_int": 80200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "802.90",
+                    "value_int": 80290000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.51380100",
+                    "value_int": 351380100
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "803.00",
+                    "value_int": 80300000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "24.87250000",
+                    "value_int": 2487250000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "804.00",
+                    "value_int": 80400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "4.29675140",
+                    "value_int": 429675140
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "804.76",
+                    "value_int": 80476000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "804.89",
+                    "value_int": 80489000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.00981233",
+                    "value_int": 981233
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "806.25",
+                    "value_int": 80625000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "807.53",
+                    "value_int": 80753000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.00000000",
+                    "value_int": 1000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "810.00",
+                    "value_int": 81000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "50.00000000",
+                    "value_int": 5000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "815.00",
+                    "value_int": 81500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "50.00000000",
+                    "value_int": 5000000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "820.00",
+                    "value_int": 82000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.06000000",
+                    "value_int": 6000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "825.00",
+                    "value_int": 82500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "829.00",
+                    "value_int": 82900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.21800000",
+                    "value_int": 21800000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "829.90",
+                    "value_int": 82990000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25960000",
+                    "value_int": 25960000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "830.00",
+                    "value_int": 83000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "834.00",
+                    "value_int": 83400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.03681122",
+                    "value_int": 3681122
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "836.56",
+                    "value_int": 83656000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.06000000",
+                    "value_int": 6000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "839.00",
+                    "value_int": 83900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.30000000",
+                    "value_int": 330000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "845.00",
+                    "value_int": 84500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "849.00",
+                    "value_int": 84900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.01594937",
+                    "value_int": 1594937
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "850.00",
+                    "value_int": 85000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.06069000",
+                    "value_int": 6069000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "857.50",
+                    "value_int": 85750000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "860.00",
+                    "value_int": 86000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "861.00",
+                    "value_int": 86100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "8.95000000",
+                    "value_int": 895000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "868.00",
+                    "value_int": 86800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "870.00",
+                    "value_int": 87000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "874.00",
+                    "value_int": 87400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.25000000",
+                    "value_int": 25000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "875.00",
+                    "value_int": 87500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.20000000",
+                    "value_int": 120000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "876.00",
+                    "value_int": 87600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "878.99",
+                    "value_int": 87899000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "879.60",
+                    "value_int": 87960000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "884.00",
+                    "value_int": 88400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "888.00",
+                    "value_int": 88800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "888.50",
+                    "value_int": 88850000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "891.00",
+                    "value_int": 89100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "894.00",
+                    "value_int": 89400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "895.00",
+                    "value_int": 89500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "897.00",
+                    "value_int": 89700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "898.00",
+                    "value_int": 89800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "3.00000000",
+                    "value_int": 300000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "899.00",
+                    "value_int": 89900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "35.10000000",
+                    "value_int": 3510000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "900.00",
+                    "value_int": 90000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "900.11",
+                    "value_int": 90011000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "904.99",
+                    "value_int": 90499000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "905.00",
+                    "value_int": 90500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.01000000",
+                    "value_int": 1000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "907.00",
+                    "value_int": 90700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "921.00",
+                    "value_int": 92100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "921.99",
+                    "value_int": 92199000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.03000000",
+                    "value_int": 3000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "927.00",
+                    "value_int": 92700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.37192813",
+                    "value_int": 37192813
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "934.00",
+                    "value_int": 93400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.14000000",
+                    "value_int": 14000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "935.00",
+                    "value_int": 93500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.50000000",
+                    "value_int": 150000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "939.00",
+                    "value_int": 93900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.99000000",
+                    "value_int": 99000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "942.00",
+                    "value_int": 94200000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "2.00000000",
+                    "value_int": 200000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "947.81",
+                    "value_int": 94781000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "949.00",
+                    "value_int": 94900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.00652001",
+                    "value_int": 652001
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "949.50",
+                    "value_int": 94950000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.32000000",
+                    "value_int": 32000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "950.00",
+                    "value_int": 95000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "951.00",
+                    "value_int": 95100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.75000000",
+                    "value_int": 75000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "955.13",
+                    "value_int": 95513000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "981.00",
+                    "value_int": 98100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.14490000",
+                    "value_int": 14490000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "985.00",
+                    "value_int": 98500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.70000000",
+                    "value_int": 70000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "988.00",
+                    "value_int": 98800000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.75000000",
+                    "value_int": 75000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "994.00",
+                    "value_int": 99400000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "995.00",
+                    "value_int": 99500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "995.80",
+                    "value_int": 99580000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "995.95",
+                    "value_int": 99595000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "23.95863703",
+                    "value_int": 2395863703
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "996.00",
+                    "value_int": 99600000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.01000000",
+                    "value_int": 1000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "997.00",
+                    "value_int": 99700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.02000000",
+                    "value_int": 2000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "999.00",
+                    "value_int": 99900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.31764074",
+                    "value_int": 1031764074
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1000.00",
+                    "value_int": 100000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1005.50",
+                    "value_int": 100550000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1049.95",
+                    "value_int": 104995000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "5.00000000",
+                    "value_int": 500000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1050.00",
+                    "value_int": 105000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.42000000",
+                    "value_int": 42000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1060.00",
+                    "value_int": 106000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.00000000",
+                    "value_int": 100000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1065.00",
+                    "value_int": 106500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1069.00",
+                    "value_int": 106900000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.15000000",
+                    "value_int": 115000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1070.00",
+                    "value_int": 107000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.30000000",
+                    "value_int": 30000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1085.00",
+                    "value_int": 108500000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "10.20900000",
+                    "value_int": 1020900000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1100.00",
+                    "value_int": 110000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1111.11",
+                    "value_int": 111111000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.05000000",
+                    "value_int": 5000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1117.00",
+                    "value_int": 111700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.70000000",
+                    "value_int": 70000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1141.00",
+                    "value_int": 114100000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "8.72000000",
+                    "value_int": 872000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1150.00",
+                    "value_int": 115000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "4.01000000",
+                    "value_int": 401000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1170.00",
+                    "value_int": 117000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1177.00",
+                    "value_int": 117700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.10000000",
+                    "value_int": 10000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1185.50",
+                    "value_int": 118550000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50000000",
+                    "value_int": 50000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1190.00",
+                    "value_int": 119000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.74399000",
+                    "value_int": 74399000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1193.00",
+                    "value_int": 119300000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.02000000",
+                    "value_int": 2000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1197.00",
+                    "value_int": 119700000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "1.04000000",
+                    "value_int": 104000000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1200.00",
+                    "value_int": 120000000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50203333",
+                    "value_int": 50203333
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1200.25",
+                    "value_int": 120025000
+                }
+            },
+            {
+                "quantity": {
+                    "precision": 8,
+                    "value": "0.50010000",
+                    "value_int": 50010000
+                },
+                "price": {
+                    "precision": 5,
+                    "value": "1203.00",
+                    "value_int": 120300000
+                }
+            }
+        ]
+    }
+}

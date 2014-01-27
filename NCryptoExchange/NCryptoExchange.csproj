@@ -129,6 +129,17 @@
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VaultOfSatoshi\VoSCurrency.cs" />
+    <Compile Include="VaultOfSatoshi\VoSException.cs" />
+    <Compile Include="VaultOfSatoshi\VoSExchange.cs" />
+    <Compile Include="VaultOfSatoshi\VoSMarket.cs" />
+    <Compile Include="VaultOfSatoshi\VoSMarketId.cs" />
+    <Compile Include="VaultOfSatoshi\VoSMarketOrder.cs" />
+    <Compile Include="VaultOfSatoshi\VoSMarketTrade.cs" />
+    <Compile Include="VaultOfSatoshi\VoSOrderId.cs" />
+    <Compile Include="VaultOfSatoshi\VoSParsers.cs" />
+    <Compile Include="VaultOfSatoshi\VoSResponseException.cs" />
+    <Compile Include="VaultOfSatoshi\VoSTradeId.cs" />
     <Compile Include="Vircurex\VircurexMarket.cs" />
     <Compile Include="Vircurex\VircurexCurrency.cs" />
     <Compile Include="Vircurex\VircurexException.cs" />
