@@ -5,26 +5,31 @@ using System.Collections.Generic;
 
 namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
-    public sealed class VoSMarketId : AbstractIntBasedId, MarketId
+    public sealed class VoSMarketId : AbstractStringBasedId, MarketId
     {
-        public VoSMarketId(int id, string urlSlug) : base(id)
+        public VoSMarketId(string baseCurrency, string quoteCurrency) : base(baseCurrency + "/" + quoteCurrency)
         {
-            string[] parts = urlSlug.Split(new[] { '_' });
-
-            if (parts.Length != 2)
-            {
-                throw new ArgumentException("Invalid market URL slug; expected two currency codes separated by the '_' character, but found \""
-                    + urlSlug + "\".");
-            }
-
-            this.BaseCurrencyCode = parts[0].ToUpper();
-            this.QuoteCurrencyCode = parts[1].ToUpper();
-
-            this.UrlSlug = urlSlug;
+            this.BaseCurrencyCode = baseCurrency;
+            this.QuoteCurrencyCode = quoteCurrency;
         }
 
         public string BaseCurrencyCode { get; private set; }
+        public string BaseCurrencyCodeParameter
+        {
+            get
+            {
+                return "order_currency" + "="
+                    + Uri.EscapeUriString(BaseCurrencyCode);
+            }
+        }
         public string QuoteCurrencyCode { get; private set; }
-        public string UrlSlug { get; private set; }
+        public string QuoteCurrencyCodeParameter
+        {
+            get
+            {
+                return "payment_currency" + "="
+                    + Uri.EscapeUriString(QuoteCurrencyCode);
+            }
+        }
     }
 }

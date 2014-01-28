@@ -12,8 +12,9 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
     public class VoSExchange : AbstractExchange, ICoinDataSource<VoSCurrency>
     {
-        public const decimal PRICE_UNIT = 0.00000001m;
-        public const string DEFAULT_BASE_URL = "https://coinex.pw/api/v2/";
+        public const string DEFAULT_BASE_URL = "https://api.vaultofsatoshi.com/";
+        public const string DEFAULT_PUBLIC_URL = DEFAULT_BASE_URL + "public/";
+        public const string DEFAULT_PRIVATE_URL = DEFAULT_BASE_URL + "info/";
 
         private HttpClient client = new HttpClient();
 
@@ -23,7 +24,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public static string BuildPublicUrl(Method method)
         {
-            return DEFAULT_BASE_URL + Enum.GetName(typeof(Method), method);
+            return DEFAULT_PUBLIC_URL + Enum.GetName(typeof(Method), method);
+        }
+
+        public static string BuildPrivateUrl(Method method)
+        {
+            return DEFAULT_PRIVATE_URL + Enum.GetName(typeof(Method), method);
         }
 
         /// <summary>
@@ -48,8 +54,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
             StringBuilder url = new StringBuilder(BuildPublicUrl(method));
 
-            url.Append("?tradePair=")
-                .Append(marketId.Value.ToString());
+            url.Append(marketId.ToUrlParameters());
 
             return (T)JToken.Parse(await CallPublic(url.ToString()));
         }
@@ -79,49 +84,55 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         }
 
         /// <summary>
-        /// Convert the open order list into a more conventional order book.
+        /// Make a call to a public (non-authenticated) API
         /// </summary>
-        /// <param name="orders"></param>
-        /// <returns></returns>
-        public static Book ConsolidateOpenOrders(IEnumerable<VoSMarketOrder> orders)
+        /// <param name="method">The method to call on the VoS API</param>
+        /// <returns>The raw JSON returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method)
+            where T : JToken
         {
-            Dictionary<decimal, decimal> bidSide = new Dictionary<decimal,decimal>();
-            Dictionary<decimal, decimal> askSide = new Dictionary<decimal,decimal>();
+            return (T)JToken.Parse(await CallPrivate(BuildPrivateUrl(method)));
+        }
 
-            foreach (VoSMarketOrder order in orders) {
-                decimal price = order.Price;
-                decimal quantity = 0;
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the VoS API</param>
+        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <returns>The raw JSON returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId)
+            where T : JToken
+        {
+            StringBuilder url = new StringBuilder(BuildPublicUrl(method));
 
-                switch (order.OrderType)
+            url.Append("?").Append(marketId.BaseCurrencyCodeParameter)
+                .Append("&").Append(marketId.QuoteCurrencyCodeParameter);
+
+            return (T)JToken.Parse(await CallPrivate(url.ToString()));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from VoS</returns>
+        private async Task<string> CallPrivate(string url)
+        {
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
                 {
-                    case OrderType.Buy:
-                        if (!bidSide.TryGetValue(price, out quantity))
-                        {
-                            quantity = 0;
-                        }
-                        quantity += order.Quantity;
-                        bidSide[price] = quantity;
-                        break;
-                    case OrderType.Sell:
-                        if (!askSide.TryGetValue(price, out quantity))
-                        {
-                            quantity = 0;
-                        }
-                        quantity += order.Quantity;
-                        askSide[price] = quantity;
-                        break;
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        return await jsonStreamReader.ReadToEndAsync();
+                    }
                 }
             }
-
-            List<MarketDepth> bids = MarketDepth.DictionaryToList(bidSide);
-            List<MarketDepth> asks = MarketDepth.DictionaryToList(askSide);
-            
-            // Flip the asks to put lowest first
-            asks.Reverse();
-
-
-            return new Book(asks,
-                bids);
+            catch (ArgumentException e)
+            {
+                throw new VoSResponseException("Could not parse response from VoS.", e);
+            }
         }
 
         public override void Dispose()
@@ -146,29 +157,17 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task<List<VoSCurrency>> GetCoins()
         {
-            JArray coinsJson = (await CallPublic<JObject>(Method.currencies)).Value<JArray>("currencies");
-
-            return coinsJson.Select(coin => VoSCurrency.Parse(coin as JObject)).ToList();
+            throw new NotImplementedException();
         }
 
         public override async Task<List<Market>> GetMarkets()
         {
-            JObject jsonObj = await CallPublic<JObject>(Method.trade_pairs);
-
-            JArray marketsJson = jsonObj.Value<JArray>("trade_pairs");
-            return marketsJson.Select(
-                market => (Market)VoSMarket.Parse((JObject)market)
-            ).ToList();
+            throw new NotImplementedException();
         }
 
         public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
-            VoSMarketId VoSMarketId = (VoSMarketId)marketId;
-            JObject jsonObj = await CallPublic<JObject>(Method.trades, VoSMarketId);
-
-            return jsonObj.Value<JArray>("trades").Select(
-                marketTrade => (MarketTrade)VoSMarketTrade.Parse(marketId, (JObject)marketTrade)
-            ).ToList();
+            throw new NotImplementedException();
         }
 
         public override async Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit)
@@ -188,17 +187,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public override async Task<Book> GetMarketDepth(MarketId marketId)
         {
-            List<VoSMarketOrder> openOrders = await GetMarketOpenOrders(marketId);
-            return ConsolidateOpenOrders(openOrders.ToArray());
-        }
-
-        public async Task<List<VoSMarketOrder>> GetMarketOpenOrders(MarketId marketId)
-        {
-            VoSMarketId VoSMarketId = (VoSMarketId)marketId;
-            JObject jsonObj = await CallPublic<JObject>(Method.orders, VoSMarketId);
-
-            return jsonObj.Value<JArray>("orders")
-                .Select(order => VoSMarketOrder.Parse((JObject)order)).ToList();
+            JObject jsonObj = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
+            return VoSParsers.ParseOrderBook(jsonObj.Value<JObject>("data"));
         }
 
         public override async Task CancelOrder(OrderId orderId)
@@ -223,7 +213,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public override string Label
         {
-            get { return "VoS"; }
+            get { return "Vault of Satoshi"; }
         }
 
         public string PublicKey { get; set; }
@@ -231,11 +221,18 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public enum Method
         {
-            balances,
-            currencies,
+            currency,
+            account,
+            balance,
+            wallet_address,
+            wallet_history,
+            quote,
+            orderbook,
             orders,
-            trade_pairs,
-            trades
+            order_detail,
+            ticker,
+            place,
+            cancel
         }
     }
 }
