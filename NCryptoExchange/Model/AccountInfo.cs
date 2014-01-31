@@ -11,15 +11,8 @@ namespace Lostics.NCryptoExchange.Model
             private set;
         }
 
-        public DateTime SystemTime
-        {
-            get;
-            private set;
-        }
-
-        public      AccountInfo(List<Wallet> setWallets, DateTime setSystemTime) {
+        public      AccountInfo(List<Wallet> setWallets) {
             this.Wallets = setWallets;
-            this.SystemTime = setSystemTime;
         }
     }
 }

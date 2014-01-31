@@ -14,6 +14,13 @@ namespace Lostics.NCryptoExchange.Model
             this.HeldBalance = setHeldBalance;
         }
 
+        public Wallet(string currencyCode, decimal setBalance)
+        {
+            this.CurrencyCode = currencyCode;
+            this.Balance = setBalance;
+            this.HeldBalance = null;
+        }
+
         public override string ToString()
         {
             return Balance + " "
@@ -23,6 +30,6 @@ namespace Lostics.NCryptoExchange.Model
 
         public string CurrencyCode { get; private set; }
         public decimal Balance { get; private set; }
-        public decimal HeldBalance { get; private set; }
+        public decimal? HeldBalance { get; private set; }
     }
 }

@@ -16,18 +16,16 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public static VoSCurrency Parse(JObject currencyJson)
         {
-            return new VoSCurrency(currencyJson.Value<string>("name"), currencyJson.Value<string>("desc"))
+            return new VoSCurrency(currencyJson.Value<string>("code"), currencyJson.Value<string>("name"))
             {
-                Id = currencyJson.Value<int>("id"),
-                TransferFee = currencyJson.Value<decimal?>("tx_fee"),
-                TransferConfirmations = currencyJson.Value<int?>("tx_conf"),
-                UpdatedAt = currencyJson.Value<DateTime>("updated_at")
+                Precision = currencyJson.Value<int>("precision"),
+                Virtual = currencyJson.Value<int>("virtual") > 0,
+                Tradeable = currencyJson.Value<int>("tradeable") > 0
             };
         }
 
-        public int Id { get; set; }
-        public decimal? TransferFee { get; set; }
-        public int? TransferConfirmations { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public int Precision { get; private set; }
+        public bool Virtual { get; private set; }
+        public bool Tradeable { get; private set; }
     }
 }

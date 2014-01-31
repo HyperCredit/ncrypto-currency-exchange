@@ -32,9 +32,35 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return new MarketDepth(price, quantity);
         }
 
-        private static decimal ParseCurrencyObject(JObject currencyJson)
+        internal static decimal ParseCurrencyObject(JObject currencyJson)
         {
             return currencyJson.Value<decimal>("value");
+        }
+
+        internal static DateTime ParseTime(int secondsSinceEpoch)
+        {
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(secondsSinceEpoch);
+        }
+
+        /// <summary>
+        /// Parses an object which maps currency codes to a decimal value.
+        /// </summary>
+        /// <param name="jObject">The object to parse data from.</param>
+        /// <returns></returns>
+        internal static Dictionary<string, decimal> ParseCurrencyValueObj(JObject jObject)
+        {
+            Dictionary<string, decimal> currencyValues = new Dictionary<string, decimal>();
+
+            foreach (JProperty property in jObject.Properties())
+            {
+                string currency = property.Name;
+                decimal value = jObject.Value<decimal>(currency);
+
+                currencyValues.Add(currency, value);
+            }
+
+            return currencyValues;
         }
     }
 }
