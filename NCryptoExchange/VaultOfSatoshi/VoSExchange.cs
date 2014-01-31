@@ -90,27 +90,27 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         }
 
         /// <summary>
-        /// Make a call to a public (non-authenticated) API
+        /// Make a call to a private API method.
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
-        /// <returns>The raw JSON returned from VoS</returns>
+        /// <returns>Parsed JSON returned from VoS</returns>
         private async Task<T> CallPrivate<T>(Method method)
             where T : JToken
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce())
+                GenerateNonceParameter()
             });
 
             return (T)JToken.Parse(await CallPrivate(method, request));
         }
 
         /// <summary>
-        /// Make a call to a public (non-authenticated) API
+        /// Make a call to a private API method.
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
-        /// <returns>The raw JSON returned from VoS</returns>
+        /// <returns>Parsed JSON returned from VoS</returns>
         private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId)
             where T : JToken
         {
@@ -125,7 +125,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         }
 
         /// <summary>
-        /// Make a call to a private API.
+        /// Make a call to a private API method.
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="request">A request, containing the POST parameters. Authentication headers
@@ -168,6 +168,11 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public string FormatDateTime(DateTime dateTimeUtc)
         {
             return dateTimeUtc.ToString("s");
+        }
+
+        private KeyValuePair<string, string> GenerateNonceParameter()
+        {
+            return new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce());
         }
 
         public override async Task<AccountInfo> GetAccountInfo()
@@ -222,6 +227,29 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();
+        }
+
+        internal async Task<List<MyOrder>> GetMyOrders(int? limit, DateTime after, bool openOnly)
+        {
+            List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>();
+
+            kvPairs.Add(GenerateNonceParameter());
+            if (null != limit)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>("limit", limit.ToString()));
+            }
+            if (null != after)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>("after", after.Ticks.ToString());
+            }
+            if (openOnly)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>("openOnly", openOnly.ToString()));
+            }
+
+            JObject response = JObject.Parse(await CallPrivate(Method.orders, new FormUrlEncodedContent(kvPairs)));
+
+            return VoSMyOrder.Parse(response.Value<JArray>("data"));
         }
 
         public override async Task<Book> GetMarketDepth(MarketId marketId)
