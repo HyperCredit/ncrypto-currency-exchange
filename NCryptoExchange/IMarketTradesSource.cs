@@ -7,12 +7,9 @@ namespace Lostics.NCryptoExchange
     /// <summary>
     /// Interface for API to fetch data about a markets an exchange offers,.
     /// </summary>
-    public interface IMarketDataSource
+    public interface IMarketTradesSource
     {
-        Task<List<Market>> GetMarkets();
 
         Task<List<MarketTrade>> GetMarketTrades(MarketId marketId);
-
-        Task<Book> GetMarketDepth(MarketId marketId);
     }
 }

@@ -19,7 +19,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// To use, requires a public and private key (these can be generated from the
     /// "Settings" page within Cryptsy, once logged in).
     /// </summary>
-    public class CryptsyExchange : AbstractExchange
+    public class CryptsyExchange : AbstractExchange, IMarketTradesSource, ITrading
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -105,7 +105,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return await ParseResponseToJson<T>(response);
         }
 
-        public async override Task CancelOrder(OrderId orderId)
+        public async Task CancelOrder(OrderId orderId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelorder,
                 orderId, (CryptsyMarketId)null, null));
@@ -141,7 +141,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 returnObj.Value<decimal>("net"));
         }
 
-        public async override Task<OrderId> CreateOrder(MarketId marketId,
+        public async Task<OrderId> CreateOrder(MarketId marketId,
                 OrderType orderType, decimal quantity,
                 decimal price)
         {
@@ -273,7 +273,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             return CryptsyParsers.ParseTransactions(returnArray);
         }
 
-        public async override Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
+        public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));

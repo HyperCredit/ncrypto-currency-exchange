@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : AbstractExchange, ICoinDataSource<VircurexCurrency>
+    public class VircurexExchange : AbstractExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
     {
         public const string DEFAULT_BASE_URL = "https://vircurex.com/api/";
 
@@ -200,7 +200,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 await CallPublic(Method.orderbook_alt, quoteCurrencyCode));
         }
 
-        public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
+        public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
 
@@ -227,16 +227,6 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             return VircurexParsers.ParseOrderBook(await CallPublic(Method.orderbook,
                 vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
-        }
-
-        public override async Task CancelOrder(OrderId orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
-        {
-            throw new NotImplementedException();
         }
 
         public override string GetNextNonce()

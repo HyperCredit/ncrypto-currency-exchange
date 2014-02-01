@@ -22,17 +22,11 @@ namespace Lostics.NCryptoExchange
             return BitConverter.ToString(digester.ComputeHash(requestBytes)).Replace("-", "").ToLower();
         }
 
-        public abstract Task CancelOrder(OrderId orderId);
-
-        public abstract Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price);
-
         public abstract void Dispose();
 
         public abstract Task<AccountInfo> GetAccountInfo();
 
         public abstract Task<List<Market>> GetMarkets();
-
-        public abstract Task<List<MarketTrade>> GetMarketTrades(MarketId marketId);
 
         public abstract Task<Book> GetMarketDepth(MarketId marketId);
 

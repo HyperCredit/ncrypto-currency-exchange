@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinEx
 {
-    public class CoinExExchange : AbstractExchange, ICoinDataSource<CoinExCurrency>
+    public class CoinExExchange : AbstractExchange, ICoinDataSource<CoinExCurrency>, IMarketTradesSource
     {
         public const decimal PRICE_UNIT = 0.00000001m;
         public const string DEFAULT_BASE_URL = "https://coinex.pw/api/v2/";
@@ -161,7 +161,7 @@ namespace Lostics.NCryptoExchange.CoinEx
             ).ToList();
         }
 
-        public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
+        public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             CoinExMarketId CoinExMarketId = (CoinExMarketId)marketId;
             JObject jsonObj = await CallPublic<JObject>(Method.trades, CoinExMarketId);
@@ -189,16 +189,6 @@ namespace Lostics.NCryptoExchange.CoinEx
 
             return jsonObj.Value<JArray>("orders")
                 .Select(order => CoinExMarketOrder.Parse((JObject)order)).ToList();
-        }
-
-        public override async Task CancelOrder(OrderId orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
-        {
-            throw new NotImplementedException();
         }
 
         public override string GetNextNonce()

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
-    public class VoSExchange : AbstractExchange, ICoinDataSource<VoSCurrency>
+    public class VoSExchange : AbstractExchange, ICoinDataSource<VoSCurrency>, ITrading
     {
         public const string HEADER_SIGN = "Api-Sign";
         public const string HEADER_KEY = "Api-Key";
@@ -227,11 +227,6 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return markets;
         }
 
-        public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             return (await this.GetMyOrders(limit, (DateTime?)null, true))
@@ -268,7 +263,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return VoSParsers.ParseOrderBook(jsonObj.Value<JObject>("data"));
         }
 
-        public override async Task CancelOrder(OrderId orderId)
+        public async Task CancelOrder(OrderId orderId)
         {
             JObject response = await CallPrivate<JObject>(Method.cancel, (VoSOrderId)orderId);
 
@@ -277,7 +272,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return;
         }
 
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        public async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             throw new NotImplementedException();
         }

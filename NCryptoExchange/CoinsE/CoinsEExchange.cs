@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange.CoinsE
     /// 
     /// To use, requires a public and private key.
     /// </summary>
-    public class CoinsEExchange : AbstractExchange, ICoinDataSource<CoinsECurrency>
+    public class CoinsEExchange : AbstractExchange, ICoinDataSource<CoinsECurrency>, ITrading
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
@@ -248,14 +248,14 @@ namespace Lostics.NCryptoExchange.CoinsE
             return jsonObj;
         }
 
-        public override async Task CancelOrder(OrderId orderId)
+        public async Task CancelOrder(OrderId orderId)
         {
             CoinsEOrderId coinsEOrderId = (CoinsEOrderId)orderId;
 
             JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(coinsEOrderId.MarketId));
         }
 
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        public async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             JObject responseJson = await CallPrivate(CoinsEMethod.neworder, orderType, quantity, price, GetMarketUrl(marketId));
 
@@ -288,11 +288,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             return marketsJson.Properties().Select(
                  market => (Market)CoinsEMarket.Parse(market.Name, market.Value as JObject)
              ).ToList();
-        }
-
-        public override Task<List<Model.MarketTrade>> GetMarketTrades(MarketId marketId)
-        {
-            throw new NotImplementedException();
         }
 
         private string GetMarketUrl(MarketId marketId)

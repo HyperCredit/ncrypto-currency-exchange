@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Bter
 {
-    public class BterExchange : AbstractExchange
+    public class BterExchange : AbstractExchange, IMarketTradesSource
     {
         public const string DEFAULT_BASE_URL = "http://bter.com/api/1/";
 
@@ -104,7 +104,7 @@ namespace Lostics.NCryptoExchange.Bter
             return BterMarket.ParseMarkets(marketsJson);
         }
 
-        public override async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
+        public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
             BterMarketId bterMarketId = (BterMarketId)marketId;
 
@@ -129,16 +129,6 @@ namespace Lostics.NCryptoExchange.Bter
             BterMarketId bterMarketId = (BterMarketId)marketId;
 
             return BterParsers.ParseOrderBook(await CallPublic<JObject>(Method.depth, bterMarketId));
-        }
-
-        public override async Task CancelOrder(OrderId orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
-        {
-            throw new NotImplementedException();
         }
 
         public override string GetNextNonce()

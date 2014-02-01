@@ -14,13 +14,13 @@ namespace Lostics.NCryptoExchange
     /// <summary>
     /// Generic interface for an exchange
     /// </summary>
-    public interface IExchange : IDisposable, IMarketDataSource
+    public interface IExchange : IDisposable
     {
-        Task CancelOrder(OrderId orderId);
-
-        Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price);
-
         Task<AccountInfo> GetAccountInfo();
+
+        Task<List<Market>> GetMarkets();
+
+        Task<Book> GetMarketDepth(MarketId marketId);
 
         Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit);
 
