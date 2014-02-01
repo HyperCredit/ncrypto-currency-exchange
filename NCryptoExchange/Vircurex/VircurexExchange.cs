@@ -12,7 +12,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 {
     public class VircurexExchange : AbstractExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
     {
-        public const string DEFAULT_BASE_URL = "https://vircurex.com/api/";
+        public const string DEFAULT_BASE_URL = "https://api.vircurex.com/api/";
 
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
