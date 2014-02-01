@@ -284,7 +284,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             ).ToList();
         }
 
-        public async override Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit)
+        public async Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
@@ -296,7 +296,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 defaultTimeZone)).ToList();
         }
 
-        public async override Task<List<MyTrade>> GetAllMyTrades(int? limit)
+        public async Task<List<MyTrade>> GetAllMyTrades(int? limit)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));

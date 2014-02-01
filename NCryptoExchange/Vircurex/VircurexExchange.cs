@@ -216,16 +216,6 @@ namespace Lostics.NCryptoExchange.Vircurex
                     vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, since));
         }
 
-        public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<List<Model.MyTrade>> GetAllMyTrades(int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();

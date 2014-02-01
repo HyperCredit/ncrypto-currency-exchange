@@ -22,10 +22,6 @@ namespace Lostics.NCryptoExchange
 
         Task<AccountInfo> GetAccountInfo();
 
-        Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit);
-
-        Task<List<MyTrade>> GetAllMyTrades(int? limit);
-
         Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit);
 
         string GetNextNonce();

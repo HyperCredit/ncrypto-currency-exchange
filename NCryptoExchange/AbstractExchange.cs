@@ -30,10 +30,6 @@ namespace Lostics.NCryptoExchange
 
         public abstract Task<AccountInfo> GetAccountInfo();
 
-        public abstract Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit);
-
-        public abstract Task<List<MyTrade>> GetAllMyTrades(int? limit);
-
         public abstract Task<List<Market>> GetMarkets();
 
         public abstract Task<List<MarketTrade>> GetMarketTrades(MarketId marketId);

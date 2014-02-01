@@ -232,16 +232,6 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             throw new NotImplementedException();
         }
 
-        public override async Task<List<MyTrade>> GetMyTrades(MarketId marketId, int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<List<MyTrade>> GetAllMyTrades(int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             return (await this.GetMyOrders(limit, (DateTime?)null, true))

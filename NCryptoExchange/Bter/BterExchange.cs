@@ -119,16 +119,6 @@ namespace Lostics.NCryptoExchange.Bter
             return BterMarketId.ParsePairs(pairsJson);
         }
 
-        public override async Task<List<Model.MyTrade>> GetMyTrades(MarketId marketId, int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<List<Model.MyTrade>> GetAllMyTrades(int? limit)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();
