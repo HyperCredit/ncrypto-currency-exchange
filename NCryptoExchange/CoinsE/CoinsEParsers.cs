@@ -10,16 +10,6 @@ namespace Lostics.NCryptoExchange.CoinsE
 {
     public static class CoinsEParsers
     {
-        public static AccountInfo ParseAccountInfo(JObject jsonObj)
-        {
-            DateTime systemTime = ParseTime(jsonObj.Value<int>("systime"));
-            List<Wallet> wallets = jsonObj.Value<JObject>("wallets").Properties().Select(
-                 wallet => (Wallet)CoinsEWallet.Parse(wallet.Name, wallet.First.Value<JObject>())
-             ).ToList();
-
-            return new AccountInfo(wallets, systemTime);
-        }
-
         public static Book ParseMarketDepth(JObject bookJson)
         {
             JArray bidsArray = bookJson.Value<JArray>("bids");

@@ -66,6 +66,7 @@
     <Compile Include="CoinEx\CoinExCurrency.cs" />
     <Compile Include="CoinEx\CoinExMarketOrder.cs" />
     <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
+    <Compile Include="CoinsE\CoinsEAccountInfo.cs" />
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="ICoinDataSource.cs" />
     <Compile Include="IExchange.cs" />
@@ -136,8 +137,6 @@
     <Compile Include="VaultOfSatoshi\VoSExchange.cs" />
     <Compile Include="VaultOfSatoshi\VoSMarket.cs" />
     <Compile Include="VaultOfSatoshi\VoSMarketId.cs" />
-    <Compile Include="VaultOfSatoshi\VoSMarketOrder.cs" />
-    <Compile Include="VaultOfSatoshi\VoSMarketTrade.cs" />
     <Compile Include="VaultOfSatoshi\VoSOrderId.cs" />
     <Compile Include="VaultOfSatoshi\VoSParsers.cs" />
     <Compile Include="VaultOfSatoshi\VoSResponseException.cs" />

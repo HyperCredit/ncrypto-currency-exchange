@@ -114,11 +114,29 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId)
             where T : JToken
         {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new []
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce()),
                 marketId.BaseCurrencyCodeKeyValuePair,
                 marketId.QuoteCurrencyCodeKeyValuePair
+            });
+
+            return (T)JToken.Parse(await CallPrivate(method, request));
+        }
+
+        /// <summary>
+        /// Make a call to a private API method.
+        /// </summary>
+        /// <param name="method">The method to call on the VoS API</param>
+        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <returns>Parsed JSON returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method, VoSOrderId orderId)
+            where T : JToken
+        {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce()),
+                orderId.KeyValuePair
             });
 
             return (T)JToken.Parse(await CallPrivate(method, request));
@@ -226,10 +244,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
-            throw new NotImplementedException();
+            return (await this.GetMyOrders(limit, (DateTime?)null, true))
+                .Where(order => order.MarketId.Equals(marketId))
+                .ToList();
         }
 
-        internal async Task<List<MyOrder>> GetMyOrders(int? limit, DateTime after, bool openOnly)
+        public async Task<List<MyOrder>> GetMyOrders(int? limit, DateTime? after, bool openOnly)
         {
             List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>();
 
@@ -240,7 +260,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             }
             if (null != after)
             {
-                kvPairs.Add(new KeyValuePair<string, string>("after", after.Ticks.ToString());
+                kvPairs.Add(new KeyValuePair<string, string>("after", after.Value.Ticks.ToString()));
             }
             if (openOnly)
             {
@@ -260,12 +280,11 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public override async Task CancelOrder(OrderId orderId)
         {
-            throw new NotImplementedException();
-        }
+            JObject response = await CallPrivate<JObject>(Method.cancel, (VoSOrderId)orderId);
 
-        public override async Task CancelMarketOrders(MarketId marketId)
-        {
-            throw new NotImplementedException();
+            // TODO: Check the respnse.
+
+            return;
         }
 
         public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)

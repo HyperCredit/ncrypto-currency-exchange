@@ -18,8 +18,6 @@ namespace Lostics.NCryptoExchange
     {
         Task CancelOrder(OrderId orderId);
 
-        Task CancelMarketOrders(MarketId marketId);
-
         Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price);
 
         Task<AccountInfo> GetAccountInfo();

@@ -255,20 +255,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             JObject responseJson = await CallPrivate(CoinsEMethod.cancelorder, orderId, GetMarketUrl(coinsEOrderId.MarketId));
         }
 
-        /// <summary>
-        /// Cancel all outstanding orders in the given market. Note that Coins-E does not provide this
-        /// functionality natively, so it's emulated client-side, which risks a race condition.
-        /// </summary>
-        /// <param name="marketId"></param>
-        /// <returns></returns>
-        public override async Task CancelMarketOrders(MarketId marketId)
-        {
-            foreach (CoinsEMyOrder order in (await GetMyActiveOrders(marketId, null)))
-            {
-                await CallPrivate(CoinsEMethod.cancelorder, order.OrderId, GetMarketUrl(order.MarketId));
-            }
-        }
-
         public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             JObject responseJson = await CallPrivate(CoinsEMethod.neworder, orderType, quantity, price, GetMarketUrl(marketId));
@@ -285,7 +271,7 @@ namespace Lostics.NCryptoExchange.CoinsE
         {
             JObject responseJson = await CallPrivate(CoinsEMethod.getallwallets, WALLETS_LIST);
 
-            return CoinsEParsers.ParseAccountInfo(responseJson);
+            return CoinsEAccountInfo.Parse(responseJson);
         }
 
         public async Task<List<CoinsECurrency>> GetCoins()

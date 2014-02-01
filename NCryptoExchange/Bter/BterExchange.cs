@@ -146,11 +146,6 @@ namespace Lostics.NCryptoExchange.Bter
             throw new NotImplementedException();
         }
 
-        public override async Task CancelMarketOrders(MarketId marketId)
-        {
-            throw new NotImplementedException();
-        }
-
         public override async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
             throw new NotImplementedException();

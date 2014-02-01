@@ -13,10 +13,11 @@ namespace Lostics.NCryptoExchange.Cryptsy
 {
     public class CryptsyAccountInfo : AccountInfo
     {
-        public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setSystemTime,
+        public CryptsyAccountInfo(List<Wallet> setWallets, DateTime setServerTime,
             TimeZoneInfo serverTimeZone, int openOrderCount)
-            : base(setWallets, setSystemTime)
+            : base(setWallets)
         {
+            this.ServerTime = setServerTime;
             this.ServerTimeZone = serverTimeZone;
             this.OpenOrderCount = openOrderCount;
         }
@@ -49,11 +50,12 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         public override string ToString()
         {
-            return this.SystemTime.ToString() + ": "
+            return this.ServerTime.ToString() + ": "
                 + this.OpenOrderCount + " open orders.";
         }
 
         public int OpenOrderCount { get; private set; }
         public TimeZoneInfo ServerTimeZone { get; private set; }
+        public DateTime ServerTime { get; private set; }
     }
 }
