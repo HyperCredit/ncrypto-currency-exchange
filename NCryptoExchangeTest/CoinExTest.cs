@@ -169,10 +169,10 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual(50, trades.Count);
             Assert.AreEqual("384409", trades[0].TradeId.ToString());
             Assert.AreEqual((decimal)250000000000, trades[0].Quantity);
-            Assert.AreEqual((decimal)220, trades[0].Price);
+            Assert.AreEqual((decimal)0.00000220, trades[0].Price);
 
             Assert.AreEqual((decimal)1303931062, trades[1].Quantity);
-            Assert.AreEqual((decimal)219, trades[1].Price);
+            Assert.AreEqual((decimal)0.00000219, trades[1].Price);
         }
 
         private JObject LoadTestData(string filename)

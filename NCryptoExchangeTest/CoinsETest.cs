@@ -15,7 +15,7 @@ namespace Lostics.NCryptoExchange
         public void TestParseCoinsEAccountInfo()
         {
             JObject jsonObj = LoadTestData("get_wallets.json");
-            AccountInfo accountInfo = CoinsEParsers.ParseAccountInfo(jsonObj);
+            AccountInfo accountInfo = CoinsEAccountInfo.Parse(jsonObj);
 
             Assert.AreEqual(5, accountInfo.Wallets.Count);
 

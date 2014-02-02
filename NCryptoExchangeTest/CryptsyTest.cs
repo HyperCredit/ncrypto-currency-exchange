@@ -121,10 +121,14 @@ namespace Lostics.NCryptoExchange
                     new KeyValuePair<string, string>(CryptsyExchange.PARAM_NONCE, "1388246959")
                 });
 
-            using (CryptsyExchange cryptsy = new CryptsyExchange("64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                "topsecret"))
+            using (CryptsyExchange cryptsy = new CryptsyExchange()
+                {
+                    PublicKey = "64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
+                    PrivateKey = "topsecret"
+                }
+            )
             {
-                actual = CryptsyExchange.GenerateSHA512Signature(request, privateKeyBytes);
+                actual = cryptsy.GenerateSHA512Signature(request);
             }
 
             Assert.AreEqual(expected, actual);
