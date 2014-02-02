@@ -10,10 +10,13 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.CoinEx
 {
-    public class CoinExExchange : AbstractExchange, ICoinDataSource<CoinExCurrency>, IMarketTradesSource
+    public class CoinExExchange : AbstractSha512Exchange, ICoinDataSource<CoinExCurrency>, IMarketTradesSource
     {
         public const decimal PRICE_UNIT = 0.00000001m;
         public const string DEFAULT_BASE_URL = "https://coinex.pw/api/v2/";
+
+        public const string HEADER_SIGN = "sign";
+        public const string HEADER_KEY = "key";
 
         private HttpClient client = new HttpClient();
 
@@ -200,9 +203,14 @@ namespace Lostics.NCryptoExchange.CoinEx
         {
             get { return "CoinEx"; }
         }
-
-        public string PublicKey { get; set; }
-        public string PrivateKey { get; set; }
+        public override string SignHeader
+        {
+            get { return HEADER_SIGN; }
+        }
+        public override string KeyHeader
+        {
+            get { return HEADER_KEY; }
+        }
 
         public enum Method
         {

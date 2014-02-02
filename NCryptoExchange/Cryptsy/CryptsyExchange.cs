@@ -19,7 +19,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// To use, requires a public and private key (these can be generated from the
     /// "Settings" page within Cryptsy, once logged in).
     /// </summary>
-    public class CryptsyExchange : AbstractExchange, IMarketTradesSource, ITrading
+    public class CryptsyExchange : AbstractSha512Exchange, IMarketTradesSource, ITrading
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
@@ -38,15 +38,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
 
         private HttpClient client = new HttpClient();
         private DirectoryInfo dumpResponse = null;
-        private readonly string privateUrl = "https://www.cryptsy.com/api";
-        private readonly string publicKey;
-        private readonly byte[] privateKey;
-
-        public CryptsyExchange(string publicKey, string privateKey)
-        {
-            this.publicKey = publicKey;
-            this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
-        }
+        private readonly string privateUrl = "https://api.cryptsy.com/api";
 
         /// <summary>
         /// Asserts that the response sent by Cryptsy indicates success, and throws a relevant
@@ -82,11 +74,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// </summary>
         /// <param name="request">The request to send to Cryptsy</param>
         /// <returns></returns>
-        private async Task Call(FormUrlEncodedContent request)
+        private async Task CallPrivate(FormUrlEncodedContent request)
         {
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-
+            SignRequest(request);
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             await ParseResponseToJson(response);
         }
@@ -96,10 +86,9 @@ namespace Lostics.NCryptoExchange.Cryptsy
         /// </summary>
         /// <param name="request">The request to send to Cryptsy</param>
         /// <returns>The return from Cryptsy as a JSON token</returns>
-        private async Task<T> Call<T>(FormUrlEncodedContent request)
+        private async Task<T> CallPrivate<T>(FormUrlEncodedContent request)
         {
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
-            request.Headers.Add(HEADER_KEY, this.publicKey);
+            this.SignRequest(request);
 
             HttpResponseMessage response = await client.PostAsync(privateUrl, request);
             return await ParseResponseToJson<T>(response);
@@ -110,7 +99,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelorder,
                 orderId, (CryptsyMarketId)null, null));
 
-            await Call(request);
+            await CallPrivate(request);
         }
 
         public async Task CancelAllOrders()
@@ -118,7 +107,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelallorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
-            await Call(request);
+            await CallPrivate(request);
         }
 
         public async Task CancelMarketOrders(MarketId marketId)
@@ -126,7 +115,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.cancelmarketorder,
                 (CryptsyOrderId)null, marketId, null));
 
-            await Call(request);
+            await CallPrivate(request);
         }
 
         public async Task<Fees> CalculateFees(OrderType orderType, decimal quantity,
@@ -135,7 +124,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.calculatefees, null,
                     orderType, quantity, price));
-            JObject returnObj = await Call<JObject>(request);
+            JObject returnObj = await CallPrivate<JObject>(request);
 
             return new Fees(returnObj.Value<decimal>("fee"),
                 returnObj.Value<decimal>("net"));
@@ -148,7 +137,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(
                 GenerateOrderParameters(CryptsyMethod.createorder, marketId,
                     orderType, quantity, price));
-            JObject returnObj = await Call<JObject>(request);
+            JObject returnObj = await CallPrivate<JObject>(request);
 
             return new CryptsyOrderId(returnObj["orderid"].ToString());
         }
@@ -165,7 +154,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
                 new KeyValuePair<string, string>(PARAM_CURRENCY_CODE, currencyCode)
             });
-            JObject returnObj = await Call<JObject>(request);
+            JObject returnObj = await CallPrivate<JObject>(request);
 
             return Address.Parse(returnObj);
         }
@@ -236,7 +225,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getinfo,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
 
-            return CryptsyAccountInfo.Parse(await Call<JObject>(request));
+            return CryptsyAccountInfo.Parse(await CallPrivate<JObject>(request));
         }
 
         public override string GetNextNonce()
@@ -248,7 +237,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.marketorders,
                 (CryptsyOrderId)null, marketId, null));
-            JObject marketOrdersJson = await Call<JObject>(request);
+            JObject marketOrdersJson = await CallPrivate<JObject>(request);
 
             return CryptsyParsers.ParseMarketOrders(marketOrdersJson);
         }
@@ -257,7 +246,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.getmarkets,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JArray marketsJson = await Call<JArray>(request);
+            JArray marketsJson = await CallPrivate<JArray>(request);
 
             return marketsJson.Select(
                 market => (Market)CryptsyMarket.Parse(market as JObject, this.defaultTimeZone)
@@ -268,7 +257,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytransactions,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, null));
-            JArray returnArray = await Call<JArray>(request);
+            JArray returnArray = await CallPrivate<JArray>(request);
 
             return CryptsyParsers.ParseTransactions(returnArray);
         }
@@ -277,7 +266,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.markettrades,
                 (CryptsyOrderId)null, marketId, null));
-            JArray marketTradesJson = await Call<JArray>(request);
+            JArray marketTradesJson = await CallPrivate<JArray>(request);
 
             return marketTradesJson.Select(
                 marketTrade => (MarketTrade)CryptsyMarketTrade.Parse(marketTrade as JObject, marketId, this.defaultTimeZone)
@@ -288,7 +277,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.mytrades,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray myTradesJson = await Call<JArray>(request);
+            JArray myTradesJson = await CallPrivate<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -300,7 +289,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmytrades,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray myTradesJson = await Call<JArray>(request);
+            JArray myTradesJson = await CallPrivate<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume.
 
@@ -312,7 +301,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.myorders,
                 (CryptsyOrderId)null, marketId, limit));
-            JArray myOrdersJson = await Call<JArray>(request);
+            JArray myOrdersJson = await CallPrivate<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume it's EST
 
@@ -323,7 +312,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.allmyorders,
                 (CryptsyOrderId)null, (CryptsyMarketId)null, limit));
-            JArray myOrdersJson = await Call<JArray>(request);
+            JArray myOrdersJson = await CallPrivate<JArray>(request);
 
             // XXX: Should use timezone provided by Cryptsy, not just presume it's EST
 
@@ -334,7 +323,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(GenerateParameters(CryptsyMethod.depth,
                 (CryptsyOrderId)null, marketId, null));
-            JObject returnObj = await Call<JObject>(request);
+            JObject returnObj = await CallPrivate<JObject>(request);
 
             return CryptsyParsers.ParseMarketDepthBook(returnObj, marketId);
         }
@@ -442,6 +431,14 @@ namespace Lostics.NCryptoExchange.Cryptsy
         public override string Label
         {
             get { return "Cryptsy"; }
+        }
+        public override string SignHeader
+        {
+            get { return HEADER_SIGN; }
+        }
+        public override string KeyHeader
+        {
+            get { return HEADER_KEY; }
         }
     }
 }

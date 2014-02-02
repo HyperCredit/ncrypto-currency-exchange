@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
-    public class VoSExchange : AbstractExchange, ICoinDataSource<VoSCurrency>, ITrading
+    public class VoSExchange : AbstractSha512Exchange, ICoinDataSource<VoSCurrency>, ITrading
     {
         public const string HEADER_SIGN = "Api-Sign";
         public const string HEADER_KEY = "Api-Key";
@@ -153,8 +153,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
             string url = DEFAULT_PRIVATE_URL + Enum.GetName(typeof(Method), method);
 
-            request.Headers.Add(HEADER_KEY, this.PublicKey);
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.PrivateKeyBytes));
+            this.SignRequest(request);
 
             try
             {
@@ -286,15 +285,13 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
             get { return "Vault of Satoshi"; }
         }
-
-        public string PublicKey { get; set; }
-        public string PrivateKey { get; set; }
-        public byte[] PrivateKeyBytes
+        public override string SignHeader
         {
-            get
-            {
-                return System.Text.Encoding.ASCII.GetBytes(this.PrivateKey);
-            }
+            get { return HEADER_SIGN; }
+        }
+        public override string KeyHeader
+        {
+            get { return HEADER_KEY; }
         }
 
         public enum Method

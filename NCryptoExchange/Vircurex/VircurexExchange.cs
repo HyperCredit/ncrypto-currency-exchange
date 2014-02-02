@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : AbstractExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
+    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
     {
         public const string DEFAULT_BASE_URL = "https://api.vircurex.com/api/";
 
@@ -134,7 +134,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             client.Dispose();
         }
@@ -149,7 +149,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             return dateTimeUtc.ToString("s");
         }
 
-        public override async Task<Model.AccountInfo> GetAccountInfo()
+        public async Task<Model.AccountInfo> GetAccountInfo()
         {
             throw new NotImplementedException();
         }
@@ -159,35 +159,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info));
         }
 
-        /* public static VircurexExchange GetExchange(FileInfo configurationFile)
-        {
-            if (!configurationFile.Exists)
-            {
-                WriteDefaultConfigurationFile(configurationFile);
-                throw new ConfigurationException("No configuration file exists; blank default created. "
-                    + "Please enter public and private key values and try again.");
-            }
-
-            Dictionary<string, string> properties = GetConfiguration(configurationFile);
-            string publicKey = properties[PROPERTY_PUBLIC_KEY];
-            string privateKey = properties[PROPERTY_PRIVATE_KEY];
-
-            if (null == publicKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            if (null == privateKey)
-            {
-                throw new ConfigurationException("No public key specified in configuration file \""
-                    + configurationFile.FullName + "\".");
-            }
-
-            return new VircurexExchange(publicKey, privateKey);
-        } */
-
-        public override async Task<List<Market>> GetMarkets()
+        public async Task<List<Market>> GetMarkets()
         {
             JObject marketsJson = await CallPublic(Method.get_info_for_currency);
 
@@ -216,12 +188,12 @@ namespace Lostics.NCryptoExchange.Vircurex
                     vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, since));
         }
 
-        public override async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
+        public async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<Model.Book> GetMarketDepth(MarketId marketId)
+        public async Task<Model.Book> GetMarketDepth(MarketId marketId)
         {
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
 
@@ -229,7 +201,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
         }
 
-        public override string GetNextNonce()
+        public string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
         }
@@ -238,8 +210,16 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
             this.privateKeys[method] = key;
         }
-
-        public override string Label
+        
+        public string SignHeader
+        {
+            get { return HEADER_SIGN; }
+        }
+        public string KeyHeader
+        {
+            get { return HEADER_KEY; }
+        }
+        public string Label
         {
             get { return "Vircurex"; }
         }

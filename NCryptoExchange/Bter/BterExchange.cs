@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Bter
 {
-    public class BterExchange : AbstractExchange, IMarketTradesSource
+    public class BterExchange : AbstractSha512Exchange, IMarketTradesSource
     {
         public const string DEFAULT_BASE_URL = "http://bter.com/api/1/";
+
+        public const string HEADER_SIGN = "Sign";
+        public const string HEADER_KEY = "Key";
 
         private HttpClient client = new HttpClient();
 
@@ -136,6 +139,14 @@ namespace Lostics.NCryptoExchange.Bter
             return DateTime.Now.Ticks.ToString();
         }
 
+        public override string SignHeader
+        {
+            get { return HEADER_SIGN; }
+        }
+        public override string KeyHeader
+        {
+            get { return HEADER_KEY; }
+        }
         public override string Label
         {
             get { return "Bter"; }

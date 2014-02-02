@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange.CoinsE
     /// 
     /// To use, requires a public and private key.
     /// </summary>
-    public class CoinsEExchange : AbstractExchange, ICoinDataSource<CoinsECurrency>, ITrading
+    public class CoinsEExchange : AbstractSha512Exchange, ICoinDataSource<CoinsECurrency>, ITrading
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
@@ -36,16 +36,11 @@ namespace Lostics.NCryptoExchange.CoinsE
         public const string PARAM_QUANTITY = "quantity";
         public const string PARAM_RATE = "rate";
 
-        private readonly string publicKey;
-        private readonly byte[] privateKey;
         private HttpClient client = new HttpClient();
 
-        public CoinsEExchange(string publicKey, string privateKey)
+        public CoinsEExchange()
         {
             this.BaseUrl = DEFAULT_BASE_URL;
-
-            this.publicKey = publicKey;
-            this.privateKey = System.Text.Encoding.ASCII.GetBytes(privateKey);
         }
 
         private static void AssertSuccessStatus(JObject jsonObj)
@@ -80,8 +75,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
             });
 
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
+            this.SignRequest(request);
 
             return request;
         }
@@ -108,8 +102,7 @@ namespace Lostics.NCryptoExchange.CoinsE
 
             FormUrlEncodedContent request = new FormUrlEncodedContent(kvPairs.ToArray());
 
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
+            this.SignRequest(request);
 
             return request;
         }
@@ -125,8 +118,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString())
             });
 
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
+            this.SignRequest(request);
 
             return request;
         }
@@ -139,8 +131,7 @@ namespace Lostics.NCryptoExchange.CoinsE
                 new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
             });
 
-            request.Headers.Add(HEADER_KEY, this.publicKey);
-            request.Headers.Add(HEADER_SIGN, GenerateSHA512Signature(request, this.privateKey));
+            this.SignRequest(request);
 
             return request;
         }
@@ -326,6 +317,14 @@ namespace Lostics.NCryptoExchange.CoinsE
         }
 
         public string BaseUrl { get; private set; }
+        public override string SignHeader
+        {
+            get { return HEADER_SIGN; }
+        }
+        public override string KeyHeader
+        {
+            get { return HEADER_KEY; }
+        }
         public override string Label
         {
             get { return "Coins-E"; }

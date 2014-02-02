@@ -70,7 +70,7 @@
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="ICoinDataSource.cs" />
     <Compile Include="IExchange.cs" />
-    <Compile Include="AbstractExchange.cs" />
+    <Compile Include="AbstractSha512Exchange.cs" />
     <Compile Include="CoinsE\CoinsECurrency.cs" />
     <Compile Include="CoinsE\CoinsEException.cs" />
     <Compile Include="CoinsE\CoinsEExchange.cs" />
