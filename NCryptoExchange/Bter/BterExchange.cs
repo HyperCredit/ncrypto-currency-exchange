@@ -12,10 +12,13 @@ namespace Lostics.NCryptoExchange.Bter
 {
     public class BterExchange : AbstractSha512Exchange, IMarketTradesSource
     {
-        public const string DEFAULT_BASE_URL = "http://bter.com/api/1/";
+        public const string BASE_PUBLIC_URL = "http://bter.com/api/1/";
+        public const string BASE_PRIVATE_URL = "http://bter.com/api/1/private/";
 
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";
+
+        public const string PARAMETER_NONCE = "Nonce";
 
         private HttpClient client = new HttpClient();
 
@@ -25,7 +28,12 @@ namespace Lostics.NCryptoExchange.Bter
 
         public static string BuildPublicUrl(Method method)
         {
-            return DEFAULT_BASE_URL + Enum.GetName(typeof(Method), method);
+            return BASE_PUBLIC_URL + Enum.GetName(typeof(Method), method);
+        }
+
+        public static string BuildPrivateUrl(Method method)
+        {
+            return BASE_PRIVATE_URL + Enum.GetName(typeof(Method), method);
         }
 
         /// <summary>
@@ -66,6 +74,71 @@ namespace Lostics.NCryptoExchange.Bter
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        return await jsonStreamReader.ReadToEndAsync();
+                    }
+                }
+            }
+            catch (ArgumentException e)
+            {
+                throw new BterResponseException("Could not parse response from Bter.", e);
+            }
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Bter</returns>
+        private async Task<string> CallPublic(string url, FormUrlEncodedContent request)
+        {
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        return await jsonStreamReader.ReadToEndAsync();
+                    }
+                }
+            }
+            catch (ArgumentException e)
+            {
+                throw new BterResponseException("Could not parse response from Bter.", e);
+            }
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Bter API</param>
+        /// <returns>The raw JSON returned from Bter</returns>
+        private async Task<T> CallPrivate<T>(Method method)
+            where T : JToken
+        {
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce())
+            });
+
+            return (T)JToken.Parse(await CallPrivate(method, request));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Bter API</param>
+        /// <returns>The raw JSON returned from Bter</returns>
+        private async Task<string> CallPrivate(Method method, FormUrlEncodedContent request)
+        {
+            string url = BuildPrivateUrl(method);
+
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync(url, request);
                 using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
