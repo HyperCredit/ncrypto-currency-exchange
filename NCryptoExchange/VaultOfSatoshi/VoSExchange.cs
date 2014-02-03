@@ -310,7 +310,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             HMAC digester = new HMACSHA512(this.PrivateKeyBytes);
             byte[] message = GenerateMessageToSign(method, request);
 
-            // Yes, VoS really has us encode it twice. Seriously.
+            // Yes, VoS really has us encode the digest into hex the base64 the
+            // hex.
             string digestedMessageHex = BitConverter.ToString(digester.ComputeHash(message)).Replace("-", "").ToLower();
 
             return System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(digestedMessageHex));
@@ -333,9 +334,6 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request.ReadAsStringAsync().Result);
             byte[] message = new byte[endpointBytes.Length + requestBytes.Length + 1];
             int messageIdx;
-
-            Console.WriteLine(endpoint);
-            Console.WriteLine(request.ReadAsStringAsync().Result);
 
             for (messageIdx = 0; messageIdx < endpointBytes.Length; messageIdx++)
             {
