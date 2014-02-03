@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
-    public class VoSExchange : AbstractSha512Exchange, ICoinDataSource<VoSCurrency>, ITrading
+    public class VoSExchange : IExchange, ICoinDataSource<VoSCurrency>, ITrading
     {
         public const string HEADER_SIGN = "Api-Sign";
         public const string HEADER_KEY = "Api-Key";
@@ -19,7 +20,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public const string DEFAULT_PUBLIC_URL = DEFAULT_BASE_URL + "public/";
         public const string DEFAULT_PRIVATE_URL = DEFAULT_BASE_URL + "info/";
 
-        public const string PARAMETER_NONCE = "Nonce";
+        public const string PARAMETER_NONCE = "nonce";
 
         private HttpClient client = new HttpClient();
 
@@ -94,15 +95,14 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<T> CallPrivate<T>(Method method)
-            where T : JToken
+        private async Task<JObject> CallPrivate(Method method)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
                 GenerateNonceParameter()
             });
 
-            return (T)JToken.Parse(await CallPrivate(method, request));
+            return await CallPrivate(method, request);
         }
 
         /// <summary>
@@ -111,8 +111,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId)
-            where T : JToken
+        private async Task<JObject> CallPrivate(Method method, VoSMarketId marketId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
@@ -121,7 +120,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 marketId.QuoteCurrencyCodeKeyValuePair
             });
 
-            return (T)JToken.Parse(await CallPrivate(method, request));
+            return await CallPrivate(method, request);
         }
 
         /// <summary>
@@ -130,8 +129,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<T> CallPrivate<T>(Method method, VoSOrderId orderId)
-            where T : JToken
+        private async Task<JObject> CallPrivate(Method method, VoSOrderId orderId)
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
@@ -139,7 +137,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 orderId.KeyValuePair
             });
 
-            return (T)JToken.Parse(await CallPrivate(method, request));
+            return await CallPrivate(method, request);
         }
 
         /// <summary>
@@ -149,11 +147,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="request">A request, containing the POST parameters. Authentication headers
         /// will be added to this.</param>
         /// <returns>The raw JSON returned from VoS</returns>
-        private async Task<string> CallPrivate(Method method, FormUrlEncodedContent request)
+        private async Task<JObject> CallPrivate(Method method, FormUrlEncodedContent request)
         {
             string url = DEFAULT_PRIVATE_URL + Enum.GetName(typeof(Method), method);
 
-            this.SignRequest(request);
+            request.Headers.Add(this.SignHeader, GenerateSHA512Signature(url, request));
+            request.Headers.Add(this.KeyHeader, this.PublicKey);
 
             try
             {
@@ -162,7 +161,23 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        return await jsonStreamReader.ReadToEndAsync();
+                        string responseContent = await jsonStreamReader.ReadToEndAsync();
+
+                        using (StreamWriter contentWriter = new StreamWriter(new FileStream(System.IO.Path.GetTempFileName(), FileMode.Create)))
+                        {
+                            contentWriter.Write(responseContent);
+                        }
+
+                        JObject responseJson = JObject.Parse(responseContent);
+                        string status = responseJson.Value<string>("status");
+
+                        if (status != "success")
+                        {
+                            throw new VoSResponseException("Response from Vault of Satoshi was not a success status. Received: "
+                                + status);
+                        }
+
+                        return responseJson;
                     }
                 }
             }
@@ -172,7 +187,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             }
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             client.Dispose();
         }
@@ -192,23 +207,23 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce());
         }
 
-        public override async Task<AccountInfo> GetAccountInfo()
+        public async Task<AccountInfo> GetAccountInfo()
         {
-            JObject response = await this.CallPrivate<JObject>(Method.account);
+            JObject response = await this.CallPrivate(Method.account);
 
             return VoSAccountInfo.Parse(response.Value<JObject>("data"));
         }
 
         public async Task<List<VoSCurrency>> GetCoins()
         {
-            JObject response = await this.CallPrivate<JObject>(Method.currency);
+            JObject response = await this.CallPrivate(Method.currency);
 
             return response
                 .Value<JArray>("data")
                 .Select(coin => VoSCurrency.Parse((JObject)coin)).ToList();
         }
 
-        public override async Task<List<Market>> GetMarkets()
+        public async Task<List<Market>> GetMarkets()
         {
             List<VoSCurrency> currencies = await GetCoins();
             IEnumerable<VoSCurrency> tradeableCurrencies = currencies.Where(currency => currency.Tradeable);
@@ -226,7 +241,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return markets;
         }
 
-        public override async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
+        public async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
             return (await this.GetMyOrders(limit, (DateTime?)null, true))
                 .Where(order => order.MarketId.Equals(marketId))
@@ -251,12 +266,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 kvPairs.Add(new KeyValuePair<string, string>("openOnly", openOnly.ToString()));
             }
 
-            JObject response = JObject.Parse(await CallPrivate(Method.orders, new FormUrlEncodedContent(kvPairs)));
+            JObject response = await CallPrivate(Method.orders, new FormUrlEncodedContent(kvPairs));
 
             return VoSMyOrder.Parse(response.Value<JArray>("data"));
         }
 
-        public override async Task<Book> GetMarketDepth(MarketId marketId)
+        public async Task<Book> GetMarketDepth(MarketId marketId)
         {
             JObject jsonObj = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
             return VoSParsers.ParseOrderBook(jsonObj.Value<JObject>("data"));
@@ -264,7 +279,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task CancelOrder(OrderId orderId)
         {
-            JObject response = await CallPrivate<JObject>(Method.cancel, (VoSOrderId)orderId);
+            JObject response = await CallPrivate(Method.cancel, (VoSOrderId)orderId);
 
             // TODO: Check the respnse.
 
@@ -276,22 +291,65 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             throw new NotImplementedException();
         }
 
-        public override string GetNextNonce()
+        /// <summary>
+        /// Vault of Satoshi have their own unique way of signing requests, where the message
+        /// content is the URL, then null, then the parameters.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public string GenerateSHA512Signature(string url, FormUrlEncodedContent request)
         {
-            return DateTime.Now.Ticks.ToString();
+            HMAC digester = new HMACSHA512(this.PrivateKeyBytes);
+            StringBuilder hex = new StringBuilder();
+            byte[] urlBytes = System.Text.Encoding.ASCII.GetBytes(url);
+            byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request.ReadAsStringAsync().Result);
+            byte[] message = new byte[urlBytes.Length + requestBytes.Length + 1];
+            int messageIdx;
+
+            for (messageIdx = 0; messageIdx < urlBytes.Length; messageIdx++)
+            {
+                message[messageIdx] = urlBytes[messageIdx];
+            }
+            message[messageIdx++] = 0;
+            for (int requestIdx = 0; requestIdx < requestBytes.Length; requestIdx++, messageIdx++)
+            {
+                message[messageIdx] = requestBytes[requestIdx];
+            }
+
+            return BitConverter.ToString(digester.ComputeHash(message)).Replace("-", "").ToLower();
         }
 
-        public override string Label
+        public string GetNextNonce()
+        {
+            DateTime epoch = new DateTime(1970, 1, 1);
+
+            // Have to use number of microseconds since the Epoch, so
+            // need to divide by 10 to get from ticks to micros
+            return ((DateTime.Now.Ticks - epoch.Ticks) / 10).ToString();
+        }
+
+        public string Label
         {
             get { return "Vault of Satoshi"; }
         }
-        public override string SignHeader
+        public string SignHeader
         {
             get { return HEADER_SIGN; }
         }
-        public override string KeyHeader
+        public string KeyHeader
         {
             get { return HEADER_KEY; }
+        }
+
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; }
+        public byte[] PrivateKeyBytes
+        {
+            get
+            {
+                return System.Text.Encoding.ASCII.GetBytes(this.PrivateKey);
+            }
         }
 
         public enum Method
