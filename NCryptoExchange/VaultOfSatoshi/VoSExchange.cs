@@ -17,8 +17,10 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public const string HEADER_KEY = "Api-Key";
 
         public const string DEFAULT_BASE_URL = "https://api.vaultofsatoshi.com/";
-        public const string DEFAULT_PUBLIC_URL = DEFAULT_BASE_URL + "public/";
-        public const string DEFAULT_PRIVATE_URL = DEFAULT_BASE_URL + "info/";
+        public const string PRIVATE_END_POINT = "info/";
+        public const string PUBLIC_END_POINT = "public/";
+        public const string DEFAULT_PUBLIC_URL = DEFAULT_BASE_URL + PUBLIC_END_POINT;
+        public const string DEFAULT_PRIVATE_URL = DEFAULT_BASE_URL + PRIVATE_END_POINT;
 
         public const string PARAMETER_NONCE = "nonce";
 
@@ -151,7 +153,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
             string url = DEFAULT_PRIVATE_URL + Enum.GetName(typeof(Method), method);
 
-            request.Headers.Add(this.SignHeader, GenerateSHA512Signature(url, request));
+            request.Headers.Add(this.SignHeader, GenerateSHA512Signature(method, request));
             request.Headers.Add(this.KeyHeader, this.PublicKey);
 
             try
@@ -170,6 +172,11 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
                         JObject responseJson = JObject.Parse(responseContent);
                         string status = responseJson.Value<string>("status");
+
+                        if (status == "error")
+                        {
+                            throw new VoSResponseException(responseJson.Value<string>("message"));
+                        }
 
                         if (status != "success")
                         {
@@ -298,18 +305,41 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="url"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public string GenerateSHA512Signature(string url, FormUrlEncodedContent request)
+        public string GenerateSHA512Signature(Method method, FormUrlEncodedContent request)
         {
             HMAC digester = new HMACSHA512(this.PrivateKeyBytes);
+            byte[] message = GenerateMessageToSign(method, request);
+
+            // Yes, VoS really has us encode it twice. Seriously.
+            string digestedMessageHex = BitConverter.ToString(digester.ComputeHash(message)).Replace("-", "").ToLower();
+
+            return System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(digestedMessageHex));
+        }
+
+        /// <summary>
+        /// Builds the message to be signed with the private key, based on the given
+        /// API method and request.
+        /// </summary>
+        /// <param name="method">The API method being called.</param>
+        /// <param name="request">The parameters to be sent to the server; must
+        /// include the nonce.</param>
+        /// <returns></returns>
+        public static byte[] GenerateMessageToSign(Method method, FormUrlEncodedContent request)
+        {
+            string endpoint = "/" + PRIVATE_END_POINT + Enum.GetName(typeof(Method), method);
+
             StringBuilder hex = new StringBuilder();
-            byte[] urlBytes = System.Text.Encoding.ASCII.GetBytes(url);
+            byte[] endpointBytes = System.Text.Encoding.ASCII.GetBytes(endpoint);
             byte[] requestBytes = System.Text.Encoding.ASCII.GetBytes(request.ReadAsStringAsync().Result);
-            byte[] message = new byte[urlBytes.Length + requestBytes.Length + 1];
+            byte[] message = new byte[endpointBytes.Length + requestBytes.Length + 1];
             int messageIdx;
 
-            for (messageIdx = 0; messageIdx < urlBytes.Length; messageIdx++)
+            Console.WriteLine(endpoint);
+            Console.WriteLine(request.ReadAsStringAsync().Result);
+
+            for (messageIdx = 0; messageIdx < endpointBytes.Length; messageIdx++)
             {
-                message[messageIdx] = urlBytes[messageIdx];
+                message[messageIdx] = endpointBytes[messageIdx];
             }
             message[messageIdx++] = 0;
             for (int requestIdx = 0; requestIdx < requestBytes.Length; requestIdx++, messageIdx++)
@@ -317,7 +347,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 message[messageIdx] = requestBytes[requestIdx];
             }
 
-            return BitConverter.ToString(digester.ComputeHash(message)).Replace("-", "").ToLower();
+            return message;
         }
 
         public string GetNextNonce()

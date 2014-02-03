@@ -124,7 +124,7 @@ namespace Lostics.NCryptoExchange
             using (CryptsyExchange cryptsy = new CryptsyExchange()
                 {
                     PublicKey = "64d00dc4ee1c2b9551eabbdc831972d4ce2bcac5",
-                    PrivateKey = "topsecret"
+                    PrivateKey = privateKey
                 }
             )
             {
