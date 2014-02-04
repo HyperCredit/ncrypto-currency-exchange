@@ -27,5 +27,5 @@ be comfortable with cryptocurrency design and usage, the nature of the exchanges
 being traded on, and currency trading.
 
 
-To get started, please look at the example provided under the "Examples"
-folder, of how to construct an exchange API class, and make calls to it.
+To get started, there is a simple arbitrage search tool also on Github, which
+makes use of this API: https://github.com/rnicoll/simple-arbitrage-tool
