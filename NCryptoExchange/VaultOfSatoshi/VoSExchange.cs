@@ -1,4 +1,5 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public const string DEFAULT_PUBLIC_URL = DEFAULT_BASE_URL + PUBLIC_END_POINT;
         public const string DEFAULT_PRIVATE_URL = DEFAULT_BASE_URL + PRIVATE_END_POINT;
 
+        public const int DEFAULT_PRECISION = 8;
+
         public const string PARAMETER_NONCE = "nonce";
+        public const string PARAMETER_ORDER_TYPE = "order_type";
+        public const string PARAMETER_PRICE = "price";
+        public const string PARAMETER_UNITS = "units";
 
         private HttpClient client = new HttpClient();
 
@@ -105,6 +111,56 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             });
 
             return await CallPrivate(method, request);
+        }
+
+        private async Task<JObject> CallPrivate(Method method, VoSMarketId marketId,
+            OrderType orderType, decimal quantity, decimal price)
+        {
+            /*
+             * typeThe string containing either bid or ask.
+             * order_currencyThe code for the currency of units such as 'BTC'. Note that the currency must be tradeable.
+             * unitsCurrency Object representing the number of units to trade.
+             * payment_currencyThe code for the currency of price such as 'USD'.
+             * Note that this must not be a virtual currency. That is, you can pay for Bitcoins with US Dollars,
+             * but not with Litecoins.
+             * priceCurrency Object representing the bid or ask price for the trade.
+             * */
+            throw new NotImplementedException();
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce()),
+                new KeyValuePair<string, string>(PARAMETER_ORDER_TYPE, orderType == OrderType.Buy
+                    ? "bid"
+                    : "ask"),
+                marketId.BaseCurrencyCodeKeyValuePair,
+                marketId.QuoteCurrencyCodeKeyValuePair,
+                new KeyValuePair<string, string>(PARAMETER_UNITS, FormatAsCurrencyObject(quantity, DEFAULT_PRECISION)),
+                new KeyValuePair<string, string>(PARAMETER_PRICE, FormatAsCurrencyObject(price, DEFAULT_PRECISION))
+            });
+
+            return await CallPrivate(method, request);
+        }
+
+        /// <summary>
+        /// Format the given value as a currency object; see the Vault of Satoshi
+        /// API docs for details of the format for a currency object.
+        /// </summary>
+        /// <param name="value">The value to format.</param>
+        /// <param name="precision">The precision of the value.</param>
+        /// <returns></returns>
+        public string FormatAsCurrencyObject(decimal value, int precision)
+        {
+            long valueInt = (long)Math.Round(value * (decimal)Math.Pow(10, precision));
+
+            JObject currencyObj = new JObject()
+            {
+                {"precision", precision},
+                {"value_int", valueInt},
+                {"value", value.ToString()}
+            };
+
+            return currencyObj.ToString(Formatting.None, new JsonConverter[0]);
         }
 
         /// <summary>
@@ -295,7 +351,9 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
-            throw new NotImplementedException();
+            JObject response = await CallPrivate(Method.place, (VoSMarketId)marketId, orderType, quantity, price);
+
+            return new VoSOrderId(response.Value<int>("order_id"));
         }
 
         /// <summary>
@@ -324,8 +382,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The API method being called.</param>
         /// <param name="request">The parameters to be sent to the server; must
         /// include the nonce.</param>
-        /// <returns></returns>
-        public static byte[] GenerateMessageToSign(Method method, FormUrlEncodedContent request)
+        /// <returns>The bytes to be passed to the message digester.</returns>
+        public byte[] GenerateMessageToSign(Method method, FormUrlEncodedContent request)
         {
             string endpoint = "/" + PRIVATE_END_POINT + Enum.GetName(typeof(Method), method);
 

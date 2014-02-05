@@ -25,6 +25,18 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestFormatAsCurrencyObject()
+        {
+            using (VoSExchange exchange = new VoSExchange())
+            {
+                string actual = exchange.FormatAsCurrencyObject(0.00000132m, 8);
+                string expected = "{\"precision\":8,\"value_int\":132,\"value\":\"0.00000132\"}";
+
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestMethod]
         public void TestGenerateMessageToSign()
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
@@ -34,10 +46,13 @@ namespace Lostics.NCryptoExchange
                 new KeyValuePair<string, string>(VoSExchange.PARAMETER_NONCE, "1391466805814182")
             });
 
-            byte[] message = VoSExchange.GenerateMessageToSign(VoSExchange.Method.ticker, request);
+            using (VoSExchange exchange = new VoSExchange())
+            {
+                byte[] message = exchange.GenerateMessageToSign(VoSExchange.Method.ticker, request);
 
-            Assert.AreEqual("/info/ticker\0order_currency=BTC&payment_currency=USD&nonce=1391466805814182",
-                System.Text.Encoding.ASCII.GetString(message));
+                Assert.AreEqual("/info/ticker\0order_currency=BTC&payment_currency=USD&nonce=1391466805814182",
+                    System.Text.Encoding.ASCII.GetString(message));
+            }
         }
 
         [TestMethod]
