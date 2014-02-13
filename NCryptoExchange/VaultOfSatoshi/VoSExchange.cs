@@ -408,7 +408,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public string GetNextNonce()
         {
-            DateTime epoch = new DateTime(1970, 1, 1);
+            DateTime epoch = new DateTime(1970, 1, 1).ToUniversalTime();
 
             // Have to use number of microseconds since the Epoch, so
             // need to divide by 10 to get from ticks to micros
