@@ -22,11 +22,61 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestParseVircurexBuildTokenMessage()
+        {
+            DateTime time = new DateTime(2014, 1, 20, 12, 13, 14);
+
+            using (VircurexExchange exchange = new VircurexExchange())
+            {
+                VircurexExchange.Method method = VircurexExchange.Method.create_order;
+                string timestamp = exchange.FormatTimestamp(time);
+                string id = timestamp + "-" + 3;
+                string username = "MY_USER_NAME";
+                string secret = "123456789";
+
+                exchange.PublicKey = username;
+                exchange.PrivateKeys[method] = secret;
+
+                string expected = "123456789;MY_USER_NAME;"
+                    + timestamp + ";"
+                    + id + ";create_order";
+                string actual = exchange.BuildTokenMessage(method, new Dictionary<string, string>(),
+                    timestamp, id);
+
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestMethod]
+        public void TestParseVircurexBuildToken()
+        {
+            DateTime time = new DateTime(2014, 1, 20, 12, 13, 14);
+
+            using (VircurexExchange exchange = new VircurexExchange())
+            {
+                VircurexExchange.Method method = VircurexExchange.Method.create_order;
+                string timestamp = exchange.FormatTimestamp(time);
+                string id = timestamp + "-" + 3;
+                string username = "MY_USER_NAME";
+                string secret = "123456789";
+
+                exchange.PublicKey = username;
+                exchange.PrivateKeys[method] = secret;
+
+                string expected = "37653fa7268bd0c9bc8a48630b583abc8888b95007048e73ab7f2b8de9662a51";
+                string actual = exchange.BuildToken(method, new Dictionary<string, string>(),
+                    timestamp, id);
+
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestMethod]
         public void TestParseVircurexCoins()
         {
             JObject jsonObj = LoadTestData<JObject>("get_currency_info.json");
             List<VircurexCurrency> currencies = VircurexCurrency.Parse(jsonObj);
-            
+
             Assert.AreEqual(19, currencies.Count);
 
             Assert.AreEqual("BTC", currencies[0].CurrencyCode);

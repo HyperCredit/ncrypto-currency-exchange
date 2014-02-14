@@ -6,28 +6,32 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource, ITrading
+    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
     {
         public const string DEFAULT_BASE_URL = "https://api.vircurex.com/api/";
 
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
 
-        public const string PARAM_BASE = "base";
-        public const string PARAM_ALT = "alt";
-        public const string PARAM_SINCE = "since";
-
-        private Dictionary<Method, string> privateKeys = new Dictionary<Method, string>();
+        public const string PARAMETER_ACCOUNT = "account";
+        public const string PARAMETER_ID = "id";
+        public const string PARAMETER_TOKEN = "token";
+        public const string PARAMETER_BASE = "base";
+        public const string PARAMETER_ALT = "alt";
+        public const string PARAMETER_SINCE = "since";
+        public const string PARAMETER_TIMESTAMP = "timestamp";
 
         private HttpClient client = new HttpClient();
 
         public VircurexExchange()
         {
+            this.PrivateKeys = new Dictionary<Method, string>();
         }
 
         private void AssertResponseStatusSuccess(JObject response)
@@ -41,6 +45,56 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             throw new VircurexResponseException("Response from Vircurex was not a success status. Received: "
                 + response.Value<string>("statustext"));
+        }
+
+        /// <summary>
+        /// Build the token for authenticating with Vircurex
+        /// </summary>
+        /// <param name="method">The method being called. Used as part of the message to
+        /// be hashed, and to find the relevant private key.</param>
+        /// <param name="parameters">The parameters to the request being sent to Vircurex.</param>
+        /// <param name="timestamp"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string BuildToken(Method method, Dictionary<string, string> parameters,
+            string timestamp, string id)
+        {
+            SHA256Managed hashstring = new SHA256Managed();
+            byte[] bytes = Encoding.ASCII.GetBytes(BuildTokenMessage(method, parameters, timestamp, id));
+            byte[] hash = hashstring.ComputeHash(bytes);
+
+            return BitConverter.ToString(hash).Replace("-", "").ToLower();
+        }
+
+        /// <summary>
+        /// Build the message to be hashed, to generate the authentication token.
+        /// </summary>
+        /// <param name="method">The method being called. Used as part of the message to
+        /// be hashed, and to find the relevant private key.</param>
+        /// <param name="parameters">The parameters to the request being sent to Vircurex.</param>
+        /// <param name="timestamp"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string BuildTokenMessage(Method method,
+            Dictionary<string, string> parameters, string timestamp, string id)
+        {
+            // TODO: Should throw a meaningful exception on missing key
+            string secret = this.PrivateKeys[method];
+            string username = this.PublicKey;
+
+            StringBuilder tokenMessageBuilder = new StringBuilder(secret + ";"
+                + username + ";"
+                + timestamp + ";"
+                + id + ";"
+                + Enum.GetName(typeof(Method), method));
+
+            foreach (string name in parameters.Keys)
+            {
+                tokenMessageBuilder.Append(";")
+                    .Append(parameters[name]);
+            }
+
+            return tokenMessageBuilder.ToString();
         }
 
         public static string BuildUrl(Method method, Format format)
@@ -71,7 +125,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
             StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
             url.Append("?");
-            url.Append(PARAM_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
+            url.Append(PARAMETER_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
 
             return await CallPublic<T>(url.ToString());
         }
@@ -91,9 +145,9 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             url.Append("?");
 
-            url.Append(PARAM_BASE).Append("=")
+            url.Append(PARAMETER_BASE).Append("=")
                 .Append(Uri.EscapeUriString(baseCurrencyCode));
-            url.Append("&").Append(PARAM_ALT)
+            url.Append("&").Append(PARAMETER_ALT)
                 .Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
 
             return await CallPublic<T>(url.ToString());
@@ -115,14 +169,14 @@ namespace Lostics.NCryptoExchange.Vircurex
             StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
 
             url.Append("?");
-            url.Append(PARAM_BASE).Append("=")
+            url.Append(PARAMETER_BASE).Append("=")
                 .Append(Uri.EscapeUriString(baseCurrencyCode));
 
-            url.Append("&").Append(PARAM_ALT)
+            url.Append("&").Append(PARAMETER_ALT)
                 .Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
             if (null != since)
             {
-                url.Append("&").Append(PARAM_SINCE)
+                url.Append("&").Append(PARAMETER_SINCE)
                     .Append("=").Append(Uri.EscapeUriString(since.ToString()));
             }
 
@@ -176,20 +230,42 @@ namespace Lostics.NCryptoExchange.Vircurex
         private async Task<T> CallPrivate<T>(Method method)
             where T : JToken
         {
-            return await CallPrivate<T>(BuildUrl(method, Format.Json));
+            return await CallPrivate<T>(method, new Dictionary<string, string>());
         }
 
         /// <summary>
-        /// Make a call to a public (non-authenticated) API
+        /// Make a call to a private API.
         /// </summary>
-        /// <param name="url">Endpoint to make a request to</param>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <param name="parameters">Parameters to send as part of the request.
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<T> CallPrivate<T>(string url)
+        private async Task<T> CallPrivate<T>(Method method, Dictionary<string, string> parameters)
             where T : JToken
         {
+            StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
+            string timestamp = this.GetNextNonce();
+            string id = timestamp + "." + DateTime.Now.Millisecond;
+            string token = BuildToken(method, parameters, timestamp, id);
+
+            url.Append("?")
+                .Append(PARAMETER_ACCOUNT).Append("=")
+                .Append(Uri.EscapeUriString(this.PublicKey)).Append("&")
+                .Append(PARAMETER_ID).Append("=")
+                .Append(Uri.EscapeUriString(id)).Append("&")
+                .Append(PARAMETER_TOKEN).Append("=")
+                .Append(Uri.EscapeUriString(token)).Append("&")
+                .Append(PARAMETER_TIMESTAMP).Append("=")
+                .Append(Uri.EscapeUriString(timestamp));
+
+            foreach (string name in parameters.Keys)
+            {
+                url.Append("&").Append(Uri.EscapeUriString(name))
+                    .Append("=").Append(Uri.EscapeUriString(parameters[name]));
+            }
+
             try
             {
-                HttpResponseMessage response = await client.GetAsync(url);
+                HttpResponseMessage response = await client.GetAsync(url.ToString());
 
                 using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
                 {
@@ -231,6 +307,17 @@ namespace Lostics.NCryptoExchange.Vircurex
         public string FormatDateTime(DateTime dateTimeUtc)
         {
             return dateTimeUtc.ToString("s");
+        }
+
+        /// <summary>
+        /// Formats a date and time in a manner suitable for use as a Vircurex timestamp
+        /// for the request authentication token.
+        /// </summary>
+        /// <param name="dateTimeUtc">A date and time, must be in the UTC timezone.</param>
+        /// <returns>A formatted string</returns>
+        public string FormatTimestamp(DateTime dateTimeUtc)
+        {
+            return dateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         public async Task<Model.AccountInfo> GetAccountInfo()
@@ -287,12 +374,12 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public string GetNextNonce()
         {
-            return DateTime.Now.Ticks.ToString();
+            return FormatTimestamp(DateTime.Now.ToUniversalTime());
         }
 
         public void SetApiKey(Method method, string key)
         {
-            this.privateKeys[method] = key;
+            this.PrivateKeys[method] = key;
         }
         
         public string SignHeader
@@ -331,5 +418,8 @@ namespace Lostics.NCryptoExchange.Vircurex
             release_order,
             trades
         }
+
+        public string PublicKey { get; set; }
+        public Dictionary<Method, string> PrivateKeys { get; private set; }
     }
 }
