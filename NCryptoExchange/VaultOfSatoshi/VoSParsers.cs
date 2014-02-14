@@ -32,12 +32,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             return new MarketDepth(price, quantity);
         }
 
-        internal static decimal ParseCurrencyObject(JObject currencyJson)
+        public static decimal ParseCurrencyObject(JObject currencyJson)
         {
             return currencyJson.Value<decimal>("value");
         }
 
-        internal static DateTime ParseTime(int secondsSinceEpoch)
+        public static DateTime ParseTime(int secondsSinceEpoch)
         {
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(secondsSinceEpoch);
@@ -47,8 +47,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// Parses an object which maps currency codes to a decimal value.
         /// </summary>
         /// <param name="jObject">The object to parse data from.</param>
-        /// <returns></returns>
-        internal static Dictionary<string, decimal> ParseCurrencyValueObj(JObject jObject)
+        /// <returns>A dictionary mapping currency codes to a value.</returns>
+        public static Dictionary<string, decimal> ParseCurrencyValueObj(JObject jObject)
         {
             Dictionary<string, decimal> currencyValues = new Dictionary<string, decimal>();
 
@@ -61,6 +61,25 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             }
 
             return currencyValues;
+        }
+
+        /// <summary>
+        /// Parsers an object which maps currency codes to wallet addresses.
+        /// </summary>
+        /// <param name="jObject">The object to parse data from.</param>
+        /// <returns>A dictionary mapping currency codes to wallet addresses.</returns>
+        public static Dictionary<string, string> ParseWalletAddresses(JObject jObject)
+        {
+            Dictionary<string, string> walletAddresses = new Dictionary<string, string>();
+            foreach (JProperty property in jObject.Properties())
+            {
+                string currency = property.Name;
+                string address = jObject.Value<string>(currency);
+
+                walletAddresses.Add(currency, address);
+            }
+
+            return walletAddresses;
         }
     }
 }

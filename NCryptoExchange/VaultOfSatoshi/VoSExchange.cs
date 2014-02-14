@@ -26,6 +26,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public const int DEFAULT_PRECISION = 8;
 
         public const string PARAMETER_NONCE = "nonce";
+        public const string PARAMETER_CURRENCY = "currency";
         public const string PARAMETER_ORDER_TYPE = "order_type";
         public const string PARAMETER_PRICE = "price";
         public const string PARAMETER_UNITS = "units";
@@ -54,7 +55,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         private async Task<T> CallPublic<T>(Method method)
             where T : JToken
         {
-            return (T)JToken.Parse(await CallPublic(BuildPublicUrl(method)));
+            return await CallPublic<T>(BuildPublicUrl(method));
         }
 
         /// <summary>
@@ -71,7 +72,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
             url.Append("?").Append(marketId.BaseCurrencyCodeParameter).Append("&")
                 .Append(marketId.QuoteCurrencyCodeParameter);
 
-            return (T)JToken.Parse(await CallPublic(url.ToString()));
+            return await CallPublic<T>(url.ToString());
         }
 
         /// <summary>
@@ -79,7 +80,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
         /// <returns>The raw JSON returned from VoS</returns>
-        private async Task<string> CallPublic(string url)
+        private async Task<T> CallPublic<T>(string url)
+            where T : JToken
         {
             try
             {
@@ -88,7 +90,12 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        return await jsonStreamReader.ReadToEndAsync();
+                        using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+
+                            return serializer.Deserialize<T>(jsonReader);
+                        }
                     }
                 }
             }
@@ -103,30 +110,43 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<JObject> CallPrivate(Method method)
+        private async Task<T> CallPrivate<T>(Method method)
+            where T : JToken
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
                 GenerateNonceParameter()
             });
 
-            return await CallPrivate(method, request);
+            return await CallPrivate<T>(method, request);
         }
 
-        private async Task<JObject> CallPrivate(Method method, VoSMarketId marketId,
-            OrderType orderType, decimal quantity, decimal price)
+        /// <summary>
+        /// Make a call to a private API method.
+        /// </summary>
+        /// <param name="method">The method to call on the VoS API</param>
+        /// <returns>Parsed JSON returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method, VoSCurrency currency)
+            where T : JToken
         {
-            /*
-             * typeThe string containing either bid or ask.
-             * order_currencyThe code for the currency of units such as 'BTC'. Note that the currency must be tradeable.
-             * unitsCurrency Object representing the number of units to trade.
-             * payment_currencyThe code for the currency of price such as 'USD'.
-             * Note that this must not be a virtual currency. That is, you can pay for Bitcoins with US Dollars,
-             * but not with Litecoins.
-             * priceCurrency Object representing the bid or ask price for the trade.
-             * */
-            throw new NotImplementedException();
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
+            {
+                GenerateNonceParameter(),
+                new KeyValuePair<string, string>(PARAMETER_CURRENCY, currency.CurrencyCode)
+            });
 
+            return await CallPrivate<T>(method, request);
+        }
+
+        /// <summary>
+        /// Make a call to a private API method.
+        /// </summary>
+        /// <param name="method">The method to call on the VoS API</param>
+        /// <returns>Parsed JSON returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId,
+            OrderType orderType, decimal quantity, decimal price)
+            where T : JToken
+        {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce()),
@@ -139,28 +159,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 new KeyValuePair<string, string>(PARAMETER_PRICE, FormatAsCurrencyObject(price, DEFAULT_PRECISION))
             });
 
-            return await CallPrivate(method, request);
-        }
-
-        /// <summary>
-        /// Format the given value as a currency object; see the Vault of Satoshi
-        /// API docs for details of the format for a currency object.
-        /// </summary>
-        /// <param name="value">The value to format.</param>
-        /// <param name="precision">The precision of the value.</param>
-        /// <returns></returns>
-        public string FormatAsCurrencyObject(decimal value, int precision)
-        {
-            long valueInt = (long)Math.Round(value * (decimal)Math.Pow(10, precision));
-
-            JObject currencyObj = new JObject()
-            {
-                {"precision", precision},
-                {"value_int", valueInt},
-                {"value", value.ToString()}
-            };
-
-            return currencyObj.ToString(Formatting.None, new JsonConverter[0]);
+            return await CallPrivate<T>(method, request);
         }
 
         /// <summary>
@@ -169,7 +168,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<JObject> CallPrivate(Method method, VoSMarketId marketId)
+        private async Task<T> CallPrivate<T>(Method method, VoSMarketId marketId)
+            where T : JToken
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
@@ -178,7 +178,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 marketId.QuoteCurrencyCodeKeyValuePair
             });
 
-            return await CallPrivate(method, request);
+            return await CallPrivate<T>(method, request);
         }
 
         /// <summary>
@@ -187,7 +187,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>Parsed JSON returned from VoS</returns>
-        private async Task<JObject> CallPrivate(Method method, VoSOrderId orderId)
+        private async Task<T> CallPrivate<T>(Method method, VoSOrderId orderId)
+            where T : JToken
         {
             FormUrlEncodedContent request = new FormUrlEncodedContent(new[]
             {
@@ -195,7 +196,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 orderId.KeyValuePair
             });
 
-            return await CallPrivate(method, request);
+            return await CallPrivate<T>(method, request);
         }
 
         /// <summary>
@@ -204,8 +205,9 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="request">A request, containing the POST parameters. Authentication headers
         /// will be added to this.</param>
-        /// <returns>The raw JSON returned from VoS</returns>
-        private async Task<JObject> CallPrivate(Method method, FormUrlEncodedContent request)
+        /// <returns>The JSON data object returned from VoS</returns>
+        private async Task<T> CallPrivate<T>(Method method, FormUrlEncodedContent request)
+            where T : JToken
         {
             string url = DEFAULT_PRIVATE_URL + Enum.GetName(typeof(Method), method);
 
@@ -240,7 +242,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                                 + status);
                         }
 
-                        return responseJson;
+                        return responseJson.Value<T>("data");
                     }
                 }
             }
@@ -253,6 +255,27 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public void Dispose()
         {
             client.Dispose();
+        }
+
+        /// <summary>
+        /// Format the given value as a currency object; see the Vault of Satoshi
+        /// API docs for details of the format for a currency object.
+        /// </summary>
+        /// <param name="value">The value to format.</param>
+        /// <param name="precision">The precision of the value.</param>
+        /// <returns></returns>
+        public string FormatAsCurrencyObject(decimal value, int precision)
+        {
+            long valueInt = (long)Math.Round(value * (decimal)Math.Pow(10, precision));
+
+            JObject currencyObj = new JObject()
+            {
+                {"precision", precision},
+                {"value_int", valueInt},
+                {"value", value.ToString()}
+            };
+
+            return currencyObj.ToString(Formatting.None, new JsonConverter[0]);
         }
 
         /// <summary>
@@ -272,17 +295,14 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task<AccountInfo> GetAccountInfo()
         {
-            JObject response = await this.CallPrivate(Method.account);
-
-            return VoSAccountInfo.Parse(response.Value<JObject>("data"));
+            return VoSAccountInfo.Parse(await this.CallPrivate<JObject>(Method.account));
         }
 
         public async Task<List<VoSCurrency>> GetCoins()
         {
-            JObject response = await this.CallPrivate(Method.currency);
+            JArray response = await this.CallPrivate<JArray>(Method.currency);
 
             return response
-                .Value<JArray>("data")
                 .Select(coin => VoSCurrency.Parse((JObject)coin)).ToList();
         }
 
@@ -329,20 +349,18 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                 kvPairs.Add(new KeyValuePair<string, string>("openOnly", openOnly.ToString()));
             }
 
-            JObject response = await CallPrivate(Method.orders, new FormUrlEncodedContent(kvPairs));
-
-            return VoSMyOrder.Parse(response.Value<JArray>("data"));
+            return VoSMyOrder.Parse(await CallPrivate<JArray>(Method.orders, new FormUrlEncodedContent(kvPairs)));
         }
 
         public async Task<Book> GetMarketDepth(MarketId marketId)
         {
-            JObject jsonObj = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
-            return VoSParsers.ParseOrderBook(jsonObj.Value<JObject>("data"));
+            JObject response = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
+            return VoSParsers.ParseOrderBook(response.Value<JObject>("data"));
         }
 
         public async Task CancelOrder(OrderId orderId)
         {
-            JObject response = await CallPrivate(Method.cancel, (VoSOrderId)orderId);
+            JObject response = await CallPrivate<JObject>(Method.cancel, (VoSOrderId)orderId);
 
             // TODO: Check the respnse.
 
@@ -351,9 +369,31 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task<OrderId> CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
         {
-            JObject response = await CallPrivate(Method.place, (VoSMarketId)marketId, orderType, quantity, price);
+            JObject response = await CallPrivate<JObject>(Method.place, (VoSMarketId)marketId, orderType, quantity, price);
 
             return new VoSOrderId(response.Value<int>("order_id"));
+        }
+
+        public async Task<Dictionary<string, string>> GetWalletAddresses()
+        {
+            JObject response = await CallPrivate<JObject>(Method.wallet_address);
+
+            return VoSParsers.ParseWalletAddresses(response);
+
+        }
+
+        public async Task<string> GetWalletAddresses(VoSCurrency currency)
+        {
+            JObject response = await CallPrivate<JObject>(Method.wallet_address, currency);
+            JToken address;
+
+            if (response.TryGetValue(currency.CurrencyCode, out address))
+            {
+                return address.Value<string>();
+            }
+
+            return null;
+
         }
 
         /// <summary>
