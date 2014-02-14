@@ -15,7 +15,7 @@ namespace Lostics.NCryptoExchange
         [TestMethod]
         public void TestBuildVircurexPublicUrl()
         {
-            string url = VircurexExchange.BuildPublicUrl(VircurexExchange.Method.orderbook,
+            string url = VircurexExchange.BuildUrl(VircurexExchange.Method.orderbook,
                 VircurexExchange.Format.Json);
 
             Assert.AreEqual("https://api.vircurex.com/api/orderbook.json", url);

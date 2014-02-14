@@ -1,4 +1,5 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
+    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource, ITrading
     {
         public const string DEFAULT_BASE_URL = "https://api.vircurex.com/api/";
 
@@ -29,7 +30,20 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
         }
 
-        public static string BuildPublicUrl(Method method,Format format)
+        private void AssertResponseStatusSuccess(JObject response)
+        {
+            int status = response.Value<int>("status");
+
+            if (0 == status)
+            {
+                return;
+            }
+
+            throw new VircurexResponseException("Response from Vircurex was not a success status. Received: "
+                + response.Value<string>("statustext"));
+        }
+
+        public static string BuildUrl(Method method, Format format)
         {
             return DEFAULT_BASE_URL + Enum.GetName(typeof(Method), method)
                 + "." + Enum.GetName(typeof(Format), format).ToLower();
@@ -40,9 +54,10 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// </summary>
         /// <param name="method">The method to call on the Vircurex API</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JObject> CallPublic(Method method)
+        private async Task<T> CallPublic<T>(Method method)
+            where T : JToken
         {
-            return JObject.Parse(await CallPublic(BuildPublicUrl(method, Format.Json)));
+            return await CallPublic<T>(BuildUrl(method, Format.Json));
         }
 
         /// <summary>
@@ -51,13 +66,14 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="method">The method to call on the Vircurex API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JObject> CallPublic(Method method, string quoteCurrencyCode)
+        private async Task<T> CallPublic<T>(Method method, string quoteCurrencyCode)
+            where T : JToken
         {
-            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+            StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
             url.Append("?");
             url.Append(PARAM_ALT).Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
 
-            return JObject.Parse(await CallPublic(url.ToString()));
+            return await CallPublic<T>(url.ToString());
         }
 
         /// <summary>
@@ -67,9 +83,11 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="baseCurrencyCode">A base currency code to append to the URL</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JObject> CallPublic(Method method, string baseCurrencyCode, string quoteCurrencyCode)
+        private async Task<T> CallPublic<T>(Method method,
+            string baseCurrencyCode, string quoteCurrencyCode)
+            where T : JToken
         {
-            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+            StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
 
             url.Append("?");
 
@@ -78,7 +96,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             url.Append("&").Append(PARAM_ALT)
                 .Append("=").Append(Uri.EscapeUriString(quoteCurrencyCode));
 
-            return JObject.Parse(await CallPublic(url.ToString()));
+            return await CallPublic<T>(url.ToString());
         }
 
         /// <summary>
@@ -90,10 +108,11 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
         /// <param name="since">An optional order ID to return trades since.</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<JArray> CallPublic(Method method, string baseCurrencyCode, string quoteCurrencyCode,
+        private async Task<T> CallPublic<T>(Method method, string baseCurrencyCode, string quoteCurrencyCode,
             VircurexOrderId since)
+            where T : JToken
         {
-            StringBuilder url = new StringBuilder(BuildPublicUrl(method, Format.Json));
+            StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
 
             url.Append("?");
             url.Append(PARAM_BASE).Append("=")
@@ -107,7 +126,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                     .Append("=").Append(Uri.EscapeUriString(since.ToString()));
             }
 
-            return JArray.Parse(await CallPublic(url.ToString()));
+            return await CallPublic<T>(url.ToString());
         }
 
         /// <summary>
@@ -115,16 +134,81 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// </summary>
         /// <param name="url">Endpoint to make a request to</param>
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<string> CallPublic(string url)
+        private async Task<T> CallPublic<T>(string url)
+            where T : JToken
         {
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
+
                 using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        return await jsonStreamReader.ReadToEndAsync();
+                        using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+
+                            T result = serializer.Deserialize<T>(jsonReader);
+                            JObject resultObj = result as JObject;
+
+                            if (null != resultObj)
+                            {
+                                AssertResponseStatusSuccess(resultObj);
+                            }
+
+                            return result;
+                        }
+                    }
+                }
+            }
+            catch (ArgumentException e)
+            {
+                throw new VircurexResponseException("Could not parse response from Vircurex.", e);
+            }
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Vircurex API</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<T> CallPrivate<T>(Method method)
+            where T : JToken
+        {
+            return await CallPrivate<T>(BuildUrl(method, Format.Json));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="url">Endpoint to make a request to</param>
+        /// <returns>The raw JSON returned from Vircurex</returns>
+        private async Task<T> CallPrivate<T>(string url)
+            where T : JToken
+        {
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
+                    {
+                        using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+
+                            T result = serializer.Deserialize<T>(jsonReader);
+                            JObject resultObj = result as JObject;
+
+                            if (null != resultObj)
+                            {
+                                AssertResponseStatusSuccess(resultObj);
+                            }
+
+                            return result;
+                        }
                     }
                 }
             }
@@ -151,17 +235,17 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task<Model.AccountInfo> GetAccountInfo()
         {
-            throw new NotImplementedException();
+            return VircurexParsers.ParseAccountInfo(await CallPrivate<JObject>(Method.get_balances));
         }
 
         public async Task<List<VircurexCurrency>> GetCoins()
         {
-            return VircurexCurrency.Parse(await CallPublic(Method.get_currency_info));
+            return VircurexCurrency.Parse(await CallPublic<JObject>(Method.get_currency_info));
         }
 
         public async Task<List<Market>> GetMarkets()
         {
-            JObject marketsJson = await CallPublic(Method.get_info_for_currency);
+            JObject marketsJson = await CallPublic<JObject>(Method.get_info_for_currency);
 
             return VircurexMarket.ParseMarkets(marketsJson);
         }
@@ -169,7 +253,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         public async Task<Dictionary<MarketId, Book>> GetMarketOrdersAlt(string quoteCurrencyCode)
         {
             return VircurexParsers.ParseMarketOrdersAlt(quoteCurrencyCode,
-                await CallPublic(Method.orderbook_alt, quoteCurrencyCode));
+                await CallPublic<JObject>(Method.orderbook_alt, quoteCurrencyCode));
         }
 
         public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
@@ -177,14 +261,14 @@ namespace Lostics.NCryptoExchange.Vircurex
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
 
             return VircurexParsers.ParseMarketTrades(marketId,
-                await CallPublic(Method.trades,
+                await CallPublic<JArray>(Method.trades,
                     vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, null));
         }
 
         public async Task<List<MarketTrade>> GetMarketTrades(VircurexMarketId vircurexMarketId, VircurexOrderId since)
         {
             return VircurexParsers.ParseMarketTrades(vircurexMarketId,
-                await CallPublic(Method.trades,
+                await CallPublic<JArray>(Method.trades,
                     vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, since));
         }
 
@@ -197,7 +281,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         {
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
 
-            return VircurexParsers.ParseOrderBook(await CallPublic(Method.orderbook,
+            return VircurexParsers.ParseOrderBook(await CallPublic<JObject>(Method.orderbook,
                 vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
         }
 
@@ -232,10 +316,19 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public enum Method
         {
+            create_order,
+            create_released_order,
+            delete_order,
+            get_balance,
+            get_balances,
             get_currency_info,
             get_info_for_currency,
             orderbook_alt,
             orderbook,
+            read_order,
+            read_orders,
+            read_orderexecutions,
+            release_order,
             trades
         }
     }

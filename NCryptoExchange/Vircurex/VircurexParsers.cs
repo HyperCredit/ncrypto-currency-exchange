@@ -10,13 +10,18 @@ namespace Lostics.NCryptoExchange.Vircurex
 {
     public static class VircurexParsers
     {
+        public static AccountInfo ParseAccountInfo(JObject jObject)
+        {
+            throw new NotImplementedException();
+        }
+
         public static DateTime ParseTime(int secondsSinceEpoch)
         {
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             return epoch.AddSeconds(secondsSinceEpoch);
         }
 
-        internal static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
+        public static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
         {
             return new MarketOrder(orderType,
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
@@ -73,7 +78,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                 trade.Value<decimal>("amount"), marketId);
         }
 
-        private static DateTime ParseDateTime(int secondsSinceEpoch)
+        public static DateTime ParseDateTime(int secondsSinceEpoch)
         {
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
