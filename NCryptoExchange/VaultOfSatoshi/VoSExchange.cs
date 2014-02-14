@@ -37,6 +37,27 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
         }
 
+        /// <summary>
+        /// Asserts that the status on a response from Vault of Satoshi is success, and
+        /// throws an exception otherwise.
+        /// </summary>
+        /// <param name="responseJson"></param>
+        private static void AssertResponseIsSuccess(JObject responseJson)
+        {
+            string status = responseJson.Value<string>("status");
+
+            if (status == "error")
+            {
+                throw new VoSResponseException(responseJson.Value<string>("message"));
+            }
+
+            if (status != "success")
+            {
+                throw new VoSResponseException("Response from Vault of Satoshi was not a success status. Received: "
+                    + status);
+            }
+        }
+
         public static string BuildPublicUrl(Method method)
         {
             return DEFAULT_PUBLIC_URL + Enum.GetName(typeof(Method), method);
@@ -93,8 +114,11 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                         using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
                         {
                             JsonSerializer serializer = new JsonSerializer();
+                            JObject responseJson = serializer.Deserialize<JObject>(jsonReader);
 
-                            return serializer.Deserialize<T>(jsonReader);
+                            AssertResponseIsSuccess(responseJson);
+
+                            return responseJson.Value<T>("data");
                         }
                     }
                 }
@@ -216,35 +240,25 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
             try
             {
+                JObject responseJson;
                 HttpResponseMessage response = await client.PostAsync(url, request);
+
                 using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        string responseContent = await jsonStreamReader.ReadToEndAsync();
-
-                        using (StreamWriter contentWriter = new StreamWriter(new FileStream(System.IO.Path.GetTempFileName(), FileMode.Create)))
+                        using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
                         {
-                            contentWriter.Write(responseContent);
+                            JsonSerializer serializer = new JsonSerializer();
+
+                            responseJson = serializer.Deserialize<JObject>(jsonReader);
                         }
-
-                        JObject responseJson = JObject.Parse(responseContent);
-                        string status = responseJson.Value<string>("status");
-
-                        if (status == "error")
-                        {
-                            throw new VoSResponseException(responseJson.Value<string>("message"));
-                        }
-
-                        if (status != "success")
-                        {
-                            throw new VoSResponseException("Response from Vault of Satoshi was not a success status. Received: "
-                                + status);
-                        }
-
-                        return responseJson.Value<T>("data");
                     }
                 }
+
+                AssertResponseIsSuccess(responseJson);
+
+                return responseJson.Value<T>("data");
             }
             catch (ArgumentException e)
             {
