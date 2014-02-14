@@ -1,0 +1,68 @@
+{
+    "status": "success",
+    "data": [
+        {
+            "code": "BTC",
+            "name": "Bitcoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "LTC",
+            "name": "Litecoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "CAD",
+            "name": "Canadian Dollar",
+            "precision": 5,
+            "virtual": 0,
+            "tradeable": 0
+        },
+        {
+            "code": "USD",
+            "name": "US Dollar",
+            "precision": 5,
+            "virtual": 0,
+            "tradeable": 0
+        },
+        {
+            "code": "PPC",
+            "name": "Peercoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "DOGE",
+            "name": "Dogecoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "FTC",
+            "name": "Feathercoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "XPM",
+            "name": "Primecoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        },
+        {
+            "code": "QRK",
+            "name": "Quarkcoin",
+            "precision": 8,
+            "virtual": 1,
+            "tradeable": 1
+        }
+    ]
+}
