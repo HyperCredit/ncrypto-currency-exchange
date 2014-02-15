@@ -324,11 +324,11 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
 
             // Dump out a copy for reference
-            string fileName = System.IO.Path.GetTempFileName();
+            /* string fileName = System.IO.Path.GetTempFileName();
             using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Create)))
             {
                 writer.Write(result.ToString());
-            }
+            } */
 
             return result;
         }
