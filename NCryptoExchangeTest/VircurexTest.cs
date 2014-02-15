@@ -63,7 +63,7 @@ namespace Lostics.NCryptoExchange
                 exchange.PublicKey = username;
                 exchange.PrivateKeys[method] = secret;
 
-                string expected = "37653fa7268bd0c9bc8a48630b583abc8888b95007048e73ab7f2b8de9662a51";
+                string expected = "8e00a25d5cd41db0d481873376473ec7deded6008020c15755f46b103528a282";
                 string actual = exchange.BuildToken(method, new List<KeyValuePair<string, string>>(),
                     timestamp, id);
 
@@ -179,6 +179,22 @@ namespace Lostics.NCryptoExchange
 
             Assert.AreEqual(bids[0].Price, (decimal)0.00000037);
             Assert.AreEqual(bids[0].Quantity, (decimal)2295316.39314516);
+        }
+
+        [TestMethod]
+        public void TestParseVircurexOrderExecutions()
+        {
+            JObject orderExecutionsJson = LoadTestData<JObject>("read_order_executions.json");
+            List<MyTrade> trades = VircurexParsers.ParseOrderExecutions(orderExecutionsJson);
+
+            Assert.AreEqual(1, trades.Count);
+
+            MyTrade trade = trades[0];
+
+            Assert.AreEqual("DOGE/BTC", trade.MarketId.ToString());
+            Assert.AreEqual(57796.176m, trade.Quantity);
+            Assert.AreEqual(0.0000025m, trade.Price);
+            Assert.AreEqual(OrderType.Buy, trade.TradeType);
         }
 
         [TestMethod]

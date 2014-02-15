@@ -1,0 +1,19 @@
+{
+  "account": "rnicoll",
+  "timestamp": "2014-02-15T16:35:46+00:00",
+  "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "orderid": "1234",
+  "status": 0,
+  "status_text": "",
+  "function": "read_orderexecutions",
+  "orderexecution-1": {
+    "currency1": "DOGE",
+    "currency2": "BTC",
+    "quantity": "57796.176",
+    "unitprice": "0.0000025",
+    "feepaid": "115.592352",
+    "ordertype": "BUY",
+    "executed_at": "2014-02-14T15:17:08+00:00"
+  },
+  "numberorderexecutions": 1
+}

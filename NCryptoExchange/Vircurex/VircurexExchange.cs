@@ -324,11 +324,11 @@ namespace Lostics.NCryptoExchange.Vircurex
             }
 
             // Dump out a copy for reference
-            /* string fileName = System.IO.Path.GetTempFileName();
+            string fileName = System.IO.Path.GetTempFileName();
             using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Create)))
             {
                 writer.Write(result.ToString());
-            } */
+            }
 
             return result;
         }
@@ -466,11 +466,9 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
         {
-            List<MyOrder> orders = await GetMyActiveOrders(OrderReleased.Released);
-
-            // TODO: Filter orders by market?
-
-            return orders;
+            return (await GetMyActiveOrders(OrderReleased.Released))
+                .Where(order => order.MarketId.Equals(marketId))
+                .ToList();
         }
 
         public async Task<Model.Book> GetMarketDepth(MarketId marketId)
@@ -479,6 +477,19 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             return VircurexParsers.ParseOrderBook(await CallPublic<JObject>(Method.orderbook,
                 vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode));
+        }
+
+        public async Task<List<MyTrade>> GetOrderExecutions(OrderId orderId)
+        {
+            VircurexOrderId vircurexOrderId = (VircurexOrderId)orderId;
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>(PARAMETER_ORDER_ID, vircurexOrderId.Value.ToString())
+            };
+
+            JObject response = await CallPrivate<JObject>(Method.read_orderexecutions, parameters);
+
+            return VircurexParsers.ParseOrderExecutions(response);
         }
 
         public string GetNextNonce()

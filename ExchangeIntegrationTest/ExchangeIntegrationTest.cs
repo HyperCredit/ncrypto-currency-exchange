@@ -1,15 +1,22 @@
-﻿using Lostics.NCryptoExchange.Model;
+﻿using System;
+
+using Lostics.NCryptoExchange.Model;
 using Lostics.NCryptoExchange.Vircurex;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ExchangeIntegrationTest
 {
     public class ExchangeIntegrationTest
     {
         public static void Main(string[] argv)
+        {
+            TestVircurex();
+
+            Console.WriteLine("Press any key to quit.");
+
+            Console.ReadKey();
+        }
+
+        private static void TestVircurex()
         {
             using (VircurexExchange vircurex = new VircurexExchange())
             {
@@ -19,7 +26,13 @@ namespace ExchangeIntegrationTest
                 vircurex.DefaultPrivateKey = "topsecret";
 
                 vircurex.GetMyActiveOrders(VircurexExchange.OrderReleased.Released).Wait();
-                TestOrderCreation(vircurex);
+
+                // Try creating, releasing then deleting an order
+                VircurexMarketId marketId = new VircurexMarketId("VTC", "BTC");
+                VircurexOrderId unreleasedOrderId = vircurex.CreateUnreleasedOrder(marketId,
+                    OrderType.Sell, 1m, 0.005m).Result;
+                VircurexOrderId releasedOrderId = vircurex.ReleaseOrder(unreleasedOrderId).Result;
+                vircurex.CancelOrder(releasedOrderId).Wait();
 
                 foreach (Wallet wallet in vircurex.GetAccountInfo().Result.Wallets)
                 {
@@ -39,19 +52,8 @@ namespace ExchangeIntegrationTest
                         + btcWallet.Balance + "BTC");
                 }
 
-                Console.WriteLine("Press any key to quit.");
-
-                Console.ReadKey();
+                // vircurex.GetOrderExecutions(new VircurexOrderId(5)).Wait();
             }
-        }
-
-        private static void TestOrderCreation(VircurexExchange vircurex)
-        {
-            VircurexMarketId marketId = new VircurexMarketId("VTC", "BTC");
-            VircurexOrderId unreleasedOrderId = vircurex.CreateUnreleasedOrder(marketId,
-                OrderType.Sell, 1m, 0.005m).Result;
-            VircurexOrderId releasedOrderId = vircurex.ReleaseOrder(unreleasedOrderId).Result;
-            vircurex.CancelOrder(releasedOrderId).Wait();
         }
     }
 }

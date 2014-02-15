@@ -150,6 +150,7 @@
     <Compile Include="Vircurex\VircurexOrderId.cs" />
     <Compile Include="Vircurex\VircurexParsers.cs" />
     <Compile Include="Vircurex\VircurexResponseException.cs" />
+    <Compile Include="Vircurex\VircurexFakeTradeId.cs" />
     <Compile Include="Vircurex\VircurexTradeId.cs" />
   </ItemGroup>
   <ItemGroup>

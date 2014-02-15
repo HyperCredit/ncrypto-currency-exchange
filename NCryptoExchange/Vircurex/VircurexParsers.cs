@@ -90,7 +90,7 @@ namespace Lostics.NCryptoExchange.Vircurex
             int numberOrders = responseJson.Value<int>("numberorders");
             List<MyOrder> orders = new List<MyOrder>(numberOrders);
 
-            // Parsers an order such as:
+            // Parses an order such as:
             // "orderid": 3670301,
             // "ordertype": "BUY",
             // "quantity": "19.87",
@@ -135,6 +135,40 @@ namespace Lostics.NCryptoExchange.Vircurex
             ).ToList();
 
             return new Book(asks, bids);
+        }
+
+        public static List<MyTrade> ParseOrderExecutions(JObject responseJson)
+        {
+            int numberOrderExecutions = responseJson.Value<int>("numberorderexecutions");
+            VircurexOrderId orderId = new VircurexOrderId(responseJson.Value<int>("orderid"));
+            List<MyTrade> trades = new List<MyTrade>(numberOrderExecutions);
+
+            // Parses a trade such as:
+            // "currency1": "DOGE",
+            // "currency2": "BTC",
+            // "quantity": "57796.176",
+            // "unitprice": "0.0000025",
+            // "feepaid": "115.592352",
+            // "ordertype": "BUY",
+            // "executed_at": "2014-02-14T15:17:08+00:00"
+
+            for (int orderExecutionIdx = 1; orderExecutionIdx <= numberOrderExecutions; orderExecutionIdx++)
+            {
+                JObject orderExecutionJson = responseJson.Value<JObject>("orderexecution-" + orderExecutionIdx);
+                DateTime executed = orderExecutionJson.Value<DateTime>("executed_at");
+                VircurexMarketId marketId = new VircurexMarketId(orderExecutionJson.Value<string>("currency1"),
+                    orderExecutionJson.Value<string>("currency2"));
+                OrderType orderType
+                    = orderExecutionJson.Value<string>("ordertype").Equals(Enum.GetName(typeof(OrderType), OrderType.Buy).ToUpper())
+                    ? OrderType.Buy
+                    : OrderType.Sell;
+
+                trades.Add(new MyTrade(new VircurexFakeTradeId(orderId, orderExecutionIdx), orderType,
+                    executed, orderExecutionJson.Value<decimal>("unitprice"), orderExecutionJson.Value<decimal>("feepaid"),
+                    orderExecutionJson.Value<decimal>("quantity"), marketId, orderId));
+            }
+
+            return trades;
         }
     }
 }
