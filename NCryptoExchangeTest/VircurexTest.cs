@@ -76,8 +76,22 @@ namespace Lostics.NCryptoExchange
         {
             JObject walletsJson = LoadTestData<JObject>("get_balances.json");
             AccountInfo accountInfo = VircurexParsers.ParseAccountInfo(walletsJson);
+            Wallet btcWallet = null;
 
             Assert.AreEqual(21, accountInfo.Wallets.Count);
+
+            foreach (Wallet wallet in accountInfo.Wallets)
+            {
+                if (wallet.CurrencyCode == "BTC")
+                {
+                    btcWallet = wallet;
+                }
+            }
+
+            Assert.IsNotNull(btcWallet);
+
+            Assert.AreEqual(0.15m, btcWallet.Balance);
+            Assert.AreEqual(0.05m, btcWallet.HeldBalance);
         }
 
         [TestMethod]

@@ -19,8 +19,9 @@ namespace Lostics.NCryptoExchange.Vircurex
             foreach (JProperty currency in balances.Properties())
             {
                 JObject walletJson = balances.Value<JObject>(currency.Name);
+                decimal availableBalance = walletJson.Value<decimal>("availablebalance");
                 decimal balance = walletJson.Value<decimal>("balance");
-                decimal heldBalance = balance - walletJson.Value<decimal>("available_balance");
+                decimal heldBalance = balance - availableBalance;
                 string currencyCode = currency.Name;
 
                 wallets.Add(new Wallet(currencyCode, balance, heldBalance));
