@@ -55,38 +55,43 @@ namespace PanicSell
                     if (wallet.CurrencyCode == market.QuoteCurrencyCode
                         && wallet.Balance > 0.0m)
                     {
-                        flattenTasks.Add(ClosePosition(cryptsy, cryptsy, market, wallet));
+                        // Start the flatten requests, but don't block waiting for any of
+                        // them to complete, yet
+                        flattenTasks.Add(ClosePosition(cryptsy, market, wallet));
                     }
                 }
             }
 
+            // Wait for all of the orders to be issued.
             foreach (Task<OrderId> task in flattenTasks)
             {
                 task.Wait();
             }
         }
 
-        private async static Task<OrderId> ClosePosition(IExchange exchange,
-            ITrading tradingExchange, Market market, Wallet wallet)
+        private async static Task<OrderId> ClosePosition(CryptsyExchange cryptsy, Market market, Wallet wallet)
         {
-            Book book = await exchange.GetMarketDepth(market.MarketId);
+            // Get the market depth to determine best available price
+            Book book = await cryptsy.GetMarketDepth(market.MarketId);
+            decimal price;
 
             if (book.Bids.Count > 0)
             {
-                decimal bestBid = book.Bids[0].Price;
-                decimal quantity = wallet.Balance * bestBid;
-
-                return await tradingExchange.CreateOrder(market.MarketId, OrderType.Sell,
-                    quantity, bestBid);
+                price = book.Bids[0].Price;
+            }
+            else if (book.Asks.Count > 0)
+            {
+                price = book.Asks[0].Price;
             }
             else
             {
-                decimal bestAsk = book.Asks[0].Price;
-                decimal quantity = wallet.Balance * bestAsk;
+                List<MarketTrade> recentTrades = await cryptsy.GetMarketTrades(market.MarketId);
 
-                return await tradingExchange.CreateOrder(market.MarketId, OrderType.Sell,
-                    quantity, bestAsk);
+                price = recentTrades[0].Price;
             }
+
+            return await cryptsy.CreateOrder(market.MarketId, OrderType.Sell,
+                wallet.Balance, price);
         }
     }
 }
