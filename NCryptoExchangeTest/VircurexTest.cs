@@ -72,6 +72,15 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestParseVircurexGetAccountInfo()
+        {
+            JObject walletsJson = LoadTestData<JObject>("get_balances.json");
+            AccountInfo accountInfo = VircurexParsers.ParseAccountInfo(walletsJson);
+
+            Assert.AreEqual(21, accountInfo.Wallets.Count);
+        }
+
+        [TestMethod]
         public void TestParseVircurexCoins()
         {
             JObject jsonObj = LoadTestData<JObject>("get_currency_info.json");

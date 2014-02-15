@@ -1,0 +1,93 @@
+{
+  "account": "rnicoll",
+  "timestamp": "2014-02-15T15:18:02+00:00",
+  "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "function": "get_balances",
+  "status": 0,
+  "balances": {
+    "ANC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "BTC": {
+      "balance": "0.00000001",
+      "availablebalance": "0.00000001"
+    },
+    "DGC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "DOGE": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "DVC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "EUR": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "FRC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "FTC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "I0C": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "IXC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "LTC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "NMC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "NVC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "NXT": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "PPC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "QRK": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "TRC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "USD": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "VTC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "WDC": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    },
+    "XPM": {
+      "balance": "0.0",
+      "availablebalance": "0.0"
+    }
+  }
+}

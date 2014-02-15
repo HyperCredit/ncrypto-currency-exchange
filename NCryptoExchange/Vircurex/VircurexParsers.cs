@@ -14,12 +14,14 @@ namespace Lostics.NCryptoExchange.Vircurex
         public static AccountInfo ParseAccountInfo(JObject walletsJson)
         {
             List<Wallet> wallets = new List<Wallet>();
+            JObject balances = walletsJson.Value<JObject>("balances");
 
-            foreach (JProperty wallet in walletsJson.Properties())
+            foreach (JProperty currency in balances.Properties())
             {
-                decimal balance = wallet.Value<decimal>("balance");
-                decimal heldBalance = balance - wallet.Value<decimal>("available_balance");
-                string currencyCode = wallet.Name;
+                JObject walletJson = balances.Value<JObject>(currency.Name);
+                decimal balance = walletJson.Value<decimal>("balance");
+                decimal heldBalance = balance - walletJson.Value<decimal>("available_balance");
+                string currencyCode = currency.Name;
 
                 wallets.Add(new Wallet(currencyCode, balance, heldBalance));
             }
