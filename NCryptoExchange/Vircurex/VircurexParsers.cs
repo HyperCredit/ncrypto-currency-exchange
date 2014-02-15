@@ -10,9 +10,20 @@ namespace Lostics.NCryptoExchange.Vircurex
 {
     public static class VircurexParsers
     {
-        public static AccountInfo ParseAccountInfo(JObject jObject)
+        public static AccountInfo ParseAccountInfo(JObject walletsJson)
         {
-            throw new NotImplementedException();
+            List<Wallet> wallets = new List<Wallet>();
+
+            foreach (JProperty wallet in walletsJson.Properties())
+            {
+                decimal balance = wallet.Value<decimal>("balance");
+                decimal heldBalance = balance - wallet.Value<decimal>("available_balance");
+                string currencyCode = wallet.Name;
+
+                wallets.Add(new Wallet(currencyCode, balance, heldBalance));
+            }
+
+            return new AccountInfo(wallets);
         }
 
         public static DateTime ParseTime(int secondsSinceEpoch)

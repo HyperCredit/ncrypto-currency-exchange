@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.Vircurex
 {
-    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource
+    public class VircurexExchange : IExchange, ICoinDataSource<VircurexCurrency>, IMarketTradesSource, ITrading
     {
         public const string DEFAULT_BASE_URL = "https://api.vircurex.com/api/";
 
@@ -20,12 +20,16 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string HEADER_KEY = "key";
 
         public const string PARAMETER_ACCOUNT = "account";
-        public const string PARAMETER_ID = "id";
-        public const string PARAMETER_TOKEN = "token";
-        public const string PARAMETER_BASE = "base";
+        public const string PARAMETER_AMOUNT = "amount";
         public const string PARAMETER_ALT = "alt";
+        public const string PARAMETER_BASE = "base";
+        public const string PARAMETER_ID = "id";
+        public const string PARAMETER_ORDER_ID = "orderid";
+        public const string PARAMETER_ORDER_TYPE = "ordertype";
         public const string PARAMETER_SINCE = "since";
+        public const string PARAMETER_TOKEN = "token";
         public const string PARAMETER_TIMESTAMP = "timestamp";
+        public const string PARAMETER_UNITPRICE = "unitprice";
 
         private HttpClient client = new HttpClient();
 
@@ -56,7 +60,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="timestamp"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public string BuildToken(Method method, Dictionary<string, string> parameters,
+        public string BuildToken(Method method, List<KeyValuePair<string, string>> parameters,
             string timestamp, string id)
         {
             SHA256Managed hashstring = new SHA256Managed();
@@ -76,7 +80,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="id"></param>
         /// <returns></returns>
         public string BuildTokenMessage(Method method,
-            Dictionary<string, string> parameters, string timestamp, string id)
+            List<KeyValuePair<string, string>> parameters, string timestamp, string id)
         {
             // TODO: Should throw a meaningful exception on missing key
             string secret = this.PrivateKeys[method];
@@ -85,13 +89,22 @@ namespace Lostics.NCryptoExchange.Vircurex
             StringBuilder tokenMessageBuilder = new StringBuilder(secret + ";"
                 + username + ";"
                 + timestamp + ";"
-                + id + ";"
-                + Enum.GetName(typeof(Method), method));
+                + id + ";");
 
-            foreach (string name in parameters.Keys)
+            switch (method)
             {
-                tokenMessageBuilder.Append(";")
-                    .Append(parameters[name]);
+                case Method.create_released_order:
+                    // This is a special case, where i'
+                    tokenMessageBuilder.Append(Enum.GetName(typeof(Method), Method.create_order));
+                    break;
+                default:
+                    tokenMessageBuilder.Append(Enum.GetName(typeof(Method), method));
+                    break;
+            }
+
+            foreach (KeyValuePair<string, string> parameter in parameters)
+            {
+                tokenMessageBuilder.Append(";").Append(parameter.Value);
             }
 
             return tokenMessageBuilder.ToString();
@@ -230,7 +243,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         private async Task<T> CallPrivate<T>(Method method)
             where T : JToken
         {
-            return await CallPrivate<T>(method, new Dictionary<string, string>());
+            return await CallPrivate<T>(method, new List<KeyValuePair<string, string>>());
         }
 
         /// <summary>
@@ -239,7 +252,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         /// <param name="method">The method to call on the Vircurex API</param>
         /// <param name="parameters">Parameters to send as part of the request.
         /// <returns>The raw JSON returned from Vircurex</returns>
-        private async Task<T> CallPrivate<T>(Method method, Dictionary<string, string> parameters)
+        private async Task<T> CallPrivate<T>(Method method, List<KeyValuePair<string, string>> parameters)
             where T : JToken
         {
             StringBuilder url = new StringBuilder(BuildUrl(method, Format.Json));
@@ -257,10 +270,10 @@ namespace Lostics.NCryptoExchange.Vircurex
                 .Append(PARAMETER_TIMESTAMP).Append("=")
                 .Append(Uri.EscapeUriString(timestamp));
 
-            foreach (string name in parameters.Keys)
+            foreach (KeyValuePair<string, string> parameter in parameters)
             {
-                url.Append("&").Append(Uri.EscapeUriString(name))
-                    .Append("=").Append(Uri.EscapeUriString(parameters[name]));
+                url.Append("&").Append(Uri.EscapeUriString(parameter.Key))
+                    .Append("=").Append(Uri.EscapeUriString(parameter.Value));
             }
 
             try
@@ -292,6 +305,35 @@ namespace Lostics.NCryptoExchange.Vircurex
             {
                 throw new VircurexResponseException("Could not parse response from Vircurex.", e);
             }
+        }
+
+        public async Task CancelOrder(OrderId orderId)
+        {
+            VircurexOrderId vircurexOrderId = (VircurexOrderId)orderId;
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("order_id", vircurexOrderId.Value.ToString())
+            };
+
+            JObject response = await CallPrivate<JObject>(Method.delete_order, parameters);
+        }
+
+        public async Task<OrderId>
+            CreateOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        {
+            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>("ordertype", Enum.GetName(typeof(OrderType), orderType).ToUpper()),
+                new KeyValuePair<string, string>("amount", quantity.ToString()),
+                new KeyValuePair<string, string>("currency1", vircurexMarketId.BaseCurrencyCode),
+                new KeyValuePair<string, string>("unitprice", price.ToString()),
+                new KeyValuePair<string, string>("currency2", vircurexMarketId.QuoteCurrencyCode)
+            };
+
+            JObject response = await CallPrivate<JObject>(Method.create_released_order, parameters);
+
+            return new VircurexOrderId(response.Value<int>("orderid"));
         }
 
         public void Dispose()
