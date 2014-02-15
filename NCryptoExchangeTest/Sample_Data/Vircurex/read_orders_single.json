@@ -1,0 +1,19 @@
+{
+  "order-1": {
+    "orderid": 3670301,
+    "ordertype": "BUY",
+    "quantity": "19.87",
+    "openquantity": "18.79",
+    "currency1": "VTC",
+    "unitprice": "0.00363",
+    "currency2": "BTC",
+    "lastchangedat": "2014-01-13T22:54:30+00:00",
+    "releasedat": "2014-01-13T22:41:46+00:00"
+  },
+  "numberorders": 1,
+  "account": "rnicoll",
+  "timestamp": "2014-02-15T11:30:24+00:00",
+  "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "status": 0,
+  "function": "read_orders"
+}
