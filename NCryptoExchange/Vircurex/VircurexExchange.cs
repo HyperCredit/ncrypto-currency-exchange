@@ -26,6 +26,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string PARAMETER_ID = "id";
         public const string PARAMETER_ORDER_ID = "orderid";
         public const string PARAMETER_ORDER_TYPE = "ordertype";
+        public const string PARAMETER_ORDER_RELEASED = "otype";
         public const string PARAMETER_SINCE = "since";
         public const string PARAMETER_TOKEN = "token";
         public const string PARAMETER_TIMESTAMP = "timestamp";
@@ -104,6 +105,13 @@ namespace Lostics.NCryptoExchange.Vircurex
 
             foreach (KeyValuePair<string, string> parameter in parameters)
             {
+                if (method == Method.read_orders
+                    && parameter.Key == PARAMETER_ORDER_RELEASED)
+                {
+                    // For whatever reason, read_orders doesn't include order type in its hash
+                    continue;
+                }
+                
                 tokenMessageBuilder.Append(";").Append(parameter.Value);
             }
 
@@ -276,6 +284,8 @@ namespace Lostics.NCryptoExchange.Vircurex
                     .Append("=").Append(Uri.EscapeUriString(parameter.Value));
             }
 
+            T result;
+
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url.ToString());
@@ -288,15 +298,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                         {
                             JsonSerializer serializer = new JsonSerializer();
 
-                            T result = serializer.Deserialize<T>(jsonReader);
-                            JObject resultObj = result as JObject;
-
-                            if (null != resultObj)
-                            {
-                                AssertResponseStatusSuccess(resultObj);
-                            }
-
-                            return result;
+                            result = serializer.Deserialize<T>(jsonReader);
                         }
                     }
                 }
@@ -305,6 +307,22 @@ namespace Lostics.NCryptoExchange.Vircurex
             {
                 throw new VircurexResponseException("Could not parse response from Vircurex.", e);
             }
+
+            JObject resultObj = result as JObject;
+
+            if (null != resultObj)
+            {
+                AssertResponseStatusSuccess(resultObj);
+            }
+
+            // Dump out a copy for reference
+            string fileName = System.IO.Path.GetTempFileName();
+            using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Create)))
+            {
+                writer.Write(result.ToString());
+            }
+
+            return result;
         }
 
         public async Task CancelOrder(OrderId orderId)
@@ -351,17 +369,6 @@ namespace Lostics.NCryptoExchange.Vircurex
             return dateTimeUtc.ToString("s");
         }
 
-        /// <summary>
-        /// Formats a date and time in a manner suitable for use as a Vircurex timestamp
-        /// for the request authentication token.
-        /// </summary>
-        /// <param name="dateTimeUtc">A date and time, must be in the UTC timezone.</param>
-        /// <returns>A formatted string</returns>
-        public string FormatTimestamp(DateTime dateTimeUtc)
-        {
-            return dateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
         public async Task<Model.AccountInfo> GetAccountInfo()
         {
             return VircurexParsers.ParseAccountInfo(await CallPrivate<JObject>(Method.get_balances));
@@ -401,9 +408,26 @@ namespace Lostics.NCryptoExchange.Vircurex
                     vircurexMarketId.BaseCurrencyCode, vircurexMarketId.QuoteCurrencyCode, since));
         }
 
-        public async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
+        public async Task<List<MyOrder>> GetMyActiveOrders(OrderReleased orderReleased)
         {
-            throw new NotImplementedException();
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>(PARAMETER_ORDER_RELEASED,
+                    orderReleased == OrderReleased.Unreleased
+                        ? "0"
+                        : "1")
+            };
+
+            return VircurexParsers.ParseMyOrders(await CallPrivate<JObject>(Method.read_orders, parameters));
+        }
+
+        public async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
+        {
+            List<MyOrder> orders = await GetMyActiveOrders(OrderReleased.Released);
+
+            // TODO: Filter orders by market?
+
+            return orders;
         }
 
         public async Task<Model.Book> GetMarketDepth(MarketId marketId)
@@ -416,7 +440,7 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public string GetNextNonce()
         {
-            return FormatTimestamp(DateTime.Now.ToUniversalTime());
+            return FormatDateTime(DateTime.Now.ToUniversalTime());
         }
 
         public void SetApiKey(Method method, string key)
@@ -459,6 +483,12 @@ namespace Lostics.NCryptoExchange.Vircurex
             read_orderexecutions,
             release_order,
             trades
+        }
+
+        public enum OrderReleased
+        {
+            Unreleased,
+            Released
         }
 
         public string PublicKey { get; set; }
