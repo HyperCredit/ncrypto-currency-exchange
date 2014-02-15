@@ -19,6 +19,10 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string HEADER_SIGN = "sign";
         public const string HEADER_KEY = "key";
 
+        // These values are used only for sending to Vircurex
+        private const int ORDER_RELEASED = 1;
+        private const int ORDER_UNRELEASED = 0;
+
         public const string PARAMETER_ACCOUNT = "account";
         public const string PARAMETER_AMOUNT = "amount";
         public const string PARAMETER_ALT = "alt";
@@ -30,7 +34,7 @@ namespace Lostics.NCryptoExchange.Vircurex
         public const string PARAMETER_SINCE = "since";
         public const string PARAMETER_TOKEN = "token";
         public const string PARAMETER_TIMESTAMP = "timestamp";
-        public const string PARAMETER_UNITPRICE = "unitprice";
+        public const string PARAMETER_UNIT_PRICE = "unitprice";
 
         private HttpClient client = new HttpClient();
 
@@ -83,9 +87,13 @@ namespace Lostics.NCryptoExchange.Vircurex
         public string BuildTokenMessage(Method method,
             List<KeyValuePair<string, string>> parameters, string timestamp, string id)
         {
-            // TODO: Should throw a meaningful exception on missing key
-            string secret = this.PrivateKeys[method];
+            string secret;
             string username = this.PublicKey;
+
+            if (!this.PrivateKeys.TryGetValue(method, out secret))
+            {
+                secret = this.DefaultPrivateKey;
+            }
 
             StringBuilder tokenMessageBuilder = new StringBuilder(secret + ";"
                 + username + ";"
@@ -327,10 +335,18 @@ namespace Lostics.NCryptoExchange.Vircurex
 
         public async Task CancelOrder(OrderId orderId)
         {
+            await CancelOrder(orderId, OrderReleased.Released);
+        }
+
+        public async Task CancelOrder(OrderId orderId, OrderReleased orderReleased)
+        {
             VircurexOrderId vircurexOrderId = (VircurexOrderId)orderId;
             List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
             {
-                new KeyValuePair<string, string>("order_id", vircurexOrderId.Value.ToString())
+                new KeyValuePair<string, string>(PARAMETER_ORDER_ID, vircurexOrderId.Value.ToString()),
+                new KeyValuePair<string, string>(PARAMETER_ORDER_RELEASED, orderReleased == OrderReleased.Unreleased
+                    ? ORDER_UNRELEASED.ToString()
+                    : ORDER_RELEASED.ToString())
             };
 
             JObject response = await CallPrivate<JObject>(Method.delete_order, parameters);
@@ -342,14 +358,41 @@ namespace Lostics.NCryptoExchange.Vircurex
             VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
             List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
             {
-                new KeyValuePair<string, string>("ordertype", Enum.GetName(typeof(OrderType), orderType).ToUpper()),
-                new KeyValuePair<string, string>("amount", quantity.ToString()),
+                new KeyValuePair<string, string>(PARAMETER_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType).ToUpper()),
+                new KeyValuePair<string, string>(PARAMETER_AMOUNT, quantity.ToString()),
                 new KeyValuePair<string, string>("currency1", vircurexMarketId.BaseCurrencyCode),
-                new KeyValuePair<string, string>("unitprice", price.ToString()),
+                new KeyValuePair<string, string>(PARAMETER_UNIT_PRICE, price.ToString()),
                 new KeyValuePair<string, string>("currency2", vircurexMarketId.QuoteCurrencyCode)
             };
 
             JObject response = await CallPrivate<JObject>(Method.create_released_order, parameters);
+
+            return new VircurexOrderId(response.Value<int>("orderid"));
+        }
+
+        /// <summary>
+        /// Create a new order, but do not release it for trading.
+        /// </summary>
+        /// <param name="marketId"></param>
+        /// <param name="orderType"></param>
+        /// <param name="quantity"></param>
+        /// <param name="price"></param>
+        /// <returns>The unreleased order ID. Note that this IS NOT the same as the
+        /// released order ID.</returns>
+        public async Task<VircurexOrderId>
+            CreateUnreleasedOrder(MarketId marketId, OrderType orderType, decimal quantity, decimal price)
+        {
+            VircurexMarketId vircurexMarketId = (VircurexMarketId)marketId;
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>(PARAMETER_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType).ToUpper()),
+                new KeyValuePair<string, string>(PARAMETER_AMOUNT, quantity.ToString()),
+                new KeyValuePair<string, string>("currency1", vircurexMarketId.BaseCurrencyCode),
+                new KeyValuePair<string, string>(PARAMETER_UNIT_PRICE, price.ToString()),
+                new KeyValuePair<string, string>("currency2", vircurexMarketId.QuoteCurrencyCode)
+            };
+
+            JObject response = await CallPrivate<JObject>(Method.create_order, parameters);
 
             return new VircurexOrderId(response.Value<int>("orderid"));
         }
@@ -414,8 +457,8 @@ namespace Lostics.NCryptoExchange.Vircurex
             {
                 new KeyValuePair<string, string>(PARAMETER_ORDER_RELEASED,
                     orderReleased == OrderReleased.Unreleased
-                        ? "0"
-                        : "1")
+                        ? ORDER_UNRELEASED.ToString()
+                        : ORDER_RELEASED.ToString())
             };
 
             return VircurexParsers.ParseMyActiveOrders(await CallPrivate<JObject>(Method.read_orders, parameters));
@@ -441,6 +484,18 @@ namespace Lostics.NCryptoExchange.Vircurex
         public string GetNextNonce()
         {
             return FormatDateTime(DateTime.Now.ToUniversalTime());
+        }
+
+        public async Task<VircurexOrderId> ReleaseOrder(VircurexOrderId unreleasedOrderId)
+        {
+            List<KeyValuePair<string, string>> parameters = new List<KeyValuePair<string, string>>()
+            {
+                new KeyValuePair<string, string>(PARAMETER_ORDER_ID, unreleasedOrderId.Value.ToString())
+            };
+
+            JObject response = await CallPrivate<JObject>(Method.release_order, parameters);
+
+            return new VircurexOrderId(response.Value<int>("orderid"));
         }
 
         public void SetApiKey(Method method, string key)
@@ -492,6 +547,15 @@ namespace Lostics.NCryptoExchange.Vircurex
         }
 
         public string PublicKey { get; set; }
+        /// <summary>
+        /// Default secret to use for API calls.
+        /// </summary>
+        public string DefaultPrivateKey { get; set; }
+        /// <summary>
+        /// Secrets to use when making API calls. If these are all the same,
+        /// you can use DefaultPrivateKey instead of specifying them for each
+        /// method.
+        /// </summary>
         public Dictionary<Method, string> PrivateKeys { get; private set; }
     }
 }
