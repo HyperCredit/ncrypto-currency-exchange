@@ -2,6 +2,9 @@
 
 using Lostics.NCryptoExchange.Model;
 using Lostics.NCryptoExchange.Vircurex;
+using Lostics.NCryptoExchange.Cryptsy;
+using System.IO;
+using System.Collections.Generic;
 
 namespace ExchangeIntegrationTest
 {
@@ -9,11 +12,72 @@ namespace ExchangeIntegrationTest
     {
         public static void Main(string[] argv)
         {
-            TestVircurex();
+            TestCryptsy();
+            // TestVircurex();
 
             Console.WriteLine("Press any key to quit.");
 
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Rough test which finds market IDs, then fetches recent transactions and dumps
+        /// them to CSV.
+        /// </summary>
+        private static void TestCryptsy()
+        {
+            string fileName = System.IO.Path.GetTempFileName();
+            fileName = fileName.Replace(".tmp", ".csv");
+            Dictionary<string, CryptsyMarket> markets = new Dictionary<string, CryptsyMarket>();
+            string[] marketCodes = new string[] {
+                "DOGE/BTC",
+                "LTC/BTC",
+                "QRK/BTC",
+                "VTC/BTC"
+            };
+
+            using (StreamWriter writer = new StreamWriter(new FileStream(fileName, FileMode.Create)))
+            {
+                using (CryptsyExchange cryptsy = new CryptsyExchange())
+                {
+                    cryptsy.PublicKey = "";
+                    cryptsy.PrivateKey = "topsecret";
+
+                    foreach (Market market in cryptsy.GetMarkets().Result)
+                    {
+                        CryptsyMarket cryptsyMarket = (CryptsyMarket)market;
+                        markets[cryptsyMarket.BaseCurrencyCode + "/"
+                            + cryptsyMarket.QuoteCurrencyCode] = cryptsyMarket;
+                    }
+
+                    foreach (string marketCode in marketCodes)
+                    {
+                        CryptsyMarket market = markets[marketCode];
+
+                        writer.WriteLine("Date,Time,Side,Trade ID,Exchange,Base currency,Quantity,Quote currency,Price,Cost,Fee,Fee currency");
+
+                        foreach (MyTrade trade in cryptsy.GetMyTrades(market.MarketId, null).Result)
+                        {
+                            System.Text.StringBuilder line = new System.Text.StringBuilder();
+
+                            line.Append(trade.DateTime.ToString("yyyy-MM-dd")).Append(",")
+                                .Append(trade.DateTime.ToString("HH:mm:ss")).Append(",")
+                                .Append(Enum.GetName(typeof(OrderType), trade.TradeType)).Append(",")
+                                .Append(trade.OrderId).Append(",")
+                                .Append("Cryptsy").Append(",")
+                                .Append(market.BaseCurrencyCode).Append(",")
+                                .Append(trade.Quantity).Append(",")
+                                .Append(market.QuoteCurrencyCode).Append(",")
+                                .Append(trade.Price).Append(",")
+                                .Append(",")
+                                .Append(trade.Fee).Append(",")
+                                .Append(market.QuoteCurrencyCode);
+
+                            writer.WriteLine(line.ToString());
+                        }
+                    }
+                }
+            }
         }
 
         private static void TestVircurex()
