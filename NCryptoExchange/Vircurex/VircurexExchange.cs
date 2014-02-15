@@ -418,7 +418,7 @@ namespace Lostics.NCryptoExchange.Vircurex
                         : "1")
             };
 
-            return VircurexParsers.ParseMyOrders(await CallPrivate<JObject>(Method.read_orders, parameters));
+            return VircurexParsers.ParseMyActiveOrders(await CallPrivate<JObject>(Method.read_orders, parameters));
         }
 
         public async Task<List<MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)

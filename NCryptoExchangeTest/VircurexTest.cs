@@ -29,7 +29,7 @@ namespace Lostics.NCryptoExchange
             using (VircurexExchange exchange = new VircurexExchange())
             {
                 VircurexExchange.Method method = VircurexExchange.Method.create_order;
-                string timestamp = exchange.FormatTimestamp(time);
+                string timestamp = exchange.FormatDateTime(time);
                 string id = timestamp + "-" + 3;
                 string username = "MY_USER_NAME";
                 string secret = "123456789";
@@ -40,7 +40,7 @@ namespace Lostics.NCryptoExchange
                 string expected = "123456789;MY_USER_NAME;"
                     + timestamp + ";"
                     + id + ";create_order";
-                string actual = exchange.BuildTokenMessage(method, new Dictionary<string, string>(),
+                string actual = exchange.BuildTokenMessage(method, new List<KeyValuePair<string, string>>(),
                     timestamp, id);
 
                 Assert.AreEqual(expected, actual);
@@ -55,7 +55,7 @@ namespace Lostics.NCryptoExchange
             using (VircurexExchange exchange = new VircurexExchange())
             {
                 VircurexExchange.Method method = VircurexExchange.Method.create_order;
-                string timestamp = exchange.FormatTimestamp(time);
+                string timestamp = exchange.FormatDateTime(time);
                 string id = timestamp + "-" + 3;
                 string username = "MY_USER_NAME";
                 string secret = "123456789";
@@ -64,7 +64,7 @@ namespace Lostics.NCryptoExchange
                 exchange.PrivateKeys[method] = secret;
 
                 string expected = "37653fa7268bd0c9bc8a48630b583abc8888b95007048e73ab7f2b8de9662a51";
-                string actual = exchange.BuildToken(method, new Dictionary<string, string>(),
+                string actual = exchange.BuildToken(method, new List<KeyValuePair<string, string>>(),
                     timestamp, id);
 
                 Assert.AreEqual(expected, actual);
@@ -115,6 +115,32 @@ namespace Lostics.NCryptoExchange
             Assert.AreEqual((decimal)0.00000043, trades[0].Price);
 
             Assert.AreEqual("1110352", trades[1].TradeId.ToString());
+        }
+
+        [TestMethod]
+        public void TestParseVircurexMyOrdersEmpty()
+        {
+            JObject ordersJson = LoadTestData<JObject>("read_orders_empty.json");
+            List<MyOrder> orders = VircurexParsers.ParseMyActiveOrders(ordersJson);
+
+            Assert.AreEqual(0, orders.Count);
+        }
+
+        [TestMethod]
+        public void TestParseVircurexMyOrders()
+        {
+            JObject ordersJson = LoadTestData<JObject>("read_orders_single.json");
+            DateTime expectedCreated = new DateTime(2014, 1, 13, 22, 41, 46);
+            List<MyOrder> orders = VircurexParsers.ParseMyActiveOrders(ordersJson);
+
+            Assert.AreEqual(1, orders.Count);
+
+            Assert.AreEqual("VTC/BTC", orders[0].MarketId.ToString());
+            Assert.AreEqual(expectedCreated, orders[0].Created);
+            Assert.AreEqual(OrderType.Buy, orders[0].OrderType);
+            Assert.AreEqual(19.87m, orders[0].OriginalQuantity);
+            Assert.AreEqual(18.79m, orders[0].Quantity);
+            Assert.AreEqual(0.00363m, orders[0].Price);
         }
 
         [TestMethod]

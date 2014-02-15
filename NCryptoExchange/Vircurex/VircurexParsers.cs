@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,9 +82,41 @@ namespace Lostics.NCryptoExchange.Vircurex
                 trade.Value<decimal>("amount"), marketId);
         }
 
-        public static List<MyOrder> ParseMyOrders(JObject jObject)
+        public static List<MyOrder> ParseMyActiveOrders(JObject responseJson)
         {
-            throw new NotImplementedException();
+            int numberOrders = responseJson.Value<int>("numberorders");
+            List<MyOrder> orders = new List<MyOrder>(numberOrders);
+
+            // Parsers an order such as:
+            // "orderid": 3670301,
+            // "ordertype": "BUY",
+            // "quantity": "19.87",
+            // "openquantity": "18.79",
+            // "currency1": "VTC",
+            // "unitprice": "0.00363",
+            // "currency2": "BTC",
+            // "lastchangedat": "2014-01-13T22:54:30+00:00",
+            // "releasedat": "2014-01-13T22:41:46+00:00"
+
+            for (int orderIdx = 1; orderIdx <= numberOrders; orderIdx++)
+            {
+                JObject orderJson = responseJson.Value<JObject>("order-" + orderIdx);
+                DateTime created = orderJson.Value<DateTime>("releasedat"); // TODO: Handle unreleased orders?
+                VircurexOrderId orderId = new VircurexOrderId(orderJson.Value<int>("orderid"));
+                VircurexMarketId marketId = new VircurexMarketId(orderJson.Value<string>("currency1"),
+                    orderJson.Value<string>("currency2"));
+                OrderType orderType
+                    = orderJson.Value<string>("ordertype").Equals(Enum.GetName(typeof(OrderType), OrderType.Buy).ToUpper())
+                    ? OrderType.Buy
+                    : OrderType.Sell;
+
+                orders.Add(new MyOrder(orderId, orderType, created,
+                    orderJson.Value<decimal>("unitprice"), orderJson.Value<decimal>("openquantity"),
+                    orderJson.Value<decimal>("quantity"), marketId));
+            }
+            
+
+            return orders;
         }
 
         public static Book ParseOrderBook(JObject bookJson)
