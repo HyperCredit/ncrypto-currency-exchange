@@ -28,6 +28,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public const string PARAMETER_NONCE = "nonce";
         public const string PARAMETER_CURRENCY = "currency";
         public const string PARAMETER_ORDER_TYPE = "order_type";
+        public const string PARAMETER_ROUND= "round";
         public const string PARAMETER_PRICE = "price";
         public const string PARAMETER_UNITS = "units";
 
@@ -84,14 +85,22 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         /// </summary>
         /// <param name="method">The method to call on the VoS API</param>
         /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <param name="round">Optionally, number of digits to round prices to.</param>
         /// <returns>The raw JSON returned from VoS</returns>
-        private async Task<T> CallPublic<T>(Method method, VoSMarketId marketId)
+        private async Task<T> CallPublic<T>(Method method, VoSMarketId marketId, int? round)
             where T : JToken
         {
             StringBuilder url = new StringBuilder(BuildPublicUrl(method));
 
             url.Append("?").Append(marketId.BaseCurrencyCodeParameter).Append("&")
                 .Append(marketId.QuoteCurrencyCodeParameter);
+            if (null != round)
+            {
+                url.Append("&").Append(PARAMETER_ROUND).Append("=")
+                    .Append(round.ToString());
+            }
+
+            Console.WriteLine(url.ToString());
 
             return await CallPublic<T>(url.ToString());
         }
@@ -370,7 +379,9 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
         public async Task<Book> GetMarketDepth(MarketId marketId)
         {
-            JObject response = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
+            JObject response = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId,
+                DEFAULT_PRECISION);
+
             return VoSParsers.ParseOrderBook(response);
         }
 
