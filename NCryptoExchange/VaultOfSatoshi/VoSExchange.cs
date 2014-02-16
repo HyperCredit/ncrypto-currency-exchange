@@ -104,6 +104,8 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         private async Task<T> CallPublic<T>(string url)
             where T : JToken
         {
+            JObject responseJson;
+
             try
             {
                 HttpResponseMessage response = await client.GetAsync(url);
@@ -114,19 +116,19 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                         using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
                         {
                             JsonSerializer serializer = new JsonSerializer();
-                            JObject responseJson = serializer.Deserialize<JObject>(jsonReader);
-
-                            AssertResponseIsSuccess(responseJson);
-
-                            return responseJson.Value<T>("data");
+                            responseJson = serializer.Deserialize<JObject>(jsonReader);
                         }
                     }
                 }
+
+                AssertResponseIsSuccess(responseJson);
             }
             catch (ArgumentException e)
             {
                 throw new VoSResponseException("Could not parse response from VoS.", e);
             }
+
+            return responseJson.Value<T>("data");
         }
 
         /// <summary>
@@ -240,10 +242,10 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
 
             try
             {
-                JObject responseJson;
-                HttpResponseMessage response = await client.PostAsync(url, request);
+                JObject resultJson;
+                HttpResponseMessage result = await client.PostAsync(url, request);
 
-                using (Stream jsonStream = await response.Content.ReadAsStreamAsync())
+                using (Stream jsonStream = await result.Content.ReadAsStreamAsync())
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
@@ -251,14 +253,14 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                         {
                             JsonSerializer serializer = new JsonSerializer();
 
-                            responseJson = serializer.Deserialize<JObject>(jsonReader);
+                            resultJson = serializer.Deserialize<JObject>(jsonReader);
                         }
                     }
                 }
 
-                AssertResponseIsSuccess(responseJson);
+                AssertResponseIsSuccess(resultJson);
 
-                return responseJson.Value<T>("data");
+                return resultJson.Value<T>("data");
             }
             catch (ArgumentException e)
             {
@@ -369,7 +371,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         public async Task<Book> GetMarketDepth(MarketId marketId)
         {
             JObject response = await this.CallPublic<JObject>(Method.orderbook, (VoSMarketId)marketId);
-            return VoSParsers.ParseOrderBook(response.Value<JObject>("data"));
+            return VoSParsers.ParseOrderBook(response);
         }
 
         public async Task CancelOrder(OrderId orderId)
