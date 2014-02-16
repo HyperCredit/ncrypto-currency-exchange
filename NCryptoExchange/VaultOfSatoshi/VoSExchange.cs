@@ -100,8 +100,6 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
                     .Append(round.ToString());
             }
 
-            Console.WriteLine(url.ToString());
-
             return await CallPublic<T>(url.ToString());
         }
 
