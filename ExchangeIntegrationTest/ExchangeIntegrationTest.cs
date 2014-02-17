@@ -5,6 +5,7 @@ using Lostics.NCryptoExchange.Vircurex;
 using Lostics.NCryptoExchange.Cryptsy;
 using System.IO;
 using System.Collections.Generic;
+using Lostics.NCryptoExchange.Bter;
 
 namespace ExchangeIntegrationTest
 {
@@ -12,12 +13,28 @@ namespace ExchangeIntegrationTest
     {
         public static void Main(string[] argv)
         {
-            TestCryptsy();
+            TestBter();
+            // TestCryptsy();
             // TestVircurex();
 
             Console.WriteLine("Press any key to quit.");
 
             Console.ReadKey();
+        }
+
+        private static void TestBter()
+        {
+            using (BterExchange bter = new BterExchange())
+            {
+                bter.PublicKey = "xxxxxx";
+                bter.PrivateKey = "topsecret";
+
+                foreach (Wallet wallet in bter.GetAccountInfo().Result.Wallets)
+                {
+                    Console.WriteLine(wallet.CurrencyCode + ": "
+                        + wallet.Balance);
+                }
+            }
         }
 
         /// <summary>

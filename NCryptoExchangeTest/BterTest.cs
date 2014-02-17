@@ -21,16 +21,32 @@ namespace Lostics.NCryptoExchange
         }
 
         [TestMethod]
+        public void TestParseBterGetFunds()
+        {
+            JObject fundsJson = LoadTestData<JObject>("getfunds.json");
+            List<Wallet> wallets = BterParsers.ParseWallets(fundsJson);
+
+            Assert.AreEqual(5, wallets.Count);
+
+            Assert.AreEqual("CNY", wallets[0].CurrencyCode);
+            Assert.AreEqual(1122.16m, wallets[0].Balance);
+            Assert.AreEqual(0.0m, wallets[0].HeldBalance);
+            Assert.AreEqual("BTC", wallets[1].CurrencyCode);
+            Assert.AreEqual(0.83357671m, wallets[1].Balance);
+            Assert.AreEqual(0.0002m, wallets[1].HeldBalance);
+        }
+
+        [TestMethod]
         public void TestParseBterMarketPairs()
         {
             JArray pairsJson = LoadTestData<JArray>("pairs.json");
             List<BterMarketId> pairs = BterMarketId.ParsePairs(pairsJson);
 
             Assert.AreEqual(76, pairs.Count);
-            
-            Assert.AreEqual(pairs[0].ToString(), "btc_cny");
-            Assert.AreEqual(pairs[1].ToString(), "ltc_cny");
-            Assert.AreEqual(pairs[2].ToString(), "bqc_cny");
+
+            Assert.AreEqual("btc_cny", pairs[0].ToString());
+            Assert.AreEqual("ltc_cny", pairs[1].ToString());
+            Assert.AreEqual("bqc_cny", pairs[2].ToString());
         }
 
         [TestMethod]

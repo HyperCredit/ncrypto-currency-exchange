@@ -1,4 +1,5 @@
 ﻿using Lostics.NCryptoExchange.Model;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,8 @@ namespace Lostics.NCryptoExchange.Bter
         public const string BASE_PUBLIC_URL = "http://bter.com/api/1/";
         public const string BASE_PRIVATE_URL = "http://bter.com/api/1/private/";
 
-        public const string HEADER_SIGN = "Sign";
-        public const string HEADER_KEY = "Key";
+        public const string HEADER_SIGN = "SIGN";
+        public const string HEADER_KEY = "KEY";
 
         public const string PARAMETER_NONCE = "Nonce";
 
@@ -24,6 +25,18 @@ namespace Lostics.NCryptoExchange.Bter
 
         public BterExchange()
         {
+        }
+
+        private void AssertResponseStatusSuccess(JObject resultObj)
+        {
+            string status = resultObj.Value<string>("result");
+
+            if (status != "true")
+            {
+                throw new BterResponseException("Response from Bter was not a success status. Received: "
+                    + resultObj.ToString());
+            }
+
         }
 
         public static string BuildPublicUrl(Method method)
@@ -113,7 +126,7 @@ namespace Lostics.NCryptoExchange.Bter
         }
 
         /// <summary>
-        /// Make a call to a public (non-authenticated) API
+        /// Make a call to a private (authenticated) API
         /// </summary>
         /// <param name="method">The method to call on the Bter API</param>
         /// <returns>The raw JSON returned from Bter</returns>
@@ -124,15 +137,18 @@ namespace Lostics.NCryptoExchange.Bter
                 new KeyValuePair<string, string>(PARAMETER_NONCE, this.GetNextNonce())
             });
 
-            return (T)JToken.Parse(await CallPrivate(method, request));
+            this.SignRequest(request);
+
+            return await CallPrivate<T>(method, request);
         }
 
         /// <summary>
-        /// Make a call to a public (non-authenticated) API
+        /// Make a call to a private (authenticated) API
         /// </summary>
         /// <param name="method">The method to call on the Bter API</param>
+        /// <param name="request">The request (containing POST parameters) to send</param>
         /// <returns>The raw JSON returned from Bter</returns>
-        private async Task<string> CallPrivate(Method method, FormUrlEncodedContent request)
+        private async Task<T> CallPrivate<T>(Method method, FormUrlEncodedContent request)
         {
             string url = BuildPrivateUrl(method);
 
@@ -143,7 +159,20 @@ namespace Lostics.NCryptoExchange.Bter
                 {
                     using (StreamReader jsonStreamReader = new StreamReader(jsonStream))
                     {
-                        return await jsonStreamReader.ReadToEndAsync();
+                        using (JsonReader jsonReader = new JsonTextReader(jsonStreamReader))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+
+                            T result = serializer.Deserialize<T>(jsonReader);
+                            JObject resultObj = result as JObject;
+
+                            if (null != resultObj)
+                            {
+                                AssertResponseStatusSuccess(resultObj);
+                            }
+
+                            return result;
+                        }
                     }
                 }
             }
@@ -170,7 +199,11 @@ namespace Lostics.NCryptoExchange.Bter
 
         public override async Task<AccountInfo> GetAccountInfo()
         {
-            throw new NotImplementedException();
+            JObject fundsJson = await CallPrivate<JObject>(Method.getfunds);
+
+            List<Wallet> wallets = BterParsers.ParseWallets(fundsJson);
+
+            return new AccountInfo(wallets);
         }
 
         public override async Task<List<Market>> GetMarkets()
@@ -227,8 +260,13 @@ namespace Lostics.NCryptoExchange.Bter
 
         public enum Method
         {
+            cancelorder,
             depth,
+            getfunds,
+            getorder,
+            orderlist,
             pairs,
+            placeorder,
             tickers,
             ticker,
             trade

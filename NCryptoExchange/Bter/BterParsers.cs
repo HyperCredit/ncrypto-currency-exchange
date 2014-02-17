@@ -43,5 +43,33 @@ namespace Lostics.NCryptoExchange.Bter
             return new MarketOrder(orderType,
                 depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
         }
+
+        public static List<Wallet> ParseWallets(JObject fundsJson)
+        {
+            JObject availableFundsJson = fundsJson.Value<JObject>("available_funds");
+            JObject lockedFundsJson = fundsJson.Value<JObject>("locked_funds");
+            List<Wallet> wallets = new List<Wallet>();
+
+            foreach (JProperty fund in availableFundsJson.Properties())
+            {
+                decimal availableFunds = availableFundsJson.Value<decimal>(fund.Name);
+                JToken lockedFundJson;
+                decimal lockedFunds;
+
+                if (null != lockedFundsJson
+                    && lockedFundsJson.TryGetValue(fund.Name, out lockedFundJson))
+                {
+                    lockedFunds = decimal.Parse(lockedFundJson.ToString());
+                }
+                else
+                {
+                    lockedFunds = 0.0m;
+                }
+
+                wallets.Add(new Wallet(fund.Name, availableFunds + lockedFunds, lockedFunds));
+            }
+
+            return wallets;
+        }
     }
 }
