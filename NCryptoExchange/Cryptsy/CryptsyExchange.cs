@@ -19,7 +19,7 @@ namespace Lostics.NCryptoExchange.Cryptsy
     /// To use, requires a public and private key (these can be generated from the
     /// "Settings" page within Cryptsy, once logged in).
     /// </summary>
-    public class CryptsyExchange : AbstractSha512Exchange, IMarketTradesSource, ITrading
+    public class CryptsyExchange : AbstractSha512Exchange, IMarketTradesSource, IExchangeWithTrading
     {
         public const string HEADER_SIGN = "Sign";
         public const string HEADER_KEY = "Key";

@@ -14,7 +14,7 @@ namespace Lostics.NCryptoExchange.CoinsE
     /// 
     /// To use, requires a public and private key.
     /// </summary>
-    public class CoinsEExchange : AbstractSha512Exchange, ICoinDataSource<CoinsECurrency>, ITrading
+    public class CoinsEExchange : AbstractSha512Exchange, ICoinDataSource<CoinsECurrency>, IExchangeWithTrading
     {
         public const string DEFAULT_BASE_URL = "https://www.coins-e.com/api/v2/";
         public const string COINS_LIST = DEFAULT_BASE_URL + "coins/list/";
@@ -68,74 +68,6 @@ namespace Lostics.NCryptoExchange.CoinsE
             }
         }
 
-        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method)
-        {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
-            });
-
-            this.SignRequest(request);
-
-            return request;
-        }
-
-        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, CoinsEOrderFilter filter,
-            string cursor, int? limit)
-        {
-            List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>(
-                new[] {
-                    new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
-                    new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                    new KeyValuePair<string, string>(PARAM_FILTER, Enum.GetName(typeof(CoinsEOrderFilter), filter).ToLower())
-                }
-            );
-
-            if (null != cursor)
-            {
-                kvPairs.Add(new KeyValuePair<string, string>(PARAM_CURSOR, cursor));
-            }
-            if (null != limit)
-            {
-                kvPairs.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
-            }
-
-            FormUrlEncodedContent request = new FormUrlEncodedContent(kvPairs.ToArray());
-
-            this.SignRequest(request);
-
-            return request;
-        }
-
-        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, OrderType orderType, 
-            decimal quantity, decimal price)
-        {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType)),
-                new KeyValuePair<string, string>(PARAM_RATE, price.ToString()),
-                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString())
-            });
-
-            this.SignRequest(request);
-
-            return request;
-        }
-
-        public FormUrlEncodedContent BuildPrivateRequest(CoinsEMethod method, OrderId orderId)
-        {
-            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
-                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
-                new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
-            });
-
-            this.SignRequest(request);
-
-            return request;
-        }
-
         /// <summary>
         /// Make a call to a public (non-authenticated) API
         /// </summary>
@@ -173,7 +105,14 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, string url)
         {
-            return await CallPrivate(BuildPrivateRequest(method), url);
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce())
+            });
+
+            this.SignRequest(request);
+
+            return await CallPrivate(request, url);
         }
 
         /// <summary>
@@ -183,7 +122,15 @@ namespace Lostics.NCryptoExchange.CoinsE
         /// <returns>The raw JSON returned from Coins-E</returns>
         private async Task<JObject> CallPrivate(CoinsEMethod method, OrderId orderId, string url)
         {
-            return await CallPrivate(BuildPrivateRequest(method, orderId), url);
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_ID, orderId.ToString())
+            });
+
+            this.SignRequest(request);
+
+            return await CallPrivate(request, url);
         }
 
         /// <summary>
@@ -194,7 +141,28 @@ namespace Lostics.NCryptoExchange.CoinsE
         private async Task<JObject> CallPrivate(CoinsEMethod method, CoinsEOrderFilter filter,
             string cursor, int? limit, string url)
         {
-            return await CallPrivate(BuildPrivateRequest(method, filter, cursor, limit), url);
+            List<KeyValuePair<string, string>> kvPairs = new List<KeyValuePair<string, string>>(
+                new[] {
+                    new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                    new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                    new KeyValuePair<string, string>(PARAM_FILTER, Enum.GetName(typeof(CoinsEOrderFilter), filter).ToLower())
+                }
+            );
+
+            if (null != cursor)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>(PARAM_CURSOR, cursor));
+            }
+            if (null != limit)
+            {
+                kvPairs.Add(new KeyValuePair<string, string>(PARAM_LIMIT, limit.ToString()));
+            }
+
+            FormUrlEncodedContent request = new FormUrlEncodedContent(kvPairs.ToArray());
+
+            this.SignRequest(request);
+
+            return await CallPrivate(request, url);
         }
 
         /// <summary>
@@ -205,7 +173,17 @@ namespace Lostics.NCryptoExchange.CoinsE
         private async Task<JObject> CallPrivate(CoinsEMethod method, OrderType orderType, decimal quantity, decimal price,
             string url)
         {
-            return await CallPrivate(BuildPrivateRequest(method, orderType, quantity, price), url);
+            FormUrlEncodedContent request = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>(PARAM_METHOD, Enum.GetName(method.GetType(), method)),
+                new KeyValuePair<string, string>(PARAM_NONCE, GetNextNonce()),
+                new KeyValuePair<string, string>(PARAM_ORDER_TYPE, Enum.GetName(typeof(OrderType), orderType)),
+                new KeyValuePair<string, string>(PARAM_RATE, price.ToString()),
+                new KeyValuePair<string, string>(PARAM_QUANTITY, quantity.ToString())
+            });
+
+            this.SignRequest(request);
+
+            return await CallPrivate(request, url);
         }
 
 

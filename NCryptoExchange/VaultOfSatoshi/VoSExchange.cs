@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Lostics.NCryptoExchange.VaultOfSatoshi
 {
-    public class VoSExchange : IExchange, ICoinDataSource<VoSCurrency>, ITrading
+    public class VoSExchange : IExchange, ICoinDataSource<VoSCurrency>, IExchangeWithTrading
     {
         public const string HEADER_SIGN = "Api-Sign";
         public const string HEADER_KEY = "Api-Key";
