@@ -67,6 +67,8 @@
     <Compile Include="CoinEx\CoinExMarketOrder.cs" />
     <Compile Include="CoinsE\CoinsEMarketDepth.cs" />
     <Compile Include="CoinsE\CoinsEAccountInfo.cs" />
+    <Compile Include="Kraken\KrakenFailureException.cs" />
+    <Compile Include="Kraken\KrakenExchange.cs" />
     <Compile Include="Cryptsy\CryptsyMarketDepth.cs" />
     <Compile Include="ICoinDataSource.cs" />
     <Compile Include="IExchange.cs" />
@@ -105,6 +107,14 @@
     <Compile Include="ExchangeException.cs" />
     <Compile Include="IExchangeWithTrading.cs" />
     <Compile Include="IMarketTradesSource.cs" />
+    <Compile Include="Kraken\KrakenCurrency.cs" />
+    <Compile Include="Kraken\KrakenException.cs" />
+    <Compile Include="Kraken\KrakenMarket.cs" />
+    <Compile Include="Kraken\KrakenMarketId.cs" />
+    <Compile Include="Kraken\KrakenOrderId.cs" />
+    <Compile Include="Kraken\KrakenParsers.cs" />
+    <Compile Include="Kraken\KrakenResponseException.cs" />
+    <Compile Include="Kraken\KrakenTradeId.cs" />
     <Compile Include="Model\AbstractIntBasedId.cs" />
     <Compile Include="Model\AbstractLongBasedId.cs" />
     <Compile Include="Model\AbstractStringBasedId.cs" />

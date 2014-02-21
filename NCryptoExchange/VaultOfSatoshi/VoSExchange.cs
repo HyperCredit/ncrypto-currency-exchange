@@ -387,7 +387,7 @@ namespace Lostics.NCryptoExchange.VaultOfSatoshi
         {
             JObject response = await CallPrivate<JObject>(Method.cancel, (VoSOrderId)orderId);
 
-            // TODO: Check the respnse.
+            // TODO: Check the response.
 
             return;
         }
