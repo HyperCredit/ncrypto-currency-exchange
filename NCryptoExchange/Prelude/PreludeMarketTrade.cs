@@ -10,43 +10,25 @@ namespace Lostics.NCryptoExchange.Prelude
 {
     public class PreludeMarketTrade : MarketTrade
     {
-        public PreludeMarketTrade(TradeId tradeId, OrderType tradeType,
+        public PreludeMarketTrade(TradeId tradeId, 
             DateTime dateTime, decimal price,
             decimal quantity, MarketId marketId)
             : base(tradeId, dateTime, price, quantity, marketId)
         {
-            this.TradeType = tradeType;
         }
 
         public static List<MarketTrade> Parse(MarketId marketId, JObject tradesJson)
         {
-            return tradesJson.Value<JArray>("data").Select(
+            return tradesJson.Value<JArray>("orders").Select(
                 trade => (MarketTrade)ParseSingle(marketId, (JObject)trade)
             ).ToList();
         }
 
         internal static PreludeMarketTrade ParseSingle(MarketId marketId, JObject trade)
         {
-            OrderType orderType;
-
-            switch (trade.Value<string>("type"))
-            {
-                case "buy":
-                    orderType = OrderType.Buy;
-                    break;
-                case "sell":
-                    orderType = OrderType.Sell;
-                    break;
-                default:
-                    throw new PreludeResponseException("Found unknown trade type \""
-                        + trade.Value<string>("type") + "\", expected \"buy\" or \"sell\".");
-            }
-
-            return new PreludeMarketTrade(new PreludeTradeId(trade.Value<int>("tid")), orderType,
-                PreludeParsers.ParseDateTime(trade.Value<int>("date")), trade.Value<decimal>("price"),
+            return new PreludeMarketTrade(new PreludeFakeTradeId(),
+                PreludeParsers.ParseDateTime(trade.Value<int>("timestamp")), trade.Value<decimal>("rate"),
                 trade.Value<decimal>("amount"), marketId);
         }
-
-        public OrderType TradeType { get; private set; }
     }
 }

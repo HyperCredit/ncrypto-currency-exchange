@@ -139,6 +139,7 @@
     <Compile Include="Prelude\PreludeQuoteCurrency.cs" />
     <Compile Include="Prelude\PreludeResponseException.cs" />
     <Compile Include="Prelude\PreludeTradeId.cs" />
+    <Compile Include="Prelude\PreludeFakeTradeId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VaultOfSatoshi\VoSMyOrder.cs" />
     <Compile Include="VaultOfSatoshi\VoSAccountInfo.cs" />
