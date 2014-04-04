@@ -25,23 +25,23 @@ namespace Lostics.NCryptoExchange.Prelude
 
         public static Book ParseOrderBook(JObject bookJson)
         {
-            JArray asksArray = bookJson.Value<JArray>("asks");
-            JArray bidsArray = bookJson.Value<JArray>("bids");
+            JArray asksArray = bookJson.Value<JArray>("sell");
+            JArray bidsArray = bookJson.Value<JArray>("buy");
 
             List<MarketDepth> asks = asksArray.Select(
-                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Sell)
+                depth => (MarketDepth)ParseMarketDepth((JObject)depth, OrderType.Sell)
             ).ToList();
             List<MarketDepth> bids = bidsArray.Select(
-                depth => (MarketDepth)ParseMarketDepth((JArray)depth, OrderType.Buy)
+                depth => (MarketDepth)ParseMarketDepth((JObject)depth, OrderType.Buy)
             ).ToList();
 
             return new Book(asks, bids);
         }
 
-        internal static MarketOrder ParseMarketDepth(JArray depthArray, OrderType orderType)
+        internal static MarketOrder ParseMarketDepth(JObject depth, OrderType orderType)
         {
             return new MarketOrder(orderType,
-                depthArray.Value<decimal>(0), depthArray.Value<decimal>(1));
+                depth.Value<decimal>("rate"), depth.Value<decimal>("remaining"));
         }
     }
 }

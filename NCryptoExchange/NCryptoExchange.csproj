@@ -129,6 +129,16 @@
     <Compile Include="Model\TransactionType.cs" />
     <Compile Include="Model\Wallet.cs" />
     <Compile Include="NamespaceDoc.cs" />
+    <Compile Include="Prelude\PreludeException.cs" />
+    <Compile Include="Prelude\PreludeExchange.cs" />
+    <Compile Include="Prelude\PreludeMarket.cs" />
+    <Compile Include="Prelude\PreludeMarketId.cs" />
+    <Compile Include="Prelude\PreludeMarketTrade.cs" />
+    <Compile Include="Prelude\PreludeOrderId.cs" />
+    <Compile Include="Prelude\PreludeParsers.cs" />
+    <Compile Include="Prelude\PreludeQuoteCurrency.cs" />
+    <Compile Include="Prelude\PreludeResponseException.cs" />
+    <Compile Include="Prelude\PreludeTradeId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VaultOfSatoshi\VoSMyOrder.cs" />
     <Compile Include="VaultOfSatoshi\VoSAccountInfo.cs" />
@@ -155,6 +165,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

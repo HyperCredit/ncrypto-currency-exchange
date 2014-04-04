@@ -7,55 +7,19 @@ namespace Lostics.NCryptoExchange.Prelude
 {
     public sealed class PreludeMarketId : AbstractStringBasedId, MarketId
     {
-        public PreludeMarketId(string id) : base(id)
+        public PreludeMarketId(string baseCode, PreludeQuoteCurrency quoteCode)
+            : base(baseCode + "_" + quoteCode)
         {
-            string[] parts = id.Split(new [] { '_' });
-
-            if (parts.Length != 2)
-            {
-                throw new ArgumentException("Invalid market ID; expected two currency codes separated by the '_' character, but found \""
-                    + id + "\".");
-            }
-
-            this.BaseCurrencyCode = parts[0].ToUpper();
-            this.QuoteCurrencyCode = parts[1].ToUpper();
-        }
-
-        public static List<PreludeMarketId> ParsePairs(JArray pairsJson)
-        {
-            List<PreludeMarketId> pairs = new List<PreludeMarketId>();
-
-            foreach (JToken pairJson in pairsJson)
-            {
-                if (!(pairJson is JValue))
-                {
-                    continue;
-                }
-
-                pairs.Add(new PreludeMarketId(pairJson.ToString()));
-            }
-
-            return pairs;
+            this.BaseCurrencyCode = baseCode;
+            this.QuoteCurrencyCode = quoteCode;
         }
 
         public string BaseCurrencyCode { get; private set; }
-        public string QuoteCurrencyCode { get; private set; }
+        public PreludeQuoteCurrency QuoteCurrencyCode { get; private set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public string BaseCurrencyMethodPostfix
+        public static List<MarketId> ParsePairs(JObject json, PreludeQuoteCurrency quoteCurrency)
         {
-            get
-            {
-                switch (this.BaseCurrencyCode)
-                {
-                    case "BTC":
-                        return "";
-                    default:
-                        return "-" + BaseCurrencyCode;
-                }
-            }
+            return new List<MarketId>();
         }
     }
 }

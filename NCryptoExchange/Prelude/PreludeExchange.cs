@@ -38,23 +38,45 @@ namespace Lostics.NCryptoExchange.Prelude
 
         }
 
-        public static string BuildPublicUrl(Method method, PreludeMarketId marketId)
+        public static string BuildPublicUrl(Method method, PreludeQuoteCurrency quoteCurrency)
         {
-            return BASE_URL + Enum.GetName(typeof(Method), method)
-                + Uri.EscapeUriString(marketId.BaseCurrencyMethodPostfix) + "/"
-                + Uri.EscapeUriString(marketId.QuoteCurrencyCode);
+            switch (method)
+            {
+                case Method.pairings:
+                    return BASE_URL + Enum.GetName(typeof(Method), method) + "/"
+                        + Uri.EscapeUriString(Enum.GetName(typeof(PreludeQuoteCurrency), quoteCurrency).ToLower());
+                    break;
+                default:
+                return BASE_URL + Enum.GetName(typeof(Method), method)
+                    + Uri.EscapeUriString(GetQuoteCurrencyMethodPostfix(quoteCurrency)) + "/";
+            }
         }
 
         /// <summary>
         /// Make a call to a public (non-authenticated) API
         /// </summary>
         /// <param name="method">The method to call on the Prelude API</param>
-        /// <param name="quoteCurrencyCode">A quote currency code to append to the URL</param>
+        /// <param name="quoteCurrency">A quote currency code to append to the method URL</param>
+        /// <returns>The raw JSON returned from Prelude</returns>
+        private async Task<T> CallPublic<T>(Method method, PreludeQuoteCurrency quoteCurrencyCode)
+            where T : JToken
+        {
+            string url = BuildPublicUrl(method, quoteCurrencyCode);
+
+            return (T)JToken.Parse(await CallPublic(url));
+        }
+
+        /// <summary>
+        /// Make a call to a public (non-authenticated) API
+        /// </summary>
+        /// <param name="method">The method to call on the Prelude API</param>
+        /// <param name="marketId">A market ID to append to the method URL</param>
         /// <returns>The raw JSON returned from Prelude</returns>
         private async Task<T> CallPublic<T>(Method method, PreludeMarketId marketId)
             where T : JToken
         {
-            string url = BuildPublicUrl(method, marketId);
+            string url = BuildPublicUrl(method, marketId.QuoteCurrencyCode)
+                + Uri.EscapeUriString(marketId.BaseCurrencyCode.ToLower());
 
             return (T)JToken.Parse(await CallPublic(url));
         }
@@ -110,15 +132,10 @@ namespace Lostics.NCryptoExchange.Prelude
 
         public async Task<List<MarketTrade>> GetMarketTrades(MarketId marketId)
         {
-            PreludeMarketId bterMarketId = (PreludeMarketId)marketId;
+            PreludeMarketId preludeMarketId = (PreludeMarketId)marketId;
 
             return PreludeMarketTrade.Parse(marketId,
-                await CallPublic<JObject>(Method.last, bterMarketId));
-        }
-
-        public async Task<List<PreludeMarketId>> GetPairs()
-        {
-            throw new NotImplementedException();
+                await CallPublic<JObject>(Method.last, preludeMarketId));
         }
 
         public override async Task<List<Model.MyOrder>> GetMyActiveOrders(MarketId marketId, int? limit)
@@ -128,14 +145,46 @@ namespace Lostics.NCryptoExchange.Prelude
 
         public override async Task<Model.Book> GetMarketDepth(MarketId marketId)
         {
-            PreludeMarketId bterMarketId = (PreludeMarketId)marketId;
+            PreludeMarketId preludeMarketId = (PreludeMarketId)marketId;
 
-            return PreludeParsers.ParseOrderBook(await CallPublic<JObject>(Method.combined, bterMarketId));
+            return PreludeParsers.ParseOrderBook(await CallPublic<JObject>(Method.combined, preludeMarketId));
         }
 
         public override string GetNextNonce()
         {
             return DateTime.Now.Ticks.ToString();
+        }
+
+        public async Task<List<PreludeMarketId>> GetPairs()
+        {
+            List<PreludeMarketId> pairs = new List<PreludeMarketId>();
+
+            foreach (PreludeQuoteCurrency quoteCurrency in Enum.GetValues(typeof(PreludeQuoteCurrency)))
+            {
+                JObject response = await CallPublic<JObject>(Method.pairings, quoteCurrency);
+                foreach (PreludeMarketId marketId in PreludeMarketId.ParsePairs(response, quoteCurrency
+                )) {
+                    pairs.Add(marketId);
+                }
+            }
+
+            return pairs;
+        }
+
+        /// <summary>
+        /// Return the (unescaped) path element to be inserted between the method,
+        /// and quote currency, in the URL. This is required because Prelude has
+        /// inconsistent URL naming depending on base currency.
+        /// </summary>
+        static string GetQuoteCurrencyMethodPostfix(PreludeQuoteCurrency quoteCurrency)
+        {
+            switch (quoteCurrency)
+            {
+                case PreludeQuoteCurrency.BTC:
+                    return "";
+                default:
+                    return "-" + Enum.GetName(typeof(PreludeQuoteCurrency), quoteCurrency).ToLower();
+            }
         }
 
         public override string SignHeader
@@ -155,6 +204,7 @@ namespace Lostics.NCryptoExchange.Prelude
         {
             combined,
             last,
+            pairings,
             statistics,
         }
     }

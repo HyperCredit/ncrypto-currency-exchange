@@ -1,0 +1,10 @@
+{
+    "status": "success",
+    "currency": "DOGE",
+    "statistics": {
+        "high": "0.00000109",
+        "low": "0.00000035",
+        "volume_btc": "24.22620162",
+        "volume": "23,014,259.11956150"
+    }
+}

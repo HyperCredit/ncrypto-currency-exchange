@@ -1,0 +1,111 @@
+{
+    "status": "success",
+    "from": "BTC",
+    "pairings": [
+        {
+            "pair": "AUR",
+            "last_trade": {
+                "amount": "0.04477999",
+                "rate": "0.00499244"
+            }
+        },
+        {
+            "pair": "DRK",
+            "last_trade": {
+                "amount": "1.33566427",
+                "rate": "0.00120000"
+            }
+        },
+        {
+            "pair": "DGB",
+            "last_trade": {
+                "amount": "200.00000000",
+                "rate": "0.00000031"
+            }
+        },
+        {
+            "pair": "DGC",
+            "last_trade": {
+                "amount": "50.00000000",
+                "rate": "0.00004500"
+            }
+        },
+        {
+            "pair": "DOGE",
+            "last_trade": {
+                "amount": "42326.92307692",
+                "rate": "0.00000104"
+            }
+        },
+        {
+            "pair": "EMC2",
+            "last_trade": {
+                "amount": "579.76231884",
+                "rate": "0.00000345"
+            }
+        },
+        {
+            "pair": "MEOW",
+            "last_trade": {
+                "amount": "300.75541592",
+                "rate": "0.00000007"
+            }
+        },
+        {
+            "pair": "LTC",
+            "last_trade": {
+                "amount": "0.25885027",
+                "rate": "0.02444444"
+            }
+        },
+        {
+            "pair": "MAX",
+            "last_trade": {
+                "amount": "0.10000000",
+                "rate": "0.00055000"
+            }
+        },
+        {
+            "pair": "MINT",
+            "last_trade": {
+                "amount": "22623.36817333",
+                "rate": "0.00000015"
+            }
+        },
+        {
+            "pair": "888",
+            "last_trade": {
+                "amount": "5676.32666667",
+                "rate": "0.00000600"
+            }
+        },
+        {
+            "pair": "PPC",
+            "last_trade": {
+                "amount": "2.35664900",
+                "rate": "0.00465365"
+            }
+        },
+        {
+            "pair": "BC",
+            "last_trade": {
+                "amount": "1000.00000000",
+                "rate": "0.00009000"
+            }
+        },
+        {
+            "pair": "VTC",
+            "last_trade": {
+                "amount": "16.00000000",
+                "rate": "0.00220000"
+            }
+        },
+        {
+            "pair": "QRK",
+            "last_trade": {
+                "amount": "304.33865000",
+                "rate": "0.00004211"
+            }
+        }
+    ]
+}
