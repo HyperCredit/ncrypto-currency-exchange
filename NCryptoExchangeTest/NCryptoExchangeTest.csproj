@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="BterTest.cs" />
     <Compile Include="VaultOfSatoshiTest.cs" />
-    <Compile Include="CoinExTest.cs" />
     <Compile Include="TestUtils.cs" />
     <Compile Include="VircurexTest.cs" />
     <Compile Include="CoinsETest.cs" />
